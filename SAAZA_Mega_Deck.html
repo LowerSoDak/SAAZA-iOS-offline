@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Mega Deck</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f4f0;color:#1a1a1a;padding:1rem;min-height:100vh}
+a.back{display:inline-block;font-size:12px;color:#1D9E75;text-decoration:none;margin-bottom:12px}
+h1{font-size:20px;font-weight:600;margin-bottom:2px}
+.sub{font-size:13px;color:#666;margin-bottom:1.25rem}
+.tnav{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.tb{padding:5px 11px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:11px;color:#555}
+.tb.on{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:500}
+.prog{font-size:12px;color:#666;display:flex;justify-content:space-between;margin-bottom:10px}
+.bar{height:4px;background:#e0e0e0;border-radius:2px;margin-bottom:10px;overflow:hidden}
+.fill{height:100%;background:#1D9E75;border-radius:2px;transition:width .3s}
+.card{border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem;min-height:180px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;background:#fff;margin-bottom:10px}
+.card.ans{border-color:#1D9E75}
+.clabel{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.clabel.g{color:#1D9E75}
+.unit-tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:8px;margin-bottom:8px;background:#E1F5EE;color:#0F6E56}
+.ctext{font-size:14px;color:#1a1a1a;line-height:1.6;white-space:pre-line}
+.hint{font-size:12px;color:#aaa;margin-top:10px;text-align:center}
+.brow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.fb{padding:8px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;color:#555}
+.fb.ok{background:#EAF3DE;color:#27500A;border-color:#639922}
+.fb.no{background:#FCEBEB;color:#791F1F;border-color:#E24B4A}
+.nav{display:flex;gap:8px;margin-bottom:1rem}
+.done{background:#f7f7f5;border-radius:12px;padding:1rem;text-align:center;display:none;margin-top:1rem}
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:1.5rem;padding-bottom:1rem}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← Back to all tools</a>
+<h1>Mega Deck — All Units</h1>
+<p class="sub">All 279 cards across all 8 units — filter by unit or shuffle everything</p>
+<div class="tnav">
+<button class="tb on" onclick="setU('all',this)">All units</button>
+<button class="tb" onclick="setU('Unit 1 — Overview & Math',this)">Unit 1 — Overview & Math</button>
+<button class="tb" onclick="setU('Unit 2.1 — Drop Zone Criteria',this)">Unit 2.1 — Drop Zone Criteria</button>
+<button class="tb" onclick="setU('Unit 2.2 — Helicopter LZ Criteria',this)">Unit 2.2 — Helicopter LZ Criteria</button>
+<button class="tb" onclick="setU('Unit 2.3 — ALZ Fixed Wing Criteria',this)">Unit 2.3 — ALZ Fixed Wing Criteria</button>
+<button class="tb" onclick="setU('Unit 3 — Soils & Distresses',this)">Unit 3 — Soils & Distresses</button>
+<button class="tb" onclick="setU('Unit 3/5 — Survey Forms',this)">Unit 3/5 — Survey Forms</button>
+<button class="tb" onclick="setU('Unit 4 — SAAZA Process',this)">Unit 4 — SAAZA Process</button>
+<button class="tb" onclick="setU('Unit 5 — Completion',this)">Unit 5 — Completion</button>
+</div>
+<div class="bar"><div class="fill" id="fill" style="width:0%"></div></div>
+<div class="prog"><span id="pr">Card 1</span><span id="sc">✓ 0  ✗ 0</span></div>
+<div class="card" id="cf" onclick="flip()">
+<div class="clabel">Question — tap to reveal</div>
+<div class="unit-tag" id="utag"></div>
+<div class="ctext" id="cq"></div>
+<div class="hint">Tap card to see answer</div>
+</div>
+<div class="card ans" id="cb" onclick="flip()" style="display:none">
+<div class="clabel g">Answer — tap to go back</div>
+<div class="ctext" id="ca"></div>
+</div>
+<div class="brow" id="br" style="display:none">
+<button class="fb no" onclick="mark(0)">✗ Missed</button>
+<button class="fb" onclick="mark(2)">→ Skip</button>
+<button class="fb ok" onclick="mark(1)">✓ Got it</button>
+</div>
+<div class="nav">
+<button class="fb" style="flex:1" onclick="go(-1)">← Prev</button>
+<button class="fb" style="flex:1" onclick="shuf()">Shuffle ↺</button>
+<button class="fb" style="flex:1" onclick="go(1)">Next →</button>
+</div>
+<div class="done" id="dn">
+<div style="font-size:15px;font-weight:600;margin-bottom:6px">Deck complete!</div>
+<div style="font-size:13px;color:#666" id="fs"></div>
+<button class="fb" style="margin-top:10px" onclick="restart()">Restart ↺</button>
+</div>
+<div class="footer">SAAZA Mega Deck &mdash; 136CRF &mdash; 279 cards across all 8 units</div>
+
+<script>
+var ALL=[
+{u:'Unit 1 — Overview & Math',q:'Define: Survey',a:'To accurately determine area, contour, or boundaries by measuring lines and angles according to the principles of geometry and trigonometry. Raw, factual data regarding a location.'},
+{u:'Unit 1 — Overview & Math',q:'Define: Assessment',a:'To determine worth or condition in relation to published standards and criteria. For MMT purposes, a focus on flight safety. Supported by the accuracy of the survey.'},
+{u:'Unit 1 — Overview & Math',q:'Define: Hasty survey/assessment',a:'To provide maximum usable information within a compressed timeline.\nSurvey: prioritization of essential information\nAssessment: focus on minimum criteria'},
+{u:'Unit 1 — Overview & Math',q:'What is the key difference between a survey and an assessment?',a:'Survey = raw factual data (what is there)\nAssessment = judgment against published standards (is it usable for flight operations?)'},
+{u:'Unit 1 — Overview & Math',q:'What is an azimuth?',a:'Horizontal direction observed clockwise from a zero reference line running north-south. Measured in 1° increments from 001° to 360°.'},
+{u:'Unit 1 — Overview & Math',q:'What are the three types of North?',a:'True North — aligned to Polaris\nGrid North — aligned to the Central Meridian (MGRS)\nMagnetic North — aligned to Earth\'s magnetic pole (primary reference for SAAZA)'},
+{u:'Unit 1 — Overview & Math',q:'What is magnetic declination?',a:'The difference between the True Meridian and Magnetic Meridian. In eastern U.S. the compass points west of True North; in the west it points east.'},
+{u:'Unit 1 — Overview & Math',q:'What is Rise?',a:'The vertical distance (elevation change) between two points'},
+{u:'Unit 1 — Overview & Math',q:'What is Run?',a:'The horizontal distance between two points'},
+{u:'Unit 1 — Overview & Math',q:'What is decimal grade?',a:'Rise divided by Run'},
+{u:'Unit 1 — Overview & Math',q:'What is percent grade?',a:'Decimal grade multiplied by 100'},
+{u:'Unit 1 — Overview & Math',q:'What is a positive grade?',a:'An increase in elevation — marked with a + sign'},
+{u:'Unit 1 — Overview & Math',q:'What is a negative grade?',a:'A decrease in elevation — marked with a − sign'},
+{u:'Unit 1 — Overview & Math',q:'What is a glideslope ratio?',a:'The relationship of Run to Rise at a given distance. Divide the run by the rise.\nEx: Run 6000\' ÷ Rise 2000\' = 3:1 ratio'},
+{u:'Unit 1 — Overview & Math',q:'What publication is the basis for all airfield design criteria?',a:'UFC 3-260-1 — Airfield and Heliport Planning and Design\nChapter 7 specifically covers KC-130/C-17 semi-prepared landing zones'},
+{u:'Unit 1 — Overview & Math',q:'What is TM 3-34.48-2?',a:'Theater of Operations: Roads, Airfields, and Heliports — Airfield and Heliport Design\nUSAF source for airfield design criteria'},
+{u:'Unit 1 — Overview & Math',q:'What is DAFMAN 13-217?',a:'USAF guiding document for LZ and drop zone procedures (CCT TACSOP)\nPrescribes procedures, techniques, and requirements for operating AZs\nGoverns content, documentation, and approval process for USAF AZ surveys'},
+{u:'Unit 1 — Overview & Math',q:'What is ETL 09-6?',a:'Engineering Technical Letter 09-6\nSupersedes AFJPAM 32-8013 Vol 2 Ch 11\nDimensional criteria and guidance for planning, design, construction, and evaluation of AZs for C-17 and C-130 aircraft'},
+{u:'Unit 1 — Overview & Math',q:'What is the MMT TACSOP based on?',a:'Based on DAFMAN 13-217\nMMT guiding document for LZ and drop zone procedures\nGoverns content, documentation, and approval process for USMC AZ surveys'},
+{u:'Unit 1 — Overview & Math',q:'What is TSPWG 3-260-03.02-19?',a:'Tri-Service Pavements Working Group Manual — Airfield Pavement Evaluation Standards and Procedures\nSupersedes ETL 02-19\nProvides criteria for structural evaluation of airfields'},
+{u:'Unit 1 — Overview & Math',q:'Which publication governs USMC AZ survey approval?',a:'MMT TACSOP'},
+{u:'Unit 1 — Overview & Math',q:'Which publication governs USAF AZ survey approval?',a:'DAFMAN 13-217'},
+{u:'Unit 1 — Overview & Math',q:'What are the three main airfield categories?',a:'1. Initial airfields\n2. Temporary airfields\n3. Semi-permanent airfields'},
+{u:'Unit 1 — Overview & Math',q:'What types fall under Initial airfields?',a:'Drop zone\nExtraction zone\nExpedient airfield\nClose battle area airfield\nSupport area airfield'},
+{u:'Unit 1 — Overview & Math',q:'What is a Temporary airfield?',a:'Assault Landing Zone (ALZ)'},
+{u:'Unit 1 — Overview & Math',q:'What is a Semi-permanent airfield?',a:'Airport or Main Air Base'},
+{u:'Unit 1 — Overview & Math',q:'What are the three battle area positions for airfields?',a:'Close, Deep, and Rear'},
+{u:'Unit 1 — Overview & Math',q:'What are the three trig ratios and their formulas?',a:'Sin = Opp ÷ Hyp\nCos = Adj ÷ Hyp\nTan = Opp ÷ Adj'},
+{u:'Unit 1 — Overview & Math',q:'When do you multiply in a trig problem?',a:'When both known components are in the bottom row of the formula box — multiply Sin/Cos/Tan by the known side'},
+{u:'Unit 1 — Overview & Math',q:'When do you divide in a trig problem?',a:'When the known component is in the top row — divide it by the Sin/Cos/Tan value'},
+{u:'Unit 1 — Overview & Math',q:'When do you use the inverse trig function?',a:'When the angle is unknown — use arcSin, arcCos, or arcTan to convert a ratio back into degrees'},
+{u:'Unit 1 — Overview & Math',q:'How do you find the height of an obstruction using a clinometer and laser?',a:'Tan(θ) × distance = Opp (height from eye level)\nThen ADD observer height for true ground-to-top height'},
+{u:'Unit 1 — Overview & Math',q:'How do you find the TOTAL height of a tower when you measure both an angle of elevation to the top AND an angle of depression to the base?',a:'Tan(elevation angle) × distance = Opp1 (above eye)\nTan(depression angle) × distance = Opp2 (below eye)\nOpp1 + Opp2 = total tower height'},
+{u:'Unit 1 — Overview & Math',q:'Example: Pole is 30\' tall, you are 75\' away. What is the angle to the top?',a:'Tan(θ) = Opp ÷ Adj = 30 ÷ 75 = 0.4\nθ = arcTan(0.4) = 21.8°'},
+{u:'Unit 1 — Overview & Math',q:'Example: Angle to tower top is 3.65°, distance is 986\'. Find height.',a:'Tan(3.65°) × 986 = Opp\n0.063 × 986 = 62.9\' + observer height'},
+{u:'Unit 1 — Overview & Math',q:'Example: Angle to stadium top is 33°, straight-line distance is 154\'. Find height.',a:'Sin(33°) × 154 = Opp\n0.54 × 154 = 83.9\' + observer height\n(Uses Sin because straight-line distance = Hyp)'},
+{u:'Unit 1 — Overview & Math',q:'What surveying shape does all SAAZA trig rely on?',a:'The right triangle — every distance and angle measurement resolves to Opp, Adj, and Hyp'},
+{u:'Unit 1 — Overview & Math',q:'How do you calculate decimal grade?',a:'Rise ÷ Run = decimal grade\nEx: 2.5\' rise over 100\' run = .025 decimal grade'},
+{u:'Unit 1 — Overview & Math',q:'How do you calculate percent grade?',a:'Decimal grade × 100\nEx: .025 × 100 = 2.5% grade'},
+{u:'Unit 1 — Overview & Math',q:'Critical rule when recording gradient?',a:'You MUST carry over all + and − signs throughout every calculation'},
+{u:'Unit 1 — Overview & Math',q:'What are the two methods for recording gradients in the field?',a:'1. Line leveling — using a line level over 20\' increments\n2. Clinometer — reading the % grade scale while sighting between two surveyors'},
+{u:'Unit 1 — Overview & Math',q:'How is line leveling used to measure gradient?',a:'Stretch a line between two points, level it, measure the rise (vertical drop from line to ground)\nEx: -4.5" rise over 240" (20\') run = -1.875% grade'},
+{u:'Unit 1 — Overview & Math',q:'How do you calculate glideslope ratio?',a:'Run ÷ Rise = ratio\nEx: 6000\' run ÷ 2000\' rise = 3:1 glideslope ratio'},
+{u:'Unit 1 — Overview & Math',q:'What does a 3:1 glideslope ratio mean?',a:'For every 3 feet of horizontal distance (run), there is 1 foot of vertical rise'},
+{u:'Unit 1 — Overview & Math',q:'What radius should a SAAZA survey concern itself with?',a:'5 nautical mile (NM) radius — noting obstacles (towers, mountains) and airspace conflicts'},
+{u:'Unit 1 — Overview & Math',q:'What are the four distance measuring techniques?',a:'1. Odometer readings\n2. Pacing method\n3. Estimating distances\n4. Measuring tools (tapes, wheels, lasers)'},
+{u:'Unit 1 — Overview & Math',q:'What is the unit used for measuring visibility?',a:'Statute miles'},
+{u:'Unit 1 — Overview & Math',q:'What units are used for measuring distances in SAAZA?',a:'Feet, Meters, and Nautical Miles'},
+{u:'Unit 1 — Overview & Math',q:'How many feet in 1 statute mile?',a:'5,280 feet (= 1,609.8 m)'},
+{u:'Unit 1 — Overview & Math',q:'How many feet in 1 nautical mile?',a:'6,076 feet (= 1,852 m)'},
+{u:'Unit 1 — Overview & Math',q:'How many feet in 1 meter?',a:'3.28 feet'},
+{u:'Unit 1 — Overview & Math',q:'How many feet in one odometer click (1/10 mile)?',a:'528 feet'},
+{u:'Unit 1 — Overview & Math',q:'Convert 3895 meters to feet.',a:'3895 × 3.28 = 12,775.6 feet'},
+{u:'Unit 1 — Overview & Math',q:'What are the 4 phases of a SAAZA survey?',a:'1. Information Gathering\n2. Preparation\n3. Site Visit\n4. Final Product Development'},
+{u:'Unit 1 — Overview & Math',q:'What are the 8 pieces of SAAZA survey equipment?',a:'1. Laser Range Finder (LRF)\n2. Dynamic Cone Penetrometer (DCP)\n3. Clinometer\n4. Defense Advanced GPS Receiver (DAGR)\n5. Line Level\n6. Measuring Wheel\n7. Compass\n8. Digital Camera'},
+{u:'Unit 1 — Overview & Math',q:'What is the accuracy of the lensatic compass?',a:'+/- 2.25°'},
+{u:'Unit 1 — Overview & Math',q:'What is the accuracy of the clinometer?',a:'+/- 1°'},
+{u:'Unit 1 — Overview & Math',q:'How does the clinometer read direction?',a:'0–360° in 1° increments (bottom scale) and 5° increments (top scale). Requires both eyes — one sights the object, the other reads the scale.'},
+{u:'Unit 1 — Overview & Math',q:'What does the DAGR provide?',a:'Defense Advanced GPS Receiver — provides GPS-derived position, elevation (MSL), and coordinates in WGS-84'},
+{u:'Unit 1 — Overview & Math',q:'What is the Laser Range Finder (LRF) used for?',a:'Measuring straight-line distance to an obstruction or target — provides the Hyp for trig calculations'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'What are the three parts of a standard DZ anatomy?',a:'Leading Edge (LE)\nTrailing Edge (TE)\nPoint of Impact (PI) / Center\nAll oriented along the DZ Axis'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'How is a DZ survey described dimensionally?',a:'Three dimensional — length, width, and altitude'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'What does PI stand for and where is it normally located?',a:'Point of Impact — normally the center of the DZ\nFor circular DZs, the PI is normally the center for multiple run-in headings'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'What are circular DZs used for?',a:'When multiple run-in headings are required\nCenter and radius determined by mission requirements\nPI normally at center'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'What are the two types of DZs based on previous use?',a:'Previously surveyed DZ — PI already established\nMission specific DZ — PI determined by mission requirements'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'What are the minimum dimensions for a CDS Drop Zone?',a:'400 yds width × 400 yds length × 600 ft altitude'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'What are the minimum dimensions for a Personnel Drop Zone?',a:'600 yds width × 600 yds length × 1,000 ft altitude'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'What are the minimum dimensions for a Heavy Equipment Drop Zone?',a:'600 yds width × 1,000 yds length × 1,100 ft altitude'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'What is the minimum PI placement from the Leading Edge for CDS?',a:'250 yards from the Leading Edge'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'What is the minimum PI placement from the Leading Edge for Personnel?',a:'350 yards from the Leading Edge'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'What is the minimum PI placement from the Leading Edge for Heavy Equipment?',a:'550 yards from the Leading Edge'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'How are DZ adjustments applied?',a:'Adjustments are cumulative and made half to each side or end of the DZ, unless otherwise indicated'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'Personnel DZ — altitude adjustments?',a:'For each 100 ft above 1,000 ft → add 30 yds to length AND width'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'Personnel DZ — night adjustment?',a:'Sunset to sunrise → add 100 yds to length'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'Personnel DZ — formation/night adjustments?',a:'Day formations / night single → add 100 yds to width only\nNight formation → add 200 yds to width only'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'Personnel DZ — GPS adjustment?',a:'Add 400 yds to width (exclude formation and night drops)'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'Personnel DZ — multiple jumper adjustment?',a:'Add 75 yds to trailing edge for each jumper beyond the first'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'CDS DZ — altitude adjustment?',a:'For each 100 ft above 600 ft → add 40 yds'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'CDS DZ — night adjustment?',a:'Sunset to sunrise → 100 yds for single / 200 yds for formation'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'CDS DZ — day formation adjustment?',a:'Add 100 yds to length AND width'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'CDS DZ — GPS adjustment?',a:'Add 200 yds (exclude formation and night)'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'CDS DZ — length adjustment for containers?',a:'Length based on number of containers'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'Heavy Equipment DZ — altitude adjustment?',a:'For each 100 ft above 1,100 ft → add 30 yds to width AND length'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'Heavy Equipment DZ — night adjustment?',a:'Sunset to sunrise → add 100 yds to length'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'Heavy Equipment DZ — formation/night adjustment?',a:'Day formation / night single → add 100 yds to width\nNight formation → add 200 yds to width only'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'Heavy Equipment DZ — multiple platform adjustment?',a:'Add 400 yds to length for each platform beyond the first'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'Heavy Equipment DZ — GPS adjustment?',a:'Add 400 yds to width (exclude formation and night)'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'What does MANFAS stand for?',a:'M — Minimums\nA — Altitude\nN — Night\nF — Formations\nA — Additional\nS — Safety'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'What is the MANFAS method used for?',a:'A systematic method for calculating DZ dimensions — applied separately to Width and Length, working through each adjustment factor in order'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'MANFAS example: KC-130 dropping 12 jumpers in 3 passes of 4 from 1,500 ft at 1700L. What is the minimum DZ?',a:'Width: 600 (min) + 0 + 0 + 0 + 0 + 0 = 600 yds\nLength: 600 (min) + 0 + 0 + 0 + 0 + 225 (75 yds × 3 extra jumpers) = 825 yds\nMinimum: 750 × 975 yds\n(1500 ft = minimum altitude, 1700L = daylight, no formation add, 3 passes = 2 extra jumpers per pass)'},
+{u:'Unit 2.1 — Drop Zone Criteria',q:'MANFAS example: KC-130 dropping 3 HE platforms from 1,700 ft at 2330L. What is the minimum DZ?',a:'Width: 600 (min) + 180 (6×30 for alt) + 100 (night single) = 880 yds\nLength: 1000 (min) + 800 (2 extra platforms × 400) + 100 (sunset to sunrise) + 180 (6×30 for alt) = 2,080 yds\nMinimum: 880 × 2,080 yds'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'What are the two common types of HLZ?',a:'Hasty — located in forward battle areas, requires no construction\nPre-planned — construction limited to what is required for safety/efficiency in adverse weather'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'What is the survey principle for HLZ size?',a:'Always survey for the MAXIMUM size and/or number of helicopters the area will support'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'What obstacles are of concern in an HLZ survey?',a:'ALL obstacles within the immediate HLZ area'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'What should the HLZ survey recommend regarding axes?',a:'Give recommended approach AND departure axis\nList any quadrants that may restrict approach/departure'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'How is blade clearance spacing determined between multiple helicopters?',a:'Two-rotor blade lengths spacing required for blade clearance between aircraft\nSingle-rotor blade length clearance between each additional helicopter'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'Single LZ size for AH-1Z, AH-1W, or UH-1Y?',a:'Rotor length: 48\'\nSingle LZ: 100\'×100\' day AND night'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'Single LZ size for CH-53?',a:'Rotor length: 79\'\nSingle LZ: 100\'×120\' day AND night\nSection: 250\'×270\''},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'Single LZ size for MV-22?',a:'Rotor length: 85\'\nSingle LZ: 100\'×120\' day\nSection: 250\'×270\' day / 310\'×330\' night\nRVL: 200\'×200\' day / 600\'×600\' night'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'How is longitudinal gradient direction determined for an HLZ?',a:'From the end of the HLZ where the NOSE of the aircraft will point when landing, to the end where the TAIL will point'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'How is transverse gradient direction determined for an HLZ?',a:'From the pilot\'s right to left'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'What is the maximum safe landing slope for a helicopter?',a:'7 degrees — avoid slopes exceeding 7°\nAlways avoid landing aircraft downslope on sideslopes'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'What is the minimum glideslope for ALL helicopters?',a:'10:1 ratio (5.70°)\nThe landing point should be a distance 10 times as far from the highest obstacle'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'How do you calculate a glideslope ratio from an obstacle?',a:'Run ÷ Rise = ratio\nExample: 300\' run ÷ 30\' obstacle = 10:1 ratio'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'What does a 7.14:1 glideslope mean?',a:'For every 7.14 feet of horizontal distance there is 1 foot of rise\nIf obstacle is 35\' tall, landing point must be at least 250\' away (35 × 7.14)'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'What form is used for an HLZ survey?',a:'AF IMT 4303 — Helicopter Landing Zone Form'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'What goes in Block 6 of AF IMT 4303?',a:'Approach and Departure information — axes, ratios, and any restricted quadrants'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'What goes in Block 7 of AF IMT 4303?',a:'Coordinates — WGS-84 for GPS derived (almost always)\nLat/long to nearest 1/1000th minute'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'What goes in Block 8 of AF IMT 4303?',a:'8A/B: LZ Dimensions\n8C: Elevation in feet MSL\n8D: Maximum T/M/S of requesting agency\n8E: Obstructions to approach and departure\n8F: LZ slope from approach angle'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'What goes in Block 9 of AF IMT 4303?',a:'Describe items from Block 8E and other concerns — obstruction radials, heights, surface conditions'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'What must the HLZ diagram show?',a:'All obstructions with distances and heights, approach/departure axes, scale, north arrow, and magnetic variation'},
+{u:'Unit 2.2 — Helicopter LZ Criteria',q:'How are obstructions described on the 4303?',a:'By radial and height\nExample: "45\' palm trees from 310 radial to 035 radial"'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What are actual surfaces?',a:'Ground surfaces that an aircraft will operate on or near that will affect the aircraft\'s safety:\n1. Runway\n2. Overrun\n3. Zone A Vertical Obstruction Clearance\n4. Zone B Vertical Obstruction Clearance'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What is a runway?',a:'A rectangular area of an airfield prepared for the landing and takeoff of aircraft'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'C-130 semi-prepared runway dimensions?',a:'Length: 3,000 ft\nWidth: 60 ft'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'C-17 semi-prepared runway dimensions?',a:'Length: 3,500 ft\nWidth: 90 ft'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What is the transverse gradient requirement from centerline?',a:'-0.5% to -3% from centerline (slopes away from centerline for drainage)'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What is an overrun?',a:'An area the width of the runway plus prepared shoulders, extending 300 ft from each end of the runway into the clear zone'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What is the maximum longitudinal gradient for a runway?',a:'+/- 3% cumulative over the entire runway length'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What is the maximum longitudinal gradient change per 200 feet?',a:'+/- 1.5% change per 200 feet — no single 200\' segment can change more than 1.5%'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What is the maximum transverse gradient?',a:'+/- 0.5% to 3% — must slope away from centerline for drainage'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What is the overrun gradient limit?',a:'+/- 3% cumulative\n+/- 1.5% per 200\''},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'How many 20\' longitudinal gradient readings are taken for a C-130 ALZ?',a:'150 readings (3,000\' ÷ 20\' = 150)\nGrouped into 15 averages of 200\'\nThen 1 cumulative 3,000\' average'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'How many transverse gradient readings are taken for a C-130 ALZ?',a:'28 readings at 15\' intervals\n7 averages of 60\''},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What does Zone A protect against?',a:'Potentially hazardous obstacles to the outboard nacelle — measured from the edge of usable runway'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What does Zone B protect against?',a:'Area from Zone A to the wing tip — extends outward from the outside edge of Zone A'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'Where do Zones A and B run?',a:'Zones wrap around the entirety of the runway — both sides and both ends'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'When can the AF Form 3822 be used for Zone A and B evaluation?',a:'For new LZ construction — enter graded area data in B-Zone and shoulders in A-Zone blocks'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What are imaginary surfaces?',a:'Surfaces in space established around an LZ in relation to runways/helipads\nDesigned to protect airspace around the airfield\nThree types: Approach/Departure Clearance, Reportable Region, Controlling Region'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What is the Reportable Region (RR)?',a:'Any penetration of Glideslope Ratios within the Approach-Departure Clearance Surface\nInner edge originates at end of overrun, full width to outside corners of B Zones\nObstacles in RR do NOT drive the controlling obstacle or GSR to the runway'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What is the Controlling Region (CR)?',a:'Extends from runway threshold to end of approach-departure clearance surface (T/M/S specific)\nControlling GSR derived from the most restrictive obstacle (controlling obstacle) within the CR\nControlling GSR for at least one runway must meet minimum departure obstacle clearance'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What is the glideslope ratio for C-17?',a:'20:1 slope for C-17'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What is the glideslope ratio for C-130?',a:'35:1 slope for C-130'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What is the clear zone vertical obstruction clearance height?',a:'20 ft — obstacles in the clear zone must not exceed 20 ft'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What publication contains minimum runway dimensions table?',a:'DAFMAN 13-217, Table 4.1'},
+{u:'Unit 2.3 — ALZ Fixed Wing Criteria',q:'What publication contains LZ runway slopes and vertical obstruction clearances?',a:'DAFMAN 13-217, Table 4.2'},
+{u:'Unit 3 — Soils & Distresses',q:'What are the 3 phases of field soil identification?',a:'1. Visual Examination\n2. Sedimentation Test\n3. Plasticity Tests'},
+{u:'Unit 3 — Soils & Distresses',q:'What does the first letter of a USCS soil symbol represent?',a:'Size Group — dominant soil type by weight:\nG = Gravel\nS = Sand\nM = Silt\nC = Clay\n(Pt and O are characteristics, not size groups)'},
+{u:'Unit 3 — Soils & Distresses',q:'What does the second letter of a USCS symbol represent?',a:'Characteristic:\nW = Well-graded (size ratio)\nP = Poorly-graded (size ratio)\nH = High compressibility (plasticity — requires lab)\nL = Low compressibility (plasticity — requires lab)\nPt = Organic Peat (organics only)\nO = Organic Silts and Clays (organics only)'},
+{u:'Unit 3 — Soils & Distresses',q:'Key question when starting USCS classification?',a:'"What do I have the most of by weight?" — determines your first letter'},
+{u:'Unit 3 — Soils & Distresses',q:'At what sieve does gravel become sand?',a:'No. 4 sieve — passing No.4 and retained on No.200 = sand'},
+{u:'Unit 3 — Soils & Distresses',q:'What are fines?',a:'Material passing the No. 200 sieve — no minimum size'},
+{u:'Unit 3 — Soils & Distresses',q:'When do you need a sedimentation test?',a:'When borderline between sand and fines — determines more S or more M/C'},
+{u:'Unit 3 — Soils & Distresses',q:'Sedimentation test settlement times?',a:'2 sec = coarse/fine sand\n30 sec = sand/fines\n10 min = coarse/fine silt\n1 hour = silt/clay'},
+{u:'Unit 3 — Soils & Distresses',q:'When do you need a plasticity test?',a:'When sample is majority fines — determines Silt (M) vs Clay (C) and H or L'},
+{u:'Unit 3 — Soils & Distresses',q:'What are the 5 plasticity tests?',a:'1. Dry Strength\n2. Roll/Thread\n3. Ribbon\n4. Wet Shake\n5. Cast'},
+{u:'Unit 3 — Soils & Distresses',q:'Best USCS soil types for a landing surface?',a:'GW (excellent) and GP (good to excellent)'},
+{u:'Unit 3 — Soils & Distresses',q:'Which USCS type is always unsuitable?',a:'Pt — organic peat. Not suitable for base or subbase'},
+{u:'Unit 3 — Soils & Distresses',q:'What layer does MMT assess?',a:'Base layer only — EAF required for precision evaluation'},
+{u:'Unit 3 — Soils & Distresses',q:'What does "poorly graded" mean?',a:'Mostly same-size particles — poor interlocking, less stable'},
+{u:'Unit 3 — Soils & Distresses',q:'What system rates airfield distresses?',a:'SPACI — Semi-prepared Airfield Condition Index'},
+{u:'Unit 3 — Soils & Distresses',q:'Pothole GREEN threshold?',a:'< 4" deep AND/OR < 15" diameter'},
+{u:'Unit 3 — Soils & Distresses',q:'Pothole RED threshold?',a:'> 6" deep AND > 15" diameter'},
+{u:'Unit 3 — Soils & Distresses',q:'Rut GREEN threshold?',a:'Exist but < 4" deep'},
+{u:'Unit 3 — Soils & Distresses',q:'Rut RED threshold?',a:'> 6" deep'},
+{u:'Unit 3 — Soils & Distresses',q:'Loose aggregate coverage GREEN?',a:'Covers < 1/10 of section'},
+{u:'Unit 3 — Soils & Distresses',q:'Loose aggregate coverage RED?',a:'Covers > 1/2 of section'},
+{u:'Unit 3 — Soils & Distresses',q:'Loose aggregate SIZE GREEN?',a:'Max 3/4", recommended 1/2"'},
+{u:'Unit 3 — Soils & Distresses',q:'Loose aggregate SIZE RED?',a:'Max > 1"'},
+{u:'Unit 3 — Soils & Distresses',q:'Dust GREEN threshold?',a:'Does not obstruct visibility'},
+{u:'Unit 3 — Soils & Distresses',q:'Dust RED threshold?',a:'Thick, obstructs visibility'},
+{u:'Unit 3 — Soils & Distresses',q:'Rolling Resistant Material GREEN?',a:'Exist but < 1" deep'},
+{u:'Unit 3 — Soils & Distresses',q:'Rolling Resistant Material RED?',a:'> 3" deep'},
+{u:'Unit 3 — Soils & Distresses',q:'Jet Blast Erosion GREEN?',a:'Exist but < 1" deep'},
+{u:'Unit 3 — Soils & Distresses',q:'Stabilized Layer Failure GREEN?',a:'Exist but < 1" deep'},
+{u:'Unit 3 — Soils & Distresses',q:'Stabilized Layer Failure RED?',a:'> 2" deep'},
+{u:'Unit 3 — Soils & Distresses',q:'What does CBR stand for and measure?',a:'California Bearing Ratio — soil weight-bearing capacity based on shearing resistance'},
+{u:'Unit 3 — Soils & Distresses',q:'What is one CBR cycle?',a:'One landing + one takeoff = one pass'},
+{u:'Unit 3 — Soils & Distresses',q:'What tool measures CBR in the field?',a:'Dynamic Cone Penetrometer (DCP)'},
+{u:'Unit 3 — Soils & Distresses',q:'How deep do you test with the DCP?',a:'36 inches'},
+{u:'Unit 3 — Soils & Distresses',q:'What is a DCP denial and what do you do?',a:'10 blows, no movement → relocate 12" and repeat. 3 denials = CBR 80'},
+{u:'Unit 3 — Soils & Distresses',q:'DCP handle > 5" from plumb — what do you do?',a:'Stop, relocate 6", repeat'},
+{u:'Unit 3 — Soils & Distresses',q:'How many people operate the DCP?',a:'2 personnel'},
+{u:'Unit 3 — Soils & Distresses',q:'Time estimate per DCP location?',a:'~7 minutes including movement'},
+{u:'Unit 3 — Soils & Distresses',q:'How many test locations for a standard 3,000\' KC-130 runway?',a:'37 locations'},
+{u:'Unit 3 — Soils & Distresses',q:'5 steps to complete a DCP data sheet?',a:'1. Record blows & depth\n2. Calc depth per blow set\n3. Divide by blows\n4. Look up CBR in Table 3 (ETL 09-6)\n5. ID layers, average CBR per layer'},
+{u:'Unit 3 — Soils & Distresses',q:'How do you identify layer transitions in DCP data?',a:'Significant change in CBR values = new layer'},
+{u:'Unit 3 — Soils & Distresses',q:'Which layer controls allowable passes?',a:'The weakest layer — always the controlling layer'},
+{u:'Unit 3 — Soils & Distresses',q:'Priority DCP locations when time is limited?',a:'Touchdown, braking, turnaround, point of rotation, weak/wet/repaired areas'},
+{u:'Unit 3 — Soils & Distresses',q:'Four soil layers surface to bottom?',a:'Surface → Base → Sub-base → Sub-grade'},
+{u:'Unit 3 — Soils & Distresses',q:'When do you use inverse trig?',a:'When you know two sides and need the angle θ\narcTan, arcSin, or arcCos'},
+{u:'Unit 3 — Soils & Distresses',q:'Formula to find obstruction height?',a:'Tan(θ) × Adj = Opp\nAdd observer height for true ground-to-top'},
+{u:'Unit 3 — Soils & Distresses',q:'How to find straight-line distance (Hyp)?',a:'Know Opp → Hyp = Opp ÷ Sin(θ)\nKnow Adj → Hyp = Adj ÷ Cos(θ)'},
+{u:'Unit 3 — Soils & Distresses',q:'When do you multiply vs divide?',a:'Multiply → solving for top row (Opp or Adj)\nDivide → solving for bottom row (Hyp)'},
+{u:'Unit 3 — Soils & Distresses',q:'Which function uses Opp and Adj?',a:'Tan = Opp ÷ Adj'},
+{u:'Unit 3 — Soils & Distresses',q:'Which function uses Opp and Hyp?',a:'Sin = Opp ÷ Hyp'},
+{u:'Unit 3 — Soils & Distresses',q:'Which function uses Adj and Hyp?',a:'Cos = Adj ÷ Hyp'},
+{u:'Unit 3/5 — Survey Forms',q:'What form is used for a fixed-wing LZ survey?',a:'AF IMT 3822 — Landing Zone Survey Form'},
+{u:'Unit 3/5 — Survey Forms',q:'What form is used for a helicopter LZ survey?',a:'AF IMT 4303 — Helicopter Landing Zone Form'},
+{u:'Unit 3/5 — Survey Forms',q:'Unit of measure on AF IMT 3822?',a:'Feet — always actual ground data, not minimums'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 1A of AF IMT 3822?',a:'LZ Name — bird name or location'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 1B of AF IMT 3822?',a:'HQ AMC/A3DT will update after submission if approved — leave blank'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in blocks 2A/2B of AF IMT 3822?',a:'2A: Country where LZ is located\n2B: State, province, or territory'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 4A of AF IMT 3822?',a:'Date of physical survey, Team Leader name, grade, phone number, and unit'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 4B of AF IMT 3822?',a:'Date reviewed, reviewer name, grade, phone number, unit and location, with signature\n(User, Safety Officer, Squadron/ACE/MAGTF Commander)'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 4C of AF IMT 3822?',a:'Date approved/disapproved, name, grade, phone number, unit and location, with signature\n(Squadron/ACE/MAGTF Commander)'},
+{u:'Unit 3/5 — Survey Forms',q:'Who is the LZ Controlling Agency on AF IMT 3822?',a:'YOU — the unit conducting the survey, if surveying for operations you will support'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in blocks 9A/B of AF IMT 3822?',a:'WGS-84 coordinates for GPS derived (almost always)'},
+{u:'Unit 3/5 — Survey Forms',q:'What precision are lat/longs recorded to on AF IMT 3822?',a:'Nearest 1/1000th of a minute'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in blocks 9C-E of AF IMT 3822?',a:'Grid Zone, easting and northing obtained from map (different than MGRS)'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 10A of AF IMT 3822?',a:'Type of surface — use letter identifier'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 10B of AF IMT 3822?',a:'Thickness and CBR strength of each soil layer from the controlling point'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 11A of AF IMT 3822?',a:'Glideslope ratio used to determine obstacle clearance for BOTH arrival AND departure zones'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 11B of AF IMT 3822?',a:'Percentage of slope for longitudinal gradient — use "+" for upslope and "−" for downslope'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in blocks 12A-H of AF IMT 3822?',a:'Percent slope for each gradient section — use "+" for upslope and "−" for downslope'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 12I of AF IMT 3822?',a:'List any obstacle penetrations'},
+{u:'Unit 3/5 — Survey Forms',q:'What GPS coordinate system is used on AF IMT 3822?',a:'WGS-84 — used for virtually all GPS-derived coordinates'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 6 of AF IMT 4303?',a:'Approach and departure axis information — ratios and any restricted/obstructed quadrants'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 7 of AF IMT 4303?',a:'Coordinates — WGS-84, primary run-in heading, lat/long to nearest 1/1000th minute'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 8A/B of AF IMT 4303?',a:'LZ dimensions — length and width in feet'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 8C of AF IMT 4303?',a:'Elevation in feet MSL'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 8D of AF IMT 4303?',a:'Maximum T/M/S of requesting agency'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 8E of AF IMT 4303?',a:'Obstructions to approach and departure — note which quadrants are affected'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 8F of AF IMT 4303?',a:'LZ slope from approach angle'},
+{u:'Unit 3/5 — Survey Forms',q:'What goes in block 9 of AF IMT 4303?',a:'Describe items from block 8E and other concerns\nInclude obstruction radials, heights, surface conditions\nExample: "45\' palm trees from 310 radial to 035 radial"'},
+{u:'Unit 3/5 — Survey Forms',q:'How are obstructions described on AF IMT 4303?',a:'By radial and height\nExample: "45\' palm trees from 310 radial to 035 radial"'},
+{u:'Unit 3/5 — Survey Forms',q:'What must the HLZ diagram on AF IMT 4303 include?',a:'All obstructions with distances and heights, approach/departure axes, scale, north arrow, magnetic variation (MVAR), and LZ dimensions'},
+{u:'Unit 3/5 — Survey Forms',q:'What is Talon Point?',a:'The SAAZA database where completed surveys are submitted, reviewed, approved, and stored\nNIPR: https://talonpoint.net/\nSIPR: https://talonpoint.snlca.nro.smil.mil/TalonPoint/home'},
+{u:'Unit 3/5 — Survey Forms',q:'What are Zone Availability Reports (ZARs)?',a:'Reports in Talon Point showing status and availability of previously surveyed zones — best starting point during information gathering'},
+{u:'Unit 3/5 — Survey Forms',q:'What is the Talon Point routing sequence?',a:'1. Survey completed by MSAAZA/SAAZA Marine\n2. Routed for QC to EAF OIC/MAW Rep\n3. QC routes to MAG ASO/MAW DOS for Safety of Flight review\n4. ASO routes to MAG CO/MAW CG\n5. MAG CO/MAW CG approves or disapproves'},
+{u:'Unit 4 — SAAZA Process',q:'What are the four phases of the SAAZA process?',a:'1. Information Gathering — collection and consolidation of all pre-existing information\n2. Preparation — team planning, task assignment, logistics\n3. Site Visit — physical collection of ground truth data\n4. Final Product Development — synthesis of all data into a cohesive document for the requesting agency'},
+{u:'Unit 4 — SAAZA Process',q:'Which phase of the SAAZA process is the simplest?',a:'Site Visit — the physical survey\n"Everything is invisible except the final product"'},
+{u:'Unit 4 — SAAZA Process',q:'What is the Seven "P" Rule in SAAZA context?',a:'Proper Prior Planning Prevents Piss Poor Performance\nPlanning and preparation are essential — the physical survey is the simplest portion'},
+{u:'Unit 4 — SAAZA Process',q:'What is the primary purpose of information gathering?',a:'To create an efficient and effective collection plan for the Site Visit\nCreates priorities to fill gaps in information\nAll information must still be validated on site'},
+{u:'Unit 4 — SAAZA Process',q:'What are the nine information gathering sources?',a:'1. Previously completed surveys\n2. Satellite imagery\n3. Maps\n4. ATC supplemental info\n5. Weather reports\n6. Intelligence reports\n7. Host Nation (HN) points of contact\n8. Requestor criteria\n9. Available assets'},
+{u:'Unit 4 — SAAZA Process',q:'Where are previously completed surveys found?',a:'Talon Point and Zone Availability Reports (ZARs)\nNIPR: https://talonpoint.net/\nSIPR: https://talonpoint.snlca.nro.smil.mil/TalonPoint/home'},
+{u:'Unit 4 — SAAZA Process',q:'Why are previously completed surveys the best source of info?',a:'May still be current\nWill outline previous areas of concern\nBest source of info for a specific location'},
+{u:'Unit 4 — SAAZA Process',q:'What satellite imagery sources are available?',a:'S-2 Products\nGoogle Earth\nHAWG-VIEW'},
+{u:'Unit 4 — SAAZA Process',q:'What requestor criteria must be confirmed before the site visit?',a:'T/M/S specific NATOPS info:\nGlideslopes\nGradients\nAirframe mission weight for fixed-wing\nLZ size requirements\nSupplemental requests\n"Your assessment depends on this information"'},
+{u:'Unit 4 — SAAZA Process',q:'What available asset information must be confirmed?',a:'Logistics — air or ground insert, life support for time on station\nPersonnel — EAF integration, security attachment\nEquipment'},
+{u:'Unit 4 — SAAZA Process',q:'How do you transition from information gathering to preparation?',a:'Determine what information you HAVE to identify what you DON\'T have\nPrioritize missing information\nMake a list of necessary tasks to accomplish the mission'},
+{u:'Unit 4 — SAAZA Process',q:'What are the eight preparation considerations?',a:'1. Mission requirements\n2. Limitations\n3. Available assets\n4. Task organization\n5. Mission briefing\n6. Rehearsals\n7. Equipment\n8. Staging'},
+{u:'Unit 4 — SAAZA Process',q:'What mission requirement information must be confirmed?',a:'LZ purpose (ALZ, HLZ, FARP, etc.)\nRequesting agency (T/M/S)\nSupplemental requests'},
+{u:'Unit 4 — SAAZA Process',q:'What limitations must be accounted for in preparation?',a:'Time (including time of day)\nPersonnel\nSecurity concerns'},
+{u:'Unit 4 — SAAZA Process',q:'What must the mission briefing accomplish?',a:'Team Leader must paint a clear and concise picture of the ground scheme of maneuver to EVERY member and all integrated personnel\nEspecially important with time constraints\nClear expectations of outputs'},
+{u:'Unit 4 — SAAZA Process',q:'What is task organization?',a:'Specific tasking for every member\nPrimary, secondary, and tertiary tasks assigned\nIntegration of EAF and security personnel'},
+{u:'Unit 4 — SAAZA Process',q:'What is the most critical limitation during a site visit?',a:'TIME — it defines the scope of the survey\nUnlikely to get a second chance\nBad data = bad survey = loss of confidence'},
+{u:'Unit 4 — SAAZA Process',q:'What are the time thresholds for hasty vs full survey?',a:'Hasty survey and assessment: < 6 hours\nFull survey and assessment: ≥ 12 hours'},
+{u:'Unit 4 — SAAZA Process',q:'What is the scope difference between hasty and full surveys?',a:'Hasty — focuses on presence of MINIMUM criteria only, specific to T/M/S\nFull — provides maximum ground truth data, specific to T/M/S but provides enough info to tailor to other T/M/S'},
+{u:'Unit 4 — SAAZA Process',q:'What is the Team Leader\'s role during the site visit?',a:'NOT solely a supervisor — must also participate\nSupervise all members and integrated personnel\nEnsure plan is executed as briefed, or adjust as necessary'},
+{u:'Unit 4 — SAAZA Process',q:'What is the key equipment concern during a site visit?',a:'Accountability of gear at ALL times\n"A DCP cone is an indicator to the enemy"'},
+{u:'Unit 4 — SAAZA Process',q:'What are the three components of final product development?',a:'1. Data analysis and synthesis\n2. Product refinement\n3. Survey forms'},
+{u:'Unit 4 — SAAZA Process',q:'How many CBR calculations result from a standard ALZ DCP evaluation?',a:'37 test locations × 3 layers = 111 CBR calculations\nResults in 1 controlling test location → 3 CBR calculations → 1 controlling layer → 1 CBR rating → 1 answer for allowable passes'},
+{u:'Unit 4 — SAAZA Process',q:'How many longitudinal gradient readings and calculations for a C-130 ALZ?',a:'150 readings (20\' increments)\n15 averages of 200\' each\n1 cumulative 3,000\' average'},
+{u:'Unit 4 — SAAZA Process',q:'How many transverse gradient readings for a C-130 ALZ?',a:'28 readings at 15\' intervals\n7 averages of 60\' each'},
+{u:'Unit 4 — SAAZA Process',q:'What does product refinement include?',a:'LZ diagram\nPictures\nSurvey forms'},
+{u:'Unit 4 — SAAZA Process',q:'Which survey form is used for fixed-wing (ALZ)?',a:'AF IRT 3822'},
+{u:'Unit 4 — SAAZA Process',q:'Which survey form is used for helicopter/tilt-rotor (HLZ)?',a:'AF IRT 4303'},
+{u:'Unit 5 — Completion',q:'What goes in blocks 1A and 1B of AF IMT 3822?',a:'1A: LZ Name (bird name or location)\n1B: HQ AMC/A3DT will update after submission if approved — leave blank'},
+{u:'Unit 5 — Completion',q:'What goes in blocks 2A and 2B of AF IMT 3822?',a:'2A: Country where LZ is located\n2B: State, province, or territory'},
+{u:'Unit 5 — Completion',q:'What goes in block 3 of AF IMT 3822?',a:'Map series, sheet number, edition, and date of map used (if used)'},
+{u:'Unit 5 — Completion',q:'What goes in block 4A of AF IMT 3822?',a:'Date physical survey was conducted\nTeam Leader name, grade, phone number, and unit'},
+{u:'Unit 5 — Completion',q:'What goes in block 4B of AF IMT 3822?',a:'Date reviewed, reviewer name, grade, phone number, unit and location, with signature\nUser, Safety Officer, Squadron/ACE/MAGTF Commander'},
+{u:'Unit 5 — Completion',q:'What goes in block 4C of AF IMT 3822?',a:'Date approved/disapproved\nSquadron/ACE/MAGTF Commander name, grade, phone number, unit and location, with signature'},
+{u:'Unit 5 — Completion',q:'Who is listed as LZ Controlling Agency/Unit on AF IMT 3822?',a:'YOU — the surveying unit, if surveying for operations you will support\nRange Control info goes below — gained during Information Gathering'},
+{u:'Unit 5 — Completion',q:'What is the unit of measure throughout AF IMT 3822?',a:'Feet — always actual ground data, NOT the minimums required'},
+{u:'Unit 5 — Completion',q:'What goes in blocks 9A/B of AF IMT 3822?',a:'WGS-84 coordinates for GPS derived (almost always)\nLat/long to nearest 1/1000th of a minute'},
+{u:'Unit 5 — Completion',q:'What goes in blocks 9C-E of AF IMT 3822?',a:'Grid Zone, easting and northing obtained from map (different than MGRS)'},
+{u:'Unit 5 — Completion',q:'What goes in blocks 9F-H of AF IMT 3822?',a:'Grid zone, square designator, 10-digit grid, and lat/longs to the nearest 1/1000th minute'},
+{u:'Unit 5 — Completion',q:'What goes in block 10A of AF IMT 3822?',a:'Type of surface — use letter identifier'},
+{u:'Unit 5 — Completion',q:'What goes in block 10B of AF IMT 3822?',a:'Thickness and strength (CBR) of each soil layer from the controlling point'},
+{u:'Unit 5 — Completion',q:'What goes in block 11A of AF IMT 3822?',a:'Glideslope ratio used to determine obstacle clearance for BOTH arrival AND departure zones'},
+{u:'Unit 5 — Completion',q:'What goes in block 11B of AF IMT 3822?',a:'Percentage of slope for longitudinal gradient\nUse "+" for upslope and "-" for downslope'},
+{u:'Unit 5 — Completion',q:'What goes in blocks 12A-H of AF IMT 3822?',a:'Percent slope for each gradient section\nUse "+" for upslope and "-" for downslope'},
+{u:'Unit 5 — Completion',q:'What goes in block 12I of AF IMT 3822?',a:'List any obstacle penetrations'},
+{u:'Unit 5 — Completion',q:'What must the LZ Diagram include on AF IMT 3822?',a:'North arrow, scale, runway dimensions and headings, overrun dimensions, obstacle locations with heights and distances, access roads, any relevant features'},
+{u:'Unit 5 — Completion',q:'What goes in blocks 1A/B and 2A/B of AF IMT 4303?',a:'Same as 3822:\n1A: LZ Name, 1B: HQ AMC update after approval\n2A: Country, 2B: State/province/territory'},
+{u:'Unit 5 — Completion',q:'What goes in block 6 of AF IMT 4303?',a:'Approach and departure axis information including ratios and any restricted/obstructed quadrants'},
+{u:'Unit 5 — Completion',q:'What goes in block 7 of AF IMT 4303?',a:'Coordinates — WGS-84 for GPS derived (almost always)\nPrimary run-in heading\nLat/long to nearest 1/1000th minute'},
+{u:'Unit 5 — Completion',q:'What goes in block 8A/B of AF IMT 4303?',a:'LZ Dimensions — length and width in feet'},
+{u:'Unit 5 — Completion',q:'What goes in block 8C of AF IMT 4303?',a:'Elevation in feet MSL'},
+{u:'Unit 5 — Completion',q:'What goes in block 8D of AF IMT 4303?',a:'Maximum T/M/S of requesting agency'},
+{u:'Unit 5 — Completion',q:'What goes in block 8E of AF IMT 4303?',a:'Obstructions to approach and departure — note which quadrants are affected'},
+{u:'Unit 5 — Completion',q:'What goes in block 8F of AF IMT 4303?',a:'LZ slope from approach angle'},
+{u:'Unit 5 — Completion',q:'What goes in block 9 of AF IMT 4303?',a:'Describe items from block 8E and other concerns\nInclude obstruction radials, heights, and surface conditions\nExample: "45\' palm trees from 310 radial to 035 radial"'},
+{u:'Unit 5 — Completion',q:'What must the HLZ diagram on AF IMT 4303 show?',a:'All obstructions with distances and heights\nApproach/departure axes\nScale and north arrow\nMagnetic variation (MVAR)\nLZ dimensions'},
+{u:'Unit 5 — Completion',q:'What is Talon Point?',a:'The SAAZA database system where completed surveys are submitted, reviewed, approved, and stored\nNIPR: https://talonpoint.net/\nSIPR: https://talonpoint.snlca.nro.smil.mil/TalonPoint/home'},
+{u:'Unit 5 — Completion',q:'What is the Talon Point routing sequence?',a:'1. Survey completed by MSAAZA/SAAZA Marine\n2. Routed for QC to EAF OIC/MAW Rep\n3. QC routes to MAG ASO/MAW DOS for Safety of Flight review\n4. ASO routes to MAG CO/MAW CG\n5. MAG CO/MAW CG approves or disapproves'},
+{u:'Unit 5 — Completion',q:'What are Zone Availability Reports (ZARs)?',a:'Reports found in Talon Point that show the status and availability of previously surveyed zones\nBest starting point during the information gathering phase'}
+];
+var activeUnit='all';
+var deck=[],idx=0,flipped=false,cor=0,wrg=0;
+function build(){
+  deck=activeUnit==='all'?ALL.slice():ALL.filter(function(c){return c.u===activeUnit;});
+  idx=0;cor=0;wrg=0;show();
+}
+function setU(u,b){
+  activeUnit=u;
+  document.querySelectorAll('.tb').forEach(function(x){x.classList.remove('on');});
+  b.classList.add('on');
+  build();
+}
+function show(){
+  var done=idx>=deck.length;
+  document.getElementById('dn').style.display=done?'block':'none';
+  document.getElementById('cf').style.display=done?'none':'flex';
+  document.getElementById('cb').style.display='none';
+  document.getElementById('br').style.display='none';
+  flipped=false;
+  if(done){document.getElementById('fs').textContent='✓ '+cor+' correct   ✗ '+wrg+' missed   → '+(deck.length-cor-wrg)+' skipped';return;}
+  var c=deck[idx];
+  document.getElementById('cq').textContent=c.q;
+  document.getElementById('ca').textContent=c.a;
+  document.getElementById('utag').textContent=c.u;
+  document.getElementById('pr').textContent='Card '+(idx+1)+' of '+deck.length;
+  document.getElementById('sc').textContent='✓ '+cor+'  ✗ '+wrg;
+  document.getElementById('fill').style.width=(deck.length>0?Math.round(cor/deck.length*100):0)+'%';
+}
+function flip(){flipped=!flipped;document.getElementById('cf').style.display=flipped?'none':'flex';document.getElementById('cb').style.display=flipped?'flex':'none';document.getElementById('br').style.display=flipped?'grid':'none';}
+function mark(r){if(r===1)cor++;else if(r===0)wrg++;idx++;show();}
+function go(d){var n=idx+d;if(n>=0&&n<deck.length){idx=n;flipped=false;show();}}
+function shuf(){for(var i=deck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=deck[i];deck[i]=deck[j];deck[j]=tmp;}idx=0;cor=0;wrg=0;show();}
+function restart(){idx=0;cor=0;wrg=0;document.getElementById('dn').style.display='none';show();}
+build();
+</script>
+</body>
+</html>

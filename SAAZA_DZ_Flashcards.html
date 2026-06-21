@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Drop Zone Flashcards</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f4f0;color:#1a1a1a;padding:1rem;min-height:100vh}
+a.back{display:inline-block;font-size:12px;color:#1D9E75;text-decoration:none;margin-bottom:12px}
+h1{font-size:20px;font-weight:600;margin-bottom:2px}
+.sub{font-size:13px;color:#666;margin-bottom:1.25rem}
+.tnav{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.tb{padding:5px 11px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:12px;color:#555}
+.tb.on{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:500}
+.prog{font-size:12px;color:#666;display:flex;justify-content:space-between;margin-bottom:10px}
+.bar{height:4px;background:#e0e0e0;border-radius:2px;margin-bottom:10px;overflow:hidden}
+.fill{height:100%;background:#1D9E75;border-radius:2px;transition:width .3s}
+.card{border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem;min-height:180px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;background:#fff;margin-bottom:10px}
+.card.ans{border-color:#1D9E75}
+.clabel{font-size:11px;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.clabel.g{color:#1D9E75}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:8px;margin-bottom:8px}
+.td{background:#E1F5EE;color:#0F6E56}
+.tp{background:#EEEDFE;color:#3C3489}
+.tg{background:#FAEEDA;color:#633806}
+.tm{background:#E6F1FB;color:#0C447C}
+.ctext{font-size:14px;color:#1a1a1a;line-height:1.6;white-space:pre-line}
+.hint{font-size:12px;color:#aaa;margin-top:10px;text-align:center}
+.brow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.fb{padding:8px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;color:#555}
+.fb.ok{background:#EAF3DE;color:#27500A;border-color:#639922}
+.fb.no{background:#FCEBEB;color:#791F1F;border-color:#E24B4A}
+.nav{display:flex;gap:8px;margin-bottom:1rem}
+.done{background:#f7f7f5;border-radius:12px;padding:1rem;text-align:center;display:none;margin-top:1rem}
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:1.5rem;padding-bottom:1rem}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← Back to all tools</a>
+<h1>Drop Zone Flashcards</h1>
+<p class="sub">SAAZA Unit 2.1 — DZ anatomy, mission types, dimensions & MANFAS method</p>
+<div class="tnav">
+<button class="tb on" onclick="setT('all',this)">All cards</button>
+<button class="tb" onclick="setT('basics',this)">DZ Basics</button>
+<button class="tb" onclick="setT('dims',this)">Dimensions</button>
+<button class="tb" onclick="setT('adj',this)">Adjustments</button>
+<button class="tb" onclick="setT('manfas',this)">MANFAS</button>
+</div>
+<div class="bar"><div class="fill" id="fill" style="width:0%"></div></div>
+<div class="prog"><span id="pr">Card 1</span><span id="sc">✓ 0  ✗ 0</span></div>
+<div class="card" id="cf" onclick="flip()">
+<div class="clabel">Question — tap to reveal</div>
+<div class="tag" id="tg"></div>
+<div class="ctext" id="cq"></div>
+<div class="hint">Tap card to see answer</div>
+</div>
+<div class="card ans" id="cb" onclick="flip()" style="display:none">
+<div class="clabel g">Answer — tap to go back</div>
+<div class="ctext" id="ca"></div>
+</div>
+<div class="brow" id="br" style="display:none">
+<button class="fb no" onclick="mark(0)">✗ Missed</button>
+<button class="fb" onclick="mark(2)">→ Skip</button>
+<button class="fb ok" onclick="mark(1)">✓ Got it</button>
+</div>
+<div class="nav">
+<button class="fb" style="flex:1" onclick="go(-1)">← Prev</button>
+<button class="fb" style="flex:1" onclick="shuf()">Shuffle ↺</button>
+<button class="fb" style="flex:1" onclick="go(1)">Next →</button>
+</div>
+<div class="done" id="dn">
+<div style="font-size:15px;font-weight:600;margin-bottom:6px">Deck complete!</div>
+<div style="font-size:13px;color:#666" id="fs"></div>
+<button class="fb" style="margin-top:10px" onclick="restart()">Restart ↺</button>
+</div>
+<div class="footer">SAAZA Drop Zone Flashcards — 136CRF — works offline, no internet required</div>
+<script>
+var D=[
+{t:'basics',q:'What are the three parts of a standard DZ anatomy?',a:'Leading Edge (LE)\nTrailing Edge (TE)\nPoint of Impact (PI) / Center\nAll oriented along the DZ Axis'},
+{t:'basics',q:'How is a DZ survey described dimensionally?',a:'Three dimensional — length, width, and altitude'},
+{t:'basics',q:'What does PI stand for and where is it normally located?',a:'Point of Impact — normally the center of the DZ\nFor circular DZs, the PI is normally the center for multiple run-in headings'},
+{t:'basics',q:'What are circular DZs used for?',a:'When multiple run-in headings are required\nCenter and radius determined by mission requirements\nPI normally at center'},
+{t:'basics',q:'What are the two types of DZs based on previous use?',a:'Previously surveyed DZ — PI already established\nMission specific DZ — PI determined by mission requirements'},
+{t:'dims',q:'What are the minimum dimensions for a CDS Drop Zone?',a:'400 yds width × 400 yds length × 600 ft altitude'},
+{t:'dims',q:'What are the minimum dimensions for a Personnel Drop Zone?',a:'600 yds width × 600 yds length × 1,000 ft altitude'},
+{t:'dims',q:'What are the minimum dimensions for a Heavy Equipment Drop Zone?',a:'600 yds width × 1,000 yds length × 1,100 ft altitude'},
+{t:'dims',q:'What is the minimum PI placement from the Leading Edge for CDS?',a:'250 yards from the Leading Edge'},
+{t:'dims',q:'What is the minimum PI placement from the Leading Edge for Personnel?',a:'350 yards from the Leading Edge'},
+{t:'dims',q:'What is the minimum PI placement from the Leading Edge for Heavy Equipment?',a:'550 yards from the Leading Edge'},
+{t:'adj',q:'How are DZ adjustments applied?',a:'Adjustments are cumulative and made half to each side or end of the DZ, unless otherwise indicated'},
+{t:'adj',q:'Personnel DZ — altitude adjustments?',a:'For each 100 ft above 1,000 ft → add 30 yds to length AND width'},
+{t:'adj',q:'Personnel DZ — night adjustment?',a:'Sunset to sunrise → add 100 yds to length'},
+{t:'adj',q:'Personnel DZ — formation/night adjustments?',a:'Day formations / night single → add 100 yds to width only\nNight formation → add 200 yds to width only'},
+{t:'adj',q:'Personnel DZ — GPS adjustment?',a:'Add 400 yds to width (exclude formation and night drops)'},
+{t:'adj',q:'Personnel DZ — multiple jumper adjustment?',a:'Add 75 yds to trailing edge for each jumper beyond the first'},
+{t:'adj',q:'CDS DZ — altitude adjustment?',a:'For each 100 ft above 600 ft → add 40 yds'},
+{t:'adj',q:'CDS DZ — night adjustment?',a:'Sunset to sunrise → 100 yds for single / 200 yds for formation'},
+{t:'adj',q:'CDS DZ — day formation adjustment?',a:'Add 100 yds to length AND width'},
+{t:'adj',q:'CDS DZ — GPS adjustment?',a:'Add 200 yds (exclude formation and night)'},
+{t:'adj',q:'CDS DZ — length adjustment for containers?',a:'Length based on number of containers'},
+{t:'adj',q:'Heavy Equipment DZ — altitude adjustment?',a:'For each 100 ft above 1,100 ft → add 30 yds to width AND length'},
+{t:'adj',q:'Heavy Equipment DZ — night adjustment?',a:'Sunset to sunrise → add 100 yds to length'},
+{t:'adj',q:'Heavy Equipment DZ — formation/night adjustment?',a:'Day formation / night single → add 100 yds to width\nNight formation → add 200 yds to width only'},
+{t:'adj',q:'Heavy Equipment DZ — multiple platform adjustment?',a:'Add 400 yds to length for each platform beyond the first'},
+{t:'adj',q:'Heavy Equipment DZ — GPS adjustment?',a:'Add 400 yds to width (exclude formation and night)'},
+{t:'manfas',q:'What does MANFAS stand for?',a:'M — Minimums\nA — Altitude\nN — Night\nF — Formations\nA — Additional\nS — Safety'},
+{t:'manfas',q:'What is the MANFAS method used for?',a:'A systematic method for calculating DZ dimensions — applied separately to Width and Length, working through each adjustment factor in order'},
+{t:'manfas',q:'MANFAS example: KC-130 dropping 12 jumpers in 3 passes of 4 from 1,500 ft at 1700L. What is the minimum DZ?',a:'Width: 600 (min) + 0 + 0 + 0 + 0 + 0 = 600 yds\nLength: 600 (min) + 0 + 0 + 0 + 0 + 225 (75 yds × 3 extra jumpers) = 825 yds\nMinimum: 750 × 975 yds\n(1500 ft = minimum altitude, 1700L = daylight, no formation add, 3 passes = 2 extra jumpers per pass)'},
+{t:'manfas',q:'MANFAS example: KC-130 dropping 3 HE platforms from 1,700 ft at 2330L. What is the minimum DZ?',a:'Width: 600 (min) + 180 (6×30 for alt) + 100 (night single) = 880 yds\nLength: 1000 (min) + 800 (2 extra platforms × 400) + 100 (sunset to sunrise) + 180 (6×30 for alt) = 2,080 yds\nMinimum: 880 × 2,080 yds'},
+];
+var TG={basics:'td',dims:'tp',adj:'tg',manfas:'tm'};
+var TL={basics:'DZ Basics',dims:'Dimensions',adj:'Adjustments',manfas:'MANFAS'};
+var deck=[],idx=0,flipped=false,cor=0,wrg=0,topic='all';
+function build(){deck=topic==='all'?D.slice():D.filter(function(c){return c.t===topic;});idx=0;cor=0;wrg=0;show();}
+function setT(t,b){topic=t;document.querySelectorAll('.tb').forEach(function(x){x.classList.remove('on');});b.classList.add('on');build();}
+function show(){
+var done=idx>=deck.length;
+document.getElementById('dn').style.display=done?'block':'none';
+document.getElementById('cf').style.display=done?'none':'flex';
+document.getElementById('cb').style.display='none';
+document.getElementById('br').style.display='none';
+flipped=false;
+if(done){document.getElementById('fs').textContent='✓ '+cor+' correct   ✗ '+wrg+' missed   → '+(deck.length-cor-wrg)+' skipped';return;}
+var c=deck[idx];
+document.getElementById('cq').textContent=c.q;
+document.getElementById('ca').textContent=c.a;
+document.getElementById('tg').textContent=TL[c.t];
+document.getElementById('tg').className='tag '+TG[c.t];
+document.getElementById('pr').textContent='Card '+(idx+1)+' of '+deck.length;
+document.getElementById('sc').textContent='✓ '+cor+'  ✗ '+wrg;
+document.getElementById('fill').style.width=(deck.length>0?Math.round(cor/deck.length*100):0)+'%';
+}
+function flip(){flipped=!flipped;document.getElementById('cf').style.display=flipped?'none':'flex';document.getElementById('cb').style.display=flipped?'flex':'none';document.getElementById('br').style.display=flipped?'grid':'none';}
+function mark(r){if(r===1)cor++;else if(r===0)wrg++;idx++;show();}
+function go(d){var n=idx+d;if(n>=0&&n<deck.length){idx=n;flipped=false;show();}}
+function shuf(){for(var i=deck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=deck[i];deck[i]=deck[j];deck[j]=tmp;}idx=0;cor=0;wrg=0;show();}
+function restart(){idx=0;cor=0;wrg=0;document.getElementById('dn').style.display='none';show();}
+build();
+</script>
+</body>
+</html>

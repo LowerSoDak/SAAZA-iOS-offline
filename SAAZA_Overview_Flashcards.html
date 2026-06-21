@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Overview &amp; Math Flashcards</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f4f0;color:#1a1a1a;padding:1rem;min-height:100vh}
+a.back{display:inline-block;font-size:12px;color:#1D9E75;text-decoration:none;margin-bottom:12px}
+h1{font-size:20px;font-weight:600;margin-bottom:2px}
+.sub{font-size:13px;color:#666;margin-bottom:1.25rem}
+.tnav{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.tb{padding:5px 11px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:12px;color:#555;transition:all .15s}
+.tb.on{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:500}
+.prog{font-size:12px;color:#666;display:flex;justify-content:space-between;margin-bottom:10px}
+.bar{height:4px;background:#e0e0e0;border-radius:2px;margin-bottom:10px;overflow:hidden}
+.fill{height:100%;background:#1D9E75;border-radius:2px;transition:width .3s}
+.card{border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem;min-height:180px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;background:#fff;margin-bottom:10px}
+.card.ans{border-color:#1D9E75}
+.clabel{font-size:11px;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.clabel.g{color:#1D9E75}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:8px;margin-bottom:8px}
+.td{background:#E1F5EE;color:#0F6E56}
+.tp{background:#EEEDFE;color:#3C3489}
+.tg{background:#FAEEDA;color:#633806}
+.tm{background:#E6F1FB;color:#0C447C}
+.te{background:#FAECE7;color:#712B13}
+.ctext{font-size:14px;color:#1a1a1a;line-height:1.6;white-space:pre-line}
+.hint{font-size:12px;color:#aaa;margin-top:10px;text-align:center}
+.brow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.fb{padding:8px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;color:#555}
+.fb.ok{background:#EAF3DE;color:#27500A;border-color:#639922}
+.fb.no{background:#FCEBEB;color:#791F1F;border-color:#E24B4A}
+.nav{display:flex;gap:8px;margin-bottom:1rem}
+.done{background:#f7f7f5;border-radius:12px;padding:1rem;text-align:center;display:none;margin-top:1rem}
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:1.5rem;padding-bottom:1rem}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← Back to all tools</a>
+<h1>Overview &amp; Math Flashcards</h1>
+<p class="sub">SAAZA Units 1 — Definitions, publications, trig, gradient, glideslope &amp; measurement</p>
+<div class="tnav">
+<button class="tb on" onclick="setT('all',this)">All cards</button>
+<button class="tb" onclick="setT('def',this)">Definitions</button>
+<button class="tb" onclick="setT('pub',this)">Publications</button>
+<button class="tb" onclick="setT('cat',this)">Airfield categories</button>
+<button class="tb" onclick="setT('trig',this)">Trig</button>
+<button class="tb" onclick="setT('grad',this)">Gradient / Glideslope</button>
+<button class="tb" onclick="setT('meas',this)">Measurement</button>
+<button class="tb" onclick="setT('equip',this)">Equipment</button>
+</div>
+<div class="bar"><div class="fill" id="fill" style="width:0%"></div></div>
+<div class="prog"><span id="pr">Card 1</span><span id="sc">✓ 0  ✗ 0</span></div>
+<div class="card" id="cf" onclick="flip()">
+<div class="clabel">Question — tap to reveal</div>
+<div class="tag" id="tg"></div>
+<div class="ctext" id="cq"></div>
+<div class="hint">Tap card to see answer</div>
+</div>
+<div class="card ans" id="cb" onclick="flip()" style="display:none">
+<div class="clabel g">Answer — tap to go back</div>
+<div class="ctext" id="ca"></div>
+</div>
+<div class="brow" id="br" style="display:none">
+<button class="fb no" onclick="mark(0)">✗ Missed</button>
+<button class="fb" onclick="mark(2)">→ Skip</button>
+<button class="fb ok" onclick="mark(1)">✓ Got it</button>
+</div>
+<div class="nav">
+<button class="fb" style="flex:1" onclick="go(-1)">← Prev</button>
+<button class="fb" style="flex:1" onclick="shuf()">Shuffle ↺</button>
+<button class="fb" style="flex:1" onclick="go(1)">Next →</button>
+</div>
+<div class="done" id="dn">
+<div style="font-size:15px;font-weight:600;margin-bottom:6px">Deck complete!</div>
+<div style="font-size:13px;color:#666" id="fs"></div>
+<button class="fb" style="margin-top:10px" onclick="restart()">Restart ↺</button>
+</div>
+<div class="footer">SAAZA Overview &amp; Math Flashcards &mdash; 136CRF &mdash; works offline, no internet required</div>
+<script>
+var D=[
+{t:'def',q:'Define: Survey',a:'To accurately determine area, contour, or boundaries by measuring lines and angles according to the principles of geometry and trigonometry. Raw, factual data regarding a location.'},
+{t:'def',q:'Define: Assessment',a:'To determine worth or condition in relation to published standards and criteria. For MMT purposes, a focus on flight safety. Supported by the accuracy of the survey.'},
+{t:'def',q:'Define: Hasty survey/assessment',a:'To provide maximum usable information within a compressed timeline.\nSurvey: prioritization of essential information\nAssessment: focus on minimum criteria'},
+{t:'def',q:'What is the key difference between a survey and an assessment?',a:'Survey = raw factual data (what is there)\nAssessment = judgment against published standards (is it usable for flight operations?)'},
+{t:'def',q:'What is an azimuth?',a:'Horizontal direction observed clockwise from a zero reference line running north-south. Measured in 1° increments from 001° to 360°.'},
+{t:'def',q:'What are the three types of North?',a:'True North — aligned to Polaris\nGrid North — aligned to the Central Meridian (MGRS)\nMagnetic North — aligned to Earth\'s magnetic pole (primary reference for SAAZA)'},
+{t:'def',q:'What is magnetic declination?',a:'The difference between the True Meridian and Magnetic Meridian. In eastern U.S. the compass points west of True North; in the west it points east.'},
+{t:'def',q:'What is Rise?',a:'The vertical distance (elevation change) between two points'},
+{t:'def',q:'What is Run?',a:'The horizontal distance between two points'},
+{t:'def',q:'What is decimal grade?',a:'Rise divided by Run'},
+{t:'def',q:'What is percent grade?',a:'Decimal grade multiplied by 100'},
+{t:'def',q:'What is a positive grade?',a:'An increase in elevation — marked with a + sign'},
+{t:'def',q:'What is a negative grade?',a:'A decrease in elevation — marked with a − sign'},
+{t:'def',q:'What is a glideslope ratio?',a:'The relationship of Run to Rise at a given distance. Divide the run by the rise.\nEx: Run 6000\' ÷ Rise 2000\' = 3:1 ratio'},
+{t:'pub',q:'What publication is the basis for all airfield design criteria?',a:'UFC 3-260-1 — Airfield and Heliport Planning and Design\nChapter 7 specifically covers KC-130/C-17 semi-prepared landing zones'},
+{t:'pub',q:'What is TM 3-34.48-2?',a:'Theater of Operations: Roads, Airfields, and Heliports — Airfield and Heliport Design\nUSAF source for airfield design criteria'},
+{t:'pub',q:'What is DAFMAN 13-217?',a:'USAF guiding document for LZ and drop zone procedures (CCT TACSOP)\nPrescribes procedures, techniques, and requirements for operating AZs\nGoverns content, documentation, and approval process for USAF AZ surveys'},
+{t:'pub',q:'What is ETL 09-6?',a:'Engineering Technical Letter 09-6\nSupersedes AFJPAM 32-8013 Vol 2 Ch 11\nDimensional criteria and guidance for planning, design, construction, and evaluation of AZs for C-17 and C-130 aircraft'},
+{t:'pub',q:'What is the MMT TACSOP based on?',a:'Based on DAFMAN 13-217\nMMT guiding document for LZ and drop zone procedures\nGoverns content, documentation, and approval process for USMC AZ surveys'},
+{t:'pub',q:'What is TSPWG 3-260-03.02-19?',a:'Tri-Service Pavements Working Group Manual — Airfield Pavement Evaluation Standards and Procedures\nSupersedes ETL 02-19\nProvides criteria for structural evaluation of airfields'},
+{t:'pub',q:'Which publication governs USMC AZ survey approval?',a:'MMT TACSOP'},
+{t:'pub',q:'Which publication governs USAF AZ survey approval?',a:'DAFMAN 13-217'},
+{t:'cat',q:'What are the three main airfield categories?',a:'1. Initial airfields\n2. Temporary airfields\n3. Semi-permanent airfields'},
+{t:'cat',q:'What types fall under Initial airfields?',a:'Drop zone\nExtraction zone\nExpedient airfield\nClose battle area airfield\nSupport area airfield'},
+{t:'cat',q:'What is a Temporary airfield?',a:'Assault Landing Zone (ALZ)'},
+{t:'cat',q:'What is a Semi-permanent airfield?',a:'Airport or Main Air Base'},
+{t:'cat',q:'What are the three battle area positions for airfields?',a:'Close, Deep, and Rear'},
+{t:'trig',q:'What are the three trig ratios and their formulas?',a:'Sin = Opp ÷ Hyp\nCos = Adj ÷ Hyp\nTan = Opp ÷ Adj'},
+{t:'trig',q:'When do you multiply in a trig problem?',a:'When both known components are in the bottom row of the formula box — multiply Sin/Cos/Tan by the known side'},
+{t:'trig',q:'When do you divide in a trig problem?',a:'When the known component is in the top row — divide it by the Sin/Cos/Tan value'},
+{t:'trig',q:'When do you use the inverse trig function?',a:'When the angle is unknown — use arcSin, arcCos, or arcTan to convert a ratio back into degrees'},
+{t:'trig',q:'How do you find the height of an obstruction using a clinometer and laser?',a:'Tan(θ) × distance = Opp (height from eye level)\nThen ADD observer height for true ground-to-top height'},
+{t:'trig',q:'How do you find the TOTAL height of a tower when you measure both an angle of elevation to the top AND an angle of depression to the base?',a:'Tan(elevation angle) × distance = Opp1 (above eye)\nTan(depression angle) × distance = Opp2 (below eye)\nOpp1 + Opp2 = total tower height'},
+{t:'trig',q:'Example: Pole is 30\' tall, you are 75\' away. What is the angle to the top?',a:'Tan(θ) = Opp ÷ Adj = 30 ÷ 75 = 0.4\nθ = arcTan(0.4) = 21.8°'},
+{t:'trig',q:'Example: Angle to tower top is 3.65°, distance is 986\'. Find height.',a:'Tan(3.65°) × 986 = Opp\n0.063 × 986 = 62.9\' + observer height'},
+{t:'trig',q:'Example: Angle to stadium top is 33°, straight-line distance is 154\'. Find height.',a:'Sin(33°) × 154 = Opp\n0.54 × 154 = 83.9\' + observer height\n(Uses Sin because straight-line distance = Hyp)'},
+{t:'trig',q:'What surveying shape does all SAAZA trig rely on?',a:'The right triangle — every distance and angle measurement resolves to Opp, Adj, and Hyp'},
+{t:'grad',q:'How do you calculate decimal grade?',a:'Rise ÷ Run = decimal grade\nEx: 2.5\' rise over 100\' run = .025 decimal grade'},
+{t:'grad',q:'How do you calculate percent grade?',a:'Decimal grade × 100\nEx: .025 × 100 = 2.5% grade'},
+{t:'grad',q:'Critical rule when recording gradient?',a:'You MUST carry over all + and − signs throughout every calculation'},
+{t:'grad',q:'What are the two methods for recording gradients in the field?',a:'1. Line leveling — using a line level over 20\' increments\n2. Clinometer — reading the % grade scale while sighting between two surveyors'},
+{t:'grad',q:'How is line leveling used to measure gradient?',a:'Stretch a line between two points, level it, measure the rise (vertical drop from line to ground)\nEx: -4.5" rise over 240" (20\') run = -1.875% grade'},
+{t:'grad',q:'How do you calculate glideslope ratio?',a:'Run ÷ Rise = ratio\nEx: 6000\' run ÷ 2000\' rise = 3:1 glideslope ratio'},
+{t:'grad',q:'What does a 3:1 glideslope ratio mean?',a:'For every 3 feet of horizontal distance (run), there is 1 foot of vertical rise'},
+{t:'meas',q:'What radius should a SAAZA survey concern itself with?',a:'5 nautical mile (NM) radius — noting obstacles (towers, mountains) and airspace conflicts'},
+{t:'meas',q:'What are the four distance measuring techniques?',a:'1. Odometer readings\n2. Pacing method\n3. Estimating distances\n4. Measuring tools (tapes, wheels, lasers)'},
+{t:'meas',q:'What is the unit used for measuring visibility?',a:'Statute miles'},
+{t:'meas',q:'What units are used for measuring distances in SAAZA?',a:'Feet, Meters, and Nautical Miles'},
+{t:'meas',q:'How many feet in 1 statute mile?',a:'5,280 feet (= 1,609.8 m)'},
+{t:'meas',q:'How many feet in 1 nautical mile?',a:'6,076 feet (= 1,852 m)'},
+{t:'meas',q:'How many feet in 1 meter?',a:'3.28 feet'},
+{t:'meas',q:'How many feet in one odometer click (1/10 mile)?',a:'528 feet'},
+{t:'meas',q:'Convert 3895 meters to feet.',a:'3895 × 3.28 = 12,775.6 feet'},
+{t:'meas',q:'What are the 4 phases of a SAAZA survey?',a:'1. Information Gathering\n2. Preparation\n3. Site Visit\n4. Final Product Development'},
+{t:'equip',q:'What are the 8 pieces of SAAZA survey equipment?',a:'1. Laser Range Finder (LRF)\n2. Dynamic Cone Penetrometer (DCP)\n3. Clinometer\n4. Defense Advanced GPS Receiver (DAGR)\n5. Line Level\n6. Measuring Wheel\n7. Compass\n8. Digital Camera'},
+{t:'equip',q:'What is the accuracy of the lensatic compass?',a:'+/- 2.25°'},
+{t:'equip',q:'What is the accuracy of the clinometer?',a:'+/- 1°'},
+{t:'equip',q:'How does the clinometer read direction?',a:'0–360° in 1° increments (bottom scale) and 5° increments (top scale). Requires both eyes — one sights the object, the other reads the scale.'},
+{t:'equip',q:'What does the DAGR provide?',a:'Defense Advanced GPS Receiver — provides GPS-derived position, elevation (MSL), and coordinates in WGS-84'},
+{t:'equip',q:'What is the Laser Range Finder (LRF) used for?',a:'Measuring straight-line distance to an obstruction or target — provides the Hyp for trig calculations'},
+];
+var TG={def:'td',pub:'tp',cat:'tg',trig:'tm',grad:'te',meas:'td',equip:'tp'};
+var TL={def:'Definitions',pub:'Publications',cat:'Airfield categories',trig:'Trig',grad:'Gradient/Glideslope',meas:'Measurement',equip:'Equipment'};
+var deck=[],idx=0,flipped=false,cor=0,wrg=0,topic='all';
+function build(){deck=topic==='all'?D.slice():D.filter(function(c){return c.t===topic;});idx=0;cor=0;wrg=0;show();}
+function setT(t,b){topic=t;document.querySelectorAll('.tb').forEach(function(x){x.classList.remove('on');});b.classList.add('on');build();}
+function show(){
+var done=idx>=deck.length;
+document.getElementById('dn').style.display=done?'block':'none';
+document.getElementById('cf').style.display=done?'none':'flex';
+document.getElementById('cb').style.display='none';
+document.getElementById('br').style.display='none';
+flipped=false;
+if(done){document.getElementById('fs').textContent='✓ '+cor+' correct   ✗ '+wrg+' missed   → '+(deck.length-cor-wrg)+' skipped';return;}
+var c=deck[idx];
+document.getElementById('cq').textContent=c.q;
+document.getElementById('ca').textContent=c.a;
+document.getElementById('tg').textContent=TL[c.t];
+document.getElementById('tg').className='tag '+TG[c.t];
+document.getElementById('pr').textContent='Card '+(idx+1)+' of '+deck.length;
+document.getElementById('sc').textContent='✓ '+cor+'  ✗ '+wrg;
+document.getElementById('fill').style.width=(deck.length>0?Math.round(cor/deck.length*100):0)+'%';
+}
+function flip(){flipped=!flipped;document.getElementById('cf').style.display=flipped?'none':'flex';document.getElementById('cb').style.display=flipped?'flex':'none';document.getElementById('br').style.display=flipped?'grid':'none';}
+function mark(r){if(r===1)cor++;else if(r===0)wrg++;idx++;show();}
+function go(d){var n=idx+d;if(n>=0&&n<deck.length){idx=n;flipped=false;show();}}
+function shuf(){for(var i=deck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=deck[i];deck[i]=deck[j];deck[j]=tmp;}idx=0;cor=0;wrg=0;show();}
+function restart(){idx=0;cor=0;wrg=0;document.getElementById('dn').style.display='none';show();}
+build();
+</script>
+</body>
+</html>

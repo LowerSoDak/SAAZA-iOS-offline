@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DCP Test Locations — SAAZA</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#f5f6f4;color:#1f2421;line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:680px;margin:0 auto;padding:16px 14px 60px}
+.back{display:inline-block;color:#1D9E75;text-decoration:none;font-size:14px;font-weight:600;margin-bottom:14px}
+.back:active{opacity:.6}
+h1{font-size:21px;font-weight:700;margin-bottom:4px}
+.sub{font-size:13px;color:#6b726c;margin-bottom:16px}
+.card{background:#fff;border:1px solid #e6e8e4;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#1D9E75;margin-bottom:10px}
+.toggle{display:flex;background:#eceee9;border-radius:11px;padding:4px;margin-bottom:6px}
+.toggle button{flex:1;border:0;background:transparent;padding:11px 8px;border-radius:8px;font-size:15px;font-weight:600;color:#5a615b;cursor:pointer;transition:all .15s}
+.toggle button.on{background:#1D9E75;color:#fff;box-shadow:0 1px 3px rgba(29,158,117,.35)}
+.mode-line{font-size:13px;color:#6b726c;margin-bottom:14px;padding:0 2px;min-height:18px}
+.mode-line b{color:#1f2421}
+.diagram-card{padding:12px 10px}
+svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:10px;padding:0 4px}
+.lg{display:flex;align-items:center;gap:7px;font-size:12.5px;color:#3a403a}
+.dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;border:2px solid #E8941A;background:#1f2421}
+.dot.cl{background:#1f2421}
+.tri{width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:12px solid #E0403E;flex-shrink:0}
+.band{width:14px;height:14px;border-radius:3px;background:rgba(29,158,117,.18);border:1px solid #1D9E75;flex-shrink:0}
+.exp p{font-size:14px;margin-bottom:10px}
+.exp ul{margin:0 0 10px 4px;padding-left:18px}
+.exp li{font-size:13.7px;margin-bottom:6px}
+.exp li b{color:#1f2421}
+.exp .lead{font-size:14.5px;font-weight:600;color:#1f2421;margin-bottom:12px}
+.tbl{width:100%;border-collapse:collapse;margin:4px 0 12px;font-size:13px}
+.tbl th,.tbl td{text-align:left;padding:6px 8px;border-bottom:1px solid #eceee9}
+.tbl th{color:#6b726c;font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em}
+.tbl td:first-child{font-weight:700;color:#1D9E75;width:34px;text-align:center}
+.callout{background:#fff4e6;border-left:3px solid #E8941A;border-radius:0 9px 9px 0;padding:11px 13px;font-size:13.5px;color:#8a5a12;margin:2px 0 12px}
+.callout b{color:#6e4810}
+.proc li{font-size:13.5px;margin-bottom:8px}
+.proc li b{color:#1f2421}
+.srcnote{font-size:11.5px;color:#9aa29a;margin-top:6px;padding:0 2px}
+.foot{text-align:center;font-size:12px;color:#aab0a9;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="index.html">← Back to all tools</a>
+<h1>DCP Test Locations</h1>
+<div class="sub">Where to put your DCP readings on a landing zone — full survey vs. hasty survey. Pattern per the SAAZA course (Unit 3).</div>
+
+<div class="toggle" id="toggle">
+  <button data-m="full" class="on" onclick="setMode('full')">Full survey</button>
+  <button data-m="hasty" onclick="setMode('hasty')">Hasty survey</button>
+</div>
+<div class="mode-line" id="modeLine"></div>
+
+<div class="card diagram-card">
+  <svg id="diagram" viewBox="0 0 360 700" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Runway diagram with DCP test locations"></svg>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div class="card exp" id="explain"></div>
+
+<div class="card proc">
+  <div class="card-title">Running each test</div>
+  <ul>
+    <li><b>Two people.</b> An <b>operator</b> holds the DCP vertical and works the slide hammer; a <b>recorder</b> reads and logs the depths.</li>
+    <li><b>Seat the cone.</b> Tap until the base of the cone is flush with the surface, then take a baseline reading.</li>
+    <li><b>Each blow.</b> Raise the hammer to the bottom of the handle (don't lift the handle itself), then release and let it drop.</li>
+    <li><b>Depth.</b> Test to the full depth of the rod — <b>36 in rods are adequate</b> for semi-prepared surfaces.</li>
+    <li><b>Stay plumb.</b> If the handle leans <b>more than 6 in</b> off vertical, stop and start a fresh test right next to it. Never force the handle down. (Same response if you hit refusal and the cone stops advancing: relocate and retry.)</li>
+    <li><b>Record</b> to the nearest <b>0.2 in (5 mm)</b>, on the DCP Data Sheet, for <b>every</b> test.</li>
+    <li><b>Range.</b> The DCP reads from CBR &lt;1 up to &gt;100.</li>
+  </ul>
+  <div class="srcnote">Test pattern &amp; priority order: SAAZA Unit 3 (consistent with ETL 97-9, Fig C.2). Procedure: ETL 97-9 / TSPWG 3-260-03.02-19 — both Approved for Public Release, Distribution Unlimited. Diagram drawn original; oriented vertically for phone screens.</div>
+</div>
+
+<div class="foot">136CRF</div>
+</div>
+
+<script>
+// ===== geometry (vertical runway: approach end at top, departure at bottom) =====
+var CX=175, LX=120, RX=230, EL=95, ER=255;     // centerline, left, right cols; runway edges
+var Y0=120, Y1000=600;                           // approach end (0') and 1000' stations
+function yAt(ft){return Y0+(ft/1000)*(Y1000-Y0);}
+var svgNS='http://www.w3.org/2000/svg';
+function el(t,a){var e=document.createElementNS(svgNS,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function txt(x,y,s,o){o=o||{};var t=el('text',{x:x,y:y,'font-family':'sans-serif','font-size':o.fs||'9.5','fill':o.fill||'#6b726c','text-anchor':o.anchor||'middle','font-weight':o.fw||'400'});t.textContent=s;return t;}
+
+// ===== FULL pattern — exact course 15-location unit (Unit 3, slide 53) =====
+// n=label number, ft=longitudinal station, col=lateral position
+var FULL=[
+ {n:1, x:CX, ft:-90, col:'CL', tag:'Overrun'},
+ {n:2, x:CX, ft:0,   col:'CL'},
+ {n:3, x:LX, ft:0,   col:'L'},
+ {n:4, x:RX, ft:0,   col:'R'},
+ {n:5, x:CX, ft:100, col:'CL', tag:'Bullseye'},
+ {n:6, x:RX, ft:200, col:'R'},
+ {n:7, x:LX, ft:200, col:'L'},
+ {n:8, x:CX, ft:500, col:'CL'},
+ {n:9, x:LX, ft:500, col:'L'},
+ {n:10,x:RX, ft:500, col:'R'},
+ {n:11,x:RX, ft:600, col:'R'},
+ {n:12,x:LX, ft:800, col:'L'},
+ {n:13,x:CX, ft:1000,col:'CL'},
+ {n:14,x:LX, ft:1000,col:'L'},
+ {n:15,x:RX, ft:1000,col:'R'}
+];
+
+function drawRunway(svg, topY, botY, withStations){
+  // overrun box (top)
+  svg.appendChild(el('rect',{x:EL,y:topY-46,width:ER-EL,height:46,fill:'#e9ece8',stroke:'#cfd4cd','stroke-width':1}));
+  svg.appendChild(txt(CX,topY-30,'OVERRUN',{fs:'8.5',fw:'700',fill:'#7a807a'}));
+  // runway body
+  svg.appendChild(el('rect',{x:EL,y:topY,width:ER-EL,height:botY-topY,fill:'#dfe3dd',stroke:'#b9bfb7','stroke-width':1.5}));
+  // centerline dashed
+  svg.appendChild(el('line',{x1:CX,y1:topY+4,x2:CX,y2:botY-4,stroke:'#fff','stroke-width':2.5,'stroke-dasharray':'9 8'}));
+  // L / R column guides
+  [LX,RX].forEach(function(x){svg.appendChild(el('line',{x1:x,y1:topY+4,x2:x,y2:botY-4,stroke:'#9aa29a','stroke-width':0.8,'stroke-dasharray':'2 6',opacity:0.5}));});
+  // L / CL / R headers
+  svg.appendChild(txt(LX,topY-6,'L',{fs:'9',fw:'700',fill:'#8a908a'}));
+  svg.appendChild(txt(CX,topY-6,'CL',{fs:'9',fw:'700',fill:'#8a908a'}));
+  svg.appendChild(txt(RX,topY-6,'R',{fs:'9',fw:'700',fill:'#8a908a'}));
+  svg.appendChild(txt(ER+4,topY+4,'approach end',{fs:'8',anchor:'start',fill:'#6b726c',fw:'600'}));
+}
+
+function renderFull(){
+  var svg=document.getElementById('diagram');
+  svg.setAttribute('viewBox','0 0 360 700');
+  drawRunway(svg,Y0,Y1000);
+  // 3-across connectors (horizontal dotted) at 0', 500', 1000'
+  [0,500,1000].forEach(function(ft){
+    svg.appendChild(el('line',{x1:LX,y1:yAt(ft),x2:RX,y2:yAt(ft),stroke:'#1D9E75','stroke-width':1,'stroke-dasharray':'2 4',opacity:0.6}));
+  });
+  // station labels on left
+  [[0,"0'"],[200,"200'"],[500,"500'"],[600,"600'"],[800,"800'"],[1000,"1000'"]].forEach(function(p){
+    var y=yAt(p[0]);
+    svg.appendChild(el('line',{x1:EL-5,y1:y,x2:EL,y2:y,stroke:'#9aa29a','stroke-width':1}));
+    svg.appendChild(txt(EL-8,y+3.3,p[1],{fs:'9',anchor:'end',fill:'#7a807a'}));
+  });
+  // points
+  FULL.forEach(function(p){
+    var y=(p.ft<0)?(Y0-30):yAt(p.ft);
+    svg.appendChild(el('circle',{cx:p.x,cy:y,r:11,fill:'#1f2421',stroke:'#E8941A','stroke-width':2.5}));
+    svg.appendChild(txt(p.x,y+3.6,String(p.n),{fs:'10.5',fill:'#fff',fw:'700'}));
+    if(p.tag) svg.appendChild(txt(p.x+(p.x===RX?16:(p.x===LX?-16:16)),y+3.3,p.tag,{fs:'8.5',anchor:(p.x===LX?'end':'start'),fill:'#6b726c',fw:'600'}));
+  });
+  document.getElementById('legend').innerHTML=
+    '<div class="lg"><span class="dot"></span>Test location (numbered 1–15)</div>'+
+    '<div class="lg" style="color:#1D9E75">- - - 3-across set (CL + L + R)</div>';
+}
+
+function renderHasty(){
+  var svg=document.getElementById('diagram');
+  svg.setAttribute('viewBox','0 0 360 700');
+  var topY=120, botY=620;
+  drawRunwaySchematic(svg,topY,botY);
+  // priority zones
+  function zone(y1,y2,label){
+    svg.appendChild(el('rect',{x:EL,y:y1,width:ER-EL,height:y2-y1,fill:'#1D9E75',opacity:0.12}));
+    svg.appendChild(txt(EL+5,(y1+y2)/2+3,label,{fs:'8.5',anchor:'start',fill:'#157a5a',fw:'700'}));
+  }
+  var span=botY-topY;
+  zone(topY, topY+span*0.22, 'TOUCHDOWN');
+  zone(topY+span*0.40, topY+span*0.60, 'POINT OF ROTATION');
+  zone(topY+span*0.78, botY, 'BRAKING / TURNAROUND');
+  // representative priority points within zones (CL + both sides)
+  var pz=[0.06,0.13,0.19, 0.45,0.50,0.55, 0.83,0.90,0.96];
+  pz.forEach(function(f,i){
+    var y=topY+span*f;
+    var x=[LX,CX,RX][i%3];
+    svg.appendChild(el('circle',{cx:x,cy:y,r:8,fill:'#1f2421',stroke:'#E8941A','stroke-width':2.5}));
+  });
+  // weak/wet/repaired example markers (anywhere)
+  [[RX+2,0.30],[LX-2,0.68]].forEach(function(m){
+    var y=topY+span*m[1], x=m[0];
+    svg.appendChild(el('path',{d:'M '+x+' '+(y-7)+' L '+(x-7)+' '+(y+6)+' L '+(x+7)+' '+(y+6)+' Z',fill:'#E0403E',stroke:'#fff','stroke-width':1}));
+  });
+  svg.appendChild(txt(ER+4, topY+span*0.30+4,'weak/',{fs:'8',anchor:'start',fill:'#E0403E',fw:'700'}));
+  svg.appendChild(txt(ER+4, topY+span*0.30+13,'wet',{fs:'8',anchor:'start',fill:'#E0403E',fw:'700'}));
+  document.getElementById('legend').innerHTML=
+    '<div class="lg"><span class="band"></span>Priority zone</div>'+
+    '<div class="lg"><span class="dot"></span>Priority test</div>'+
+    '<div class="lg"><span class="tri"></span>Weak / wet / repaired — test wherever found</div>';
+}
+
+function drawRunwaySchematic(svg, topY, botY){
+  svg.appendChild(el('rect',{x:EL,y:topY-44,width:ER-EL,height:44,fill:'#e9ece8',stroke:'#cfd4cd','stroke-width':1}));
+  svg.appendChild(txt(CX,topY-28,'OVERRUN',{fs:'8.5',fw:'700',fill:'#7a807a'}));
+  svg.appendChild(el('rect',{x:EL,y:botY,width:ER-EL,height:44,fill:'#e9ece8',stroke:'#cfd4cd','stroke-width':1}));
+  svg.appendChild(txt(CX,botY+30,'OVERRUN',{fs:'8.5',fw:'700',fill:'#7a807a'}));
+  svg.appendChild(el('rect',{x:EL,y:topY,width:ER-EL,height:botY-topY,fill:'#dfe3dd',stroke:'#b9bfb7','stroke-width':1.5}));
+  svg.appendChild(el('line',{x1:CX,y1:topY+4,x2:CX,y2:botY-4,stroke:'#fff','stroke-width':2.5,'stroke-dasharray':'9 8'}));
+  svg.appendChild(txt(ER+4,topY+4,'approach',{fs:'8',anchor:'start',fill:'#6b726c',fw:'600'}));
+  svg.appendChild(txt(ER+4,botY+0,'departure',{fs:'8',anchor:'start',fill:'#6b726c',fw:'600'}));
+}
+
+var EXP={
+ full:'<div class="card-title">Full survey — the standard pattern</div>'+
+      '<p class="lead">Lay the pattern out from the approach end and <b>repeat it down the runway. A standard 3,000 ft runway works out to 37 test locations.</b></p>'+
+      '<p style="font-size:13px;color:#6b726c">One 1,000 ft unit (15 locations), longitudinal spacing <b>200 / 200 / 100 / 100 / 200 / 200</b>:</p>'+
+      '<table class="tbl"><tr><th>#</th><th>Location</th></tr>'+
+      '<tr><td>1</td><td>Overrun (one test, center)</td></tr>'+
+      '<tr><td>2–4</td><td>Approach end — CL, L, R</td></tr>'+
+      '<tr><td>5</td><td>Bullseye</td></tr>'+
+      '<tr><td>6–7</td><td>200′ — R, then L of CL</td></tr>'+
+      '<tr><td>8–10</td><td>500′ — CL, L, R</td></tr>'+
+      '<tr><td>11</td><td>600′ — R of CL</td></tr>'+
+      '<tr><td>12</td><td>800′ — L of CL</td></tr>'+
+      '<tr><td>13–15</td><td>1000′ — CL, L, R</td></tr></table>'+
+      '<p style="font-size:13px;color:#6b726c">Full <b>CL/L/R sets</b> land at the 500 ft stations (0′, 500′, 1000′ …); the staggered single offsets (200′, 600′, 800′) cover the in-between ground. Carry the same pattern to the far overrun and end.</p>',
+ hasty:'<div class="card-title">Hasty survey — priority locations</div>'+
+       '<p class="lead">If time is a factor, focus on the critical locations:</p>'+
+       '<ul>'+
+       '<li><b>Touchdown / braking / turnaround areas</b></li>'+
+       '<li><b>Point of rotation</b></li>'+
+       '<li><b>Any identified weak / wet / repaired areas</b></li>'+
+       '</ul>'+
+       '<div class="callout">Those weak / wet / repaired spots get tested <b>wherever you find them</b> — they\'re not tied to a station. Hit them first.</div>'+
+       '<p style="font-size:13px;color:#6b726c">Whatever you have time for, every reading still goes on the DCP Data Sheet.</p>'
+};
+
+function setMode(m){
+  var svg=document.getElementById('diagram');
+  while(svg.firstChild)svg.removeChild(svg.firstChild);
+  document.querySelectorAll('#toggle button').forEach(function(b){b.classList.toggle('on',b.dataset.m===m);});
+  document.getElementById('modeLine').innerHTML=(m==='full')
+    ? 'Showing the <b>full pattern</b> — one 1,000 ft unit, numbered 1–15, repeated for runway length.'
+    : 'Showing the <b>hasty priorities</b> — critical zones plus any weak / wet / repaired ground.';
+  document.getElementById('explain').innerHTML=EXP[m];
+  if(m==='full')renderFull(); else renderHasty();
+}
+setMode('full');
+</script>
+</body>
+</html>

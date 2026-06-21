@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA LZ Trig Calculator</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: #f4f4f0; color: #1a1a1a; min-height: 100vh; padding: 1rem; }
+  h1 { font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .subtitle { font-size: 13px; color: #666; margin-bottom: 1.25rem; }
+  .nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.25rem; }
+  .nav-btn { padding: 7px 13px; border: 1px solid #ccc; border-radius: 8px; background: #fff; cursor: pointer; font-size: 12px; color: #555; white-space: nowrap; transition: all 0.15s; }
+  .nav-btn:hover { background: #f0f0f0; }
+  .nav-btn.active { background: #1D9E75; color: #fff; border-color: #1D9E75; font-weight: 500; }
+  .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
+  .card-title { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+  .card-desc { font-size: 12px; color: #666; margin-bottom: 14px; line-height: 1.5; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .field-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11px; color: #666; }
+  .field input, .field select { width: 100%; padding: 7px 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; color: #1a1a1a; background: #fff; outline: none; }
+  .field input:focus, .field select:focus { border-color: #1D9E75; box-shadow: 0 0 0 2px rgba(29,158,117,0.15); }
+  .field-single { margin-bottom: 10px; }
+  .calc-btn { background: #1D9E75; color: #fff; border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .calc-btn:hover { background: #0F6E56; }
+  .result { margin-top: 12px; background: #f7f7f5; border-radius: 8px; padding: 12px 14px; display: none; }
+  .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 10px; }
+  .metric { background: #fff; border-radius: 8px; padding: 10px 12px; border: 1px solid #e5e5e5; }
+  .metric-label { font-size: 11px; color: #888; margin-bottom: 3px; }
+  .metric-val { font-size: 22px; font-weight: 600; color: #0F6E56; }
+  .metric-unit { font-size: 11px; color: #999; margin-left: 2px; }
+  .steps { font-size: 12px; color: #666; line-height: 1.9; white-space: pre-line; border-top: 1px solid #e5e5e5; padding-top: 8px; margin-top: 8px; font-family: "Courier New", monospace; }
+  .warn-box { background: #FAEEDA; border-left: 3px solid #BA7517; border-radius: 0 8px 8px 0; padding: 8px 12px; font-size: 12px; color: #633806; margin-top: 8px; display: none; }
+  .verdict { margin-top: 8px; padding: 9px 13px; border-radius: 8px; font-size: 13px; font-weight: 600; display: none; }
+  .verdict.pass { background: #EAF3DE; color: #27500A; }
+  .verdict.fail { background: #FCEBEB; color: #791F1F; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .svg-wrap { text-align: center; margin-bottom: 12px; }
+  .footer { text-align: center; font-size: 11px; color: #aaa; margin-top: 1.5rem; padding-bottom: 1rem; }
+  @media (max-width: 480px) {
+    .field-grid, .field-grid-3 { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" style="display:inline-block;font-size:12px;color:#1D9E75;text-decoration:none;margin-bottom:12px;">← Back to all tools</a>
+<h1>SAAZA LZ Trig Calculator</h1>
+<p class="subtitle">Marine Survey and Assault Zone Assessment — Landing Zone trigonometry field tool</p>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="show('obs', this)">Obstruction height</button>
+  <button class="nav-btn" onclick="show('hyp', this)">Straight-line distance</button>
+  <button class="nav-btn" onclick="show('elev', this)">Elevation difference</button>
+  <button class="nav-btn" onclick="show('angle', this)">Find angle (θ)</button>
+  <button class="nav-btn" onclick="show('tower', this)">Two-angle height</button>
+  <button class="nav-btn" onclick="show('clear', this)">Clearance check</button>
+  <button class="nav-btn" onclick="show('conv', this)">Unit conversions</button>
+</div>
+
+<div id="sec-obs" class="section active">
+  <div class="card">
+    <div class="card-title">Obstruction height</div>
+    <div class="card-desc">Solves for the vertical height of an obstacle (tree, tower, terrain). If you measured the <b>horizontal distance</b> from the base, it uses <b>Tan</b>. If you shot the <b>slant range</b> to the top with a laser, switch the distance type and it uses <b>Sin</b>.</div>
+    <div class="svg-wrap">
+      <svg width="220" height="110" viewBox="0 0 220 110" role="img" aria-label="Right triangle: theta at base left, adjacent along bottom, opposite on right side, hypotenuse as slant">
+        <polygon points="20,95 185,95 185,15" fill="none" stroke="#ccc" stroke-width="1.5"/>
+        <rect x="172" y="82" width="13" height="13" fill="none" stroke="#ccc" stroke-width="1"/>
+        <text x="12" y="107" font-size="11" fill="#1D9E75" font-weight="bold">θ</text>
+        <path d="M 37,95 A 17,17 0 0,0 32,80" fill="none" stroke="#1D9E75" stroke-width="1.5"/>
+        <text x="100" y="108" font-size="10" fill="#888" text-anchor="middle">Adj — your distance</text>
+        <text x="193" y="60" font-size="10" fill="#1D9E75" font-weight="bold">Opp</text>
+        <text x="193" y="72" font-size="10" fill="#1D9E75">(height)</text>
+        <text x="88" y="44" font-size="10" fill="#aaa" transform="rotate(-25,88,52)">Hyp (slant)</text>
+      </svg>
+    </div>
+    <div class="field-grid">
+      <div class="field"><label>Angle of elevation θ (degrees)</label><input type="number" id="obs-angle" placeholder="e.g. 14"/></div>
+      <div class="field"><label>Distance type</label><select id="obs-disttype" onchange="obsTypeHint()"><option value="horiz">Horizontal — from base (Tan)</option><option value="slant">Slant range — laser to top (Sin)</option></select></div>
+    </div>
+    <div class="field field-single"><label id="obs-dist-label">Horizontal distance from base (ft)</label><input type="number" id="obs-dist" placeholder="e.g. 500"/></div>
+    <div class="field field-single"><label>Observer height (ft) — optional, added to get true ground-to-top height</label><input type="number" id="obs-eye" placeholder="e.g. 6"/></div>
+    <button class="calc-btn" onclick="calcObs()">Calculate</button>
+    <div class="result" id="res-obs">
+      <div class="result-grid">
+        <div class="metric"><div class="metric-label">Obstruction height</div><span class="metric-val" id="obs-r1">—</span><span class="metric-unit">ft</span></div>
+        <div class="metric"><div class="metric-label">True height (+ observer)</div><span class="metric-val" id="obs-r2">—</span><span class="metric-unit">ft</span></div>
+        <div class="metric"><div class="metric-label">Slant distance (Hyp)</div><span class="metric-val" id="obs-r3">—</span><span class="metric-unit">ft</span></div>
+      </div>
+      <div class="steps" id="obs-steps"></div>
+    </div>
+  </div>
+</div>
+
+<div id="sec-hyp" class="section">
+  <div class="card">
+    <div class="card-title">Straight-line distance (hypotenuse)</div>
+    <div class="card-desc">You know the angle and one side. Solves for the diagonal straight-line distance. Use Sin when you know the vertical (Opp), Cos when you know the horizontal (Adj).</div>
+    <div class="field-grid">
+      <div class="field"><label>Angle θ (degrees)</label><input type="number" id="hyp-angle" placeholder="e.g. 22"/></div>
+      <div class="field">
+        <label>Known side type</label>
+        <select id="hyp-type">
+          <option value="opp">Vertical drop/rise (Opp)</option>
+          <option value="adj">Horizontal ground distance (Adj)</option>
+        </select>
+      </div>
+    </div>
+    <div class="field field-single"><label>Known side length (ft)</label><input type="number" id="hyp-known" placeholder="e.g. 1200"/></div>
+    <button class="calc-btn" onclick="calcHyp()">Calculate</button>
+    <div class="result" id="res-hyp">
+      <div class="result-grid">
+        <div class="metric"><div class="metric-label">Straight-line distance (Hyp)</div><span class="metric-val" id="hyp-r1">—</span><span class="metric-unit">ft</span></div>
+        <div class="metric"><div class="metric-label">Other side</div><span class="metric-val" id="hyp-r2">—</span><span class="metric-unit">ft</span></div>
+        <div class="metric"><div class="metric-label">Formula used</div><span class="metric-val" style="font-size:16px;" id="hyp-r3">—</span></div>
+      </div>
+      <div class="steps" id="hyp-steps"></div>
+    </div>
+  </div>
+</div>
+
+<div id="sec-elev" class="section">
+  <div class="card">
+    <div class="card-title">Elevation difference</div>
+    <div class="card-desc">You know the straight-line distance between two points and the angle of depression or elevation. Solves for the vertical rise or drop using Sin.</div>
+    <div class="field-grid">
+      <div class="field"><label>Angle of depression / elevation θ (degrees)</label><input type="number" id="elev-angle" placeholder="e.g. 15"/></div>
+      <div class="field"><label>Straight-line distance between points (ft)</label><input type="number" id="elev-dist" placeholder="e.g. 2800"/></div>
+    </div>
+    <button class="calc-btn" onclick="calcElev()">Calculate</button>
+    <div class="result" id="res-elev">
+      <div class="result-grid">
+        <div class="metric"><div class="metric-label">Vertical difference (Opp)</div><span class="metric-val" id="elev-r1">—</span><span class="metric-unit">ft</span></div>
+        <div class="metric"><div class="metric-label">Horizontal distance (Adj)</div><span class="metric-val" id="elev-r2">—</span><span class="metric-unit">ft</span></div>
+      </div>
+      <div class="steps" id="elev-steps"></div>
+    </div>
+  </div>
+</div>
+
+<div id="sec-angle" class="section">
+  <div class="card">
+    <div class="card-title">Find the angle (θ)</div>
+    <div class="card-desc">You know two sides. Enter any two — the calculator picks the right inverse trig function automatically.</div>
+    <div class="field-grid-3">
+      <div class="field"><label>Opp — opposite side (ft)</label><input type="number" id="ang-opp" placeholder="optional"/></div>
+      <div class="field"><label>Adj — adjacent side (ft)</label><input type="number" id="ang-adj" placeholder="optional"/></div>
+      <div class="field"><label>Hyp — hypotenuse (ft)</label><input type="number" id="ang-hyp" placeholder="optional"/></div>
+    </div>
+    <button class="calc-btn" onclick="calcAngle()">Find θ</button>
+    <div class="result" id="res-angle">
+      <div class="result-grid">
+        <div class="metric"><div class="metric-label">Angle θ</div><span class="metric-val" id="ang-r1">—</span><span class="metric-unit">°</span></div>
+        <div class="metric"><div class="metric-label">Formula used</div><span class="metric-val" style="font-size:15px;" id="ang-r2">—</span></div>
+      </div>
+      <div class="steps" id="ang-steps"></div>
+    </div>
+  </div>
+</div>
+
+<div id="sec-tower" class="section">
+  <div class="card">
+    <div class="card-title">Two-angle height</div>
+    <div class="card-desc">Measure two angles from the same point — one to the base of a structure, one to the top. Isolates the structure height above the terrain by subtracting the two results.</div>
+    <div class="field-grid-3">
+      <div class="field"><label>Angle to base θ1 (degrees)</label><input type="number" id="tw-a1" placeholder="e.g. 12"/></div>
+      <div class="field"><label>Angle to top θ2 (degrees)</label><input type="number" id="tw-a2" placeholder="e.g. 19"/></div>
+      <div class="field"><label>Horizontal distance (ft)</label><input type="number" id="tw-dist" placeholder="e.g. 500"/></div>
+    </div>
+    <button class="calc-btn" onclick="calcTower()">Calculate</button>
+    <div class="warn-box" id="tw-warn">θ2 must be greater than θ1 — the angle to the top must exceed the angle to the base.</div>
+    <div class="result" id="res-tower">
+      <div class="result-grid">
+        <div class="metric"><div class="metric-label">Structure height only</div><span class="metric-val" id="tw-r1">—</span><span class="metric-unit">ft</span></div>
+        <div class="metric"><div class="metric-label">Ground to base (terrain)</div><span class="metric-val" id="tw-r2">—</span><span class="metric-unit">ft</span></div>
+        <div class="metric"><div class="metric-label">Ground to top (total)</div><span class="metric-val" id="tw-r3">—</span><span class="metric-unit">ft</span></div>
+      </div>
+      <div class="steps" id="tw-steps"></div>
+    </div>
+  </div>
+</div>
+
+<div id="sec-clear" class="section">
+  <div class="card">
+    <div class="card-title">LZ clearance check</div>
+    <div class="card-desc">Enter your required approach angle and horizontal distance to an obstruction. Calculates the maximum allowable obstruction height and flags pass or fail against a known obstruction height.</div>
+    <div class="field-grid">
+      <div class="field"><label>Required approach angle θ (degrees)</label><input type="number" id="cl-angle" placeholder="e.g. 8"/></div>
+      <div class="field"><label>Horizontal distance to obstruction (ft)</label><input type="number" id="cl-dist" placeholder="e.g. 300"/></div>
+    </div>
+    <div class="field field-single"><label>Actual obstruction height (ft) — optional, for pass/fail</label><input type="number" id="cl-actual" placeholder="e.g. 45"/></div>
+    <button class="calc-btn" onclick="calcClear()">Check clearance</button>
+    <div class="result" id="res-clear">
+      <div class="result-grid">
+        <div class="metric"><div class="metric-label">Max allowable height</div><span class="metric-val" id="cl-r1">—</span><span class="metric-unit">ft</span></div>
+        <div class="metric"><div class="metric-label">Actual height</div><span class="metric-val" id="cl-r2">—</span><span class="metric-unit">ft</span></div>
+        <div class="metric"><div class="metric-label">Clearance margin</div><span class="metric-val" id="cl-r3">—</span><span class="metric-unit">ft</span></div>
+      </div>
+      <div class="verdict" id="cl-verdict"></div>
+      <div class="steps" id="cl-steps"></div>
+    </div>
+  </div>
+</div>
+
+<div id="sec-conv" class="section">
+  <div class="card">
+    <div class="card-title">Distance unit converter</div>
+    <div class="card-desc">Enter a value and select its unit. All equivalents display instantly. Based on SAAZA surveying conversions: statute mile, nautical mile, meters, feet, yards, and odometer increments.</div>
+    <div class="field-grid">
+      <div class="field"><label>Value</label><input type="number" id="conv-val" placeholder="e.g. 2.5" oninput="calcConv()"/></div>
+      <div class="field">
+        <label>From unit</label>
+        <select id="conv-unit" onchange="calcConv()">
+          <option value="ft">Feet (ft)</option>
+          <option value="yd">Yards (yd)</option>
+          <option value="sm">Statute miles</option>
+          <option value="nm">Nautical miles</option>
+          <option value="m">Meters</option>
+          <option value="km">Kilometers</option>
+          <option value="odo">Odometer clicks (1/10 mi)</option>
+        </select>
+      </div>
+    </div>
+    <div class="result" id="res-conv" style="display:block;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;" id="conv-grid">
+        <div class="metric"><div class="metric-label">Feet</div><span class="metric-val" id="cv-ft">—</span><span class="metric-unit">ft</span></div>
+        <div class="metric"><div class="metric-label">Yards</div><span class="metric-val" id="cv-yd">—</span><span class="metric-unit">yd</span></div>
+        <div class="metric"><div class="metric-label">Statute miles</div><span class="metric-val" id="cv-sm">—</span><span class="metric-unit">mi</span></div>
+        <div class="metric"><div class="metric-label">Nautical miles</div><span class="metric-val" id="cv-nm">—</span><span class="metric-unit">NM</span></div>
+        <div class="metric"><div class="metric-label">Meters</div><span class="metric-val" id="cv-m">—</span><span class="metric-unit">m</span></div>
+        <div class="metric"><div class="metric-label">Kilometers</div><span class="metric-val" id="cv-km">—</span><span class="metric-unit">km</span></div>
+        <div class="metric"><div class="metric-label">Odometer clicks (1/10 mi)</div><span class="metric-val" id="cv-odo">—</span><span class="metric-unit">clicks</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Quick reference</div>
+    <div class="card-desc">SAAZA surveying constants from the slide deck.</div>
+    <table style="width:100%; font-size:13px; border-collapse:collapse;">
+      <thead><tr style="border-bottom:1px solid #e0e0e0;">
+        <th style="text-align:left; padding:6px 8px; color:#888; font-weight:500;">Unit</th>
+        <th style="text-align:right; padding:6px 8px; color:#888; font-weight:500;">Feet</th>
+        <th style="text-align:right; padding:6px 8px; color:#888; font-weight:500;">Meters</th>
+      </tr></thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:7px 8px; color:#1a1a1a;">1 Statute mile (visibility)</td><td style="text-align:right; padding:7px 8px; font-weight:600; color:#0F6E56;">5,280 ft</td><td style="text-align:right; padding:7px 8px; color:#666;">1,609.8 m</td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:7px 8px; color:#1a1a1a;">1 Nautical mile</td><td style="text-align:right; padding:7px 8px; font-weight:600; color:#0F6E56;">6,076 ft</td><td style="text-align:right; padding:7px 8px; color:#666;">1,852 m</td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:7px 8px; color:#1a1a1a;">1 Meter</td><td style="text-align:right; padding:7px 8px; font-weight:600; color:#0F6E56;">3.28 ft</td><td style="text-align:right; padding:7px 8px; color:#666;">1 m</td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:7px 8px; color:#1a1a1a;">1 Yard (DZ dimensions)</td><td style="text-align:right; padding:7px 8px; font-weight:600; color:#0F6E56;">3 ft</td><td style="text-align:right; padding:7px 8px; color:#666;">0.91 m</td></tr>
+        <tr><td style="padding:7px 8px; color:#1a1a1a;">Odometer click (1/10 mi)</td><td style="text-align:right; padding:7px 8px; font-weight:600; color:#0F6E56;">528 ft</td><td style="text-align:right; padding:7px 8px; color:#666;">160.9 m</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">SAAZA LZ Trig Calculator &mdash; 136CRF &mdash; works offline, no internet required</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function r(n, d) { return parseFloat(n.toFixed(d === undefined ? 2 : d)); }
+function showRes(id) { document.getElementById(id).style.display = 'block'; }
+
+function obsTypeHint() {
+  var t = document.getElementById('obs-disttype').value;
+  document.getElementById('obs-dist-label').textContent = (t === 'slant')
+    ? 'Slant range — laser distance to the top (ft)'
+    : 'Horizontal distance from base (ft)';
+}
+function calcObs() {
+  var theta = parseFloat(document.getElementById('obs-angle').value);
+  var dist = parseFloat(document.getElementById('obs-dist').value);
+  var eye = parseFloat(document.getElementById('obs-eye').value) || 0;
+  var type = document.getElementById('obs-disttype').value;
+  if (isNaN(theta) || isNaN(dist)) { alert('Enter angle and distance.'); return; }
+  var rad = theta * Math.PI / 180;
+  var height, hyp, steps;
+  if (type === 'slant') {
+    var sinV = Math.sin(rad);
+    height = sinV * dist;                 // Opp = Hyp × sin
+    hyp = dist;                           // input IS the hypotenuse
+    var adj = Math.cos(rad) * dist;
+    steps =
+      'Formula: Sin(θ) × Hyp = Opp   (you shot the slant range to the top)\n' +
+      'Sin(' + theta + '°) = ' + r(sinV, 4) + '\n' +
+      r(sinV, 4) + ' × ' + dist + ' = ' + r(height) + ' ft  (height from eye level)\n' +
+      (eye ? 'Plus observer height ' + eye + ' ft → ' + r(height + eye) + ' ft true ground-to-top height\n' : '') +
+      'Horizontal (Adj) = Cos(' + theta + '°) × ' + dist + ' = ' + r(adj) + ' ft';
+  } else {
+    var tanV = Math.tan(rad);
+    height = tanV * dist;                 // Opp = Adj × tan
+    hyp = dist / Math.cos(rad);
+    steps =
+      'Formula: Tan(θ) × Adj = Opp\n' +
+      'Tan(' + theta + '°) = ' + r(tanV, 4) + '\n' +
+      r(tanV, 4) + ' × ' + dist + ' = ' + r(height) + ' ft  (height from eye level)\n' +
+      (eye ? 'Plus observer height ' + eye + ' ft → ' + r(height + eye) + ' ft true ground-to-top height\n' : '') +
+      'Hyp = ' + dist + ' ÷ Cos(' + theta + '°) = ' + dist + ' ÷ ' + r(Math.cos(rad), 4) + ' = ' + r(hyp) + ' ft';
+  }
+  var trueHeight = height + eye;
+  document.getElementById('obs-r1').textContent = r(height);
+  document.getElementById('obs-r2').textContent = eye ? r(trueHeight) : '—';
+  document.getElementById('obs-r3').textContent = r(hyp);
+  document.getElementById('obs-steps').textContent = steps;
+  showRes('res-obs');
+}
+
+function calcHyp() {
+  var theta = parseFloat(document.getElementById('hyp-angle').value);
+  var known = parseFloat(document.getElementById('hyp-known').value);
+  var type = document.getElementById('hyp-type').value;
+  if (isNaN(theta) || isNaN(known)) { alert('Enter angle and known side.'); return; }
+  var rad = theta * Math.PI / 180;
+  var hyp, other, formula, steps;
+  if (type === 'opp') {
+    var sinV = Math.sin(rad);
+    hyp = known / sinV;
+    other = known / Math.tan(rad);
+    formula = 'Sin';
+    steps = 'Formula: Hyp = Opp ÷ Sin(θ)\nSin(' + theta + '°) = ' + r(sinV, 4) + '\nHyp = ' + known + ' ÷ ' + r(sinV, 4) + ' = ' + r(hyp) + ' ft\nHorizontal (Adj) = ' + known + ' ÷ Tan(' + theta + '°) = ' + r(other) + ' ft';
+  } else {
+    var cosV = Math.cos(rad);
+    hyp = known / cosV;
+    other = known * Math.tan(rad);
+    formula = 'Cos';
+    steps = 'Formula: Hyp = Adj ÷ Cos(θ)\nCos(' + theta + '°) = ' + r(cosV, 4) + '\nHyp = ' + known + ' ÷ ' + r(cosV, 4) + ' = ' + r(hyp) + ' ft\nVertical (Opp) = Tan(' + theta + '°) × ' + known + ' = ' + r(other) + ' ft';
+  }
+  document.getElementById('hyp-r1').textContent = r(hyp);
+  document.getElementById('hyp-r2').textContent = r(other);
+  document.getElementById('hyp-r3').textContent = formula;
+  document.getElementById('hyp-steps').textContent = steps;
+  showRes('res-hyp');
+}
+
+function calcElev() {
+  var theta = parseFloat(document.getElementById('elev-angle').value);
+  var dist = parseFloat(document.getElementById('elev-dist').value);
+  if (isNaN(theta) || isNaN(dist)) { alert('Enter angle and distance.'); return; }
+  var rad = theta * Math.PI / 180;
+  var sinV = Math.sin(rad);
+  var cosV = Math.cos(rad);
+  var vert = sinV * dist;
+  var horiz = cosV * dist;
+  document.getElementById('elev-r1').textContent = r(vert);
+  document.getElementById('elev-r2').textContent = r(horiz);
+  document.getElementById('elev-steps').textContent =
+    'Formula: Opp = Sin(θ) × Hyp\nSin(' + theta + '°) = ' + r(sinV, 4) + '\nVertical = ' + r(sinV, 4) + ' × ' + dist + ' = ' + r(vert) + ' ft\nHorizontal = Cos(' + theta + '°) × ' + dist + ' = ' + r(cosV, 4) + ' × ' + dist + ' = ' + r(horiz) + ' ft';
+  showRes('res-elev');
+}
+
+function calcAngle() {
+  var opp = parseFloat(document.getElementById('ang-opp').value);
+  var adj = parseFloat(document.getElementById('ang-adj').value);
+  var hyp = parseFloat(document.getElementById('ang-hyp').value);
+  var theta, formula, steps;
+  if (!isNaN(opp) && !isNaN(adj)) {
+    var ratio = opp / adj;
+    theta = Math.atan(ratio) * 180 / Math.PI;
+    formula = 'arcTan(Opp/Adj)';
+    steps = 'Tan(θ) = Opp ÷ Adj = ' + opp + ' ÷ ' + adj + ' = ' + r(ratio, 4) + '\nθ = arcTan(' + r(ratio, 4) + ') = ' + r(theta) + '°';
+  } else if (!isNaN(opp) && !isNaN(hyp)) {
+    var ratio = opp / hyp;
+    theta = Math.asin(ratio) * 180 / Math.PI;
+    formula = 'arcSin(Opp/Hyp)';
+    steps = 'Sin(θ) = Opp ÷ Hyp = ' + opp + ' ÷ ' + hyp + ' = ' + r(ratio, 4) + '\nθ = arcSin(' + r(ratio, 4) + ') = ' + r(theta) + '°';
+  } else if (!isNaN(adj) && !isNaN(hyp)) {
+    var ratio = adj / hyp;
+    theta = Math.acos(ratio) * 180 / Math.PI;
+    formula = 'arcCos(Adj/Hyp)';
+    steps = 'Cos(θ) = Adj ÷ Hyp = ' + adj + ' ÷ ' + hyp + ' = ' + r(ratio, 4) + '\nθ = arcCos(' + r(ratio, 4) + ') = ' + r(theta) + '°';
+  } else {
+    alert('Enter any two sides.'); return;
+  }
+  document.getElementById('ang-r1').textContent = r(theta);
+  document.getElementById('ang-r2').textContent = formula;
+  document.getElementById('ang-steps').textContent = steps;
+  showRes('res-angle');
+}
+
+function calcTower() {
+  var a1 = parseFloat(document.getElementById('tw-a1').value);
+  var a2 = parseFloat(document.getElementById('tw-a2').value);
+  var dist = parseFloat(document.getElementById('tw-dist').value);
+  document.getElementById('tw-warn').style.display = 'none';
+  if (isNaN(a1) || isNaN(a2) || isNaN(dist)) { alert('Enter both angles and distance.'); return; }
+  if (a2 <= a1) { document.getElementById('tw-warn').style.display = 'block'; return; }
+  var r1 = a1 * Math.PI / 180, r2 = a2 * Math.PI / 180;
+  var base = Math.tan(r1) * dist;
+  var top = Math.tan(r2) * dist;
+  var structure = top - base;
+  document.getElementById('tw-r1').textContent = r(structure);
+  document.getElementById('tw-r2').textContent = r(base);
+  document.getElementById('tw-r3').textContent = r(top);
+  document.getElementById('tw-steps').textContent =
+    'Ground to base: Tan(' + a1 + '°) × ' + dist + ' = ' + r(Math.tan(r1), 4) + ' × ' + dist + ' = ' + r(base) + ' ft\n' +
+    'Ground to top:  Tan(' + a2 + '°) × ' + dist + ' = ' + r(Math.tan(r2), 4) + ' × ' + dist + ' = ' + r(top) + ' ft\n' +
+    'Structure height = ' + r(top) + ' − ' + r(base) + ' = ' + r(structure) + ' ft';
+  showRes('res-tower');
+}
+
+function calcClear() {
+  var theta = parseFloat(document.getElementById('cl-angle').value);
+  var dist = parseFloat(document.getElementById('cl-dist').value);
+  var actual = parseFloat(document.getElementById('cl-actual').value);
+  if (isNaN(theta) || isNaN(dist)) { alert('Enter approach angle and distance.'); return; }
+  var rad = theta * Math.PI / 180;
+  var maxH = Math.tan(rad) * dist;
+  var margin = isNaN(actual) ? null : maxH - actual;
+  document.getElementById('cl-r1').textContent = r(maxH);
+  document.getElementById('cl-r2').textContent = isNaN(actual) ? '—' : actual;
+  document.getElementById('cl-r3').textContent = margin !== null ? r(margin) : '—';
+  var verdict = document.getElementById('cl-verdict');
+  if (margin !== null) {
+    verdict.style.display = 'block';
+    verdict.className = 'verdict ' + (margin >= 0 ? 'pass' : 'fail');
+    verdict.textContent = margin >= 0
+      ? 'CLEAR — obstruction is ' + r(margin) + ' ft below the limit.'
+      : 'FAIL — obstruction exceeds limit by ' + r(Math.abs(margin)) + ' ft.';
+  } else {
+    verdict.style.display = 'none';
+  }
+  document.getElementById('cl-steps').textContent =
+    'Formula: Max height = Tan(θ) × distance\nTan(' + theta + '°) = ' + r(Math.tan(rad), 4) + '\nMax allowable = ' + r(Math.tan(rad), 4) + ' × ' + dist + ' = ' + r(maxH) + ' ft' +
+    (margin !== null ? '\nMargin = ' + r(maxH) + ' − ' + actual + ' = ' + r(margin) + ' ft' : '');
+  showRes('res-clear');
+}
+function calcConv() {
+  var val = parseFloat(document.getElementById('conv-val').value);
+  var unit = document.getElementById('conv-unit').value;
+  if (isNaN(val)) {
+    ['ft','yd','sm','nm','m','km','odo'].forEach(function(u) { document.getElementById('cv-'+u).textContent = '—'; });
+    return;
+  }
+  var toFeet = { ft: 1, yd: 3, sm: 5280, nm: 6076, m: 3.28084, km: 3280.84, odo: 528 };
+  var feet = val * toFeet[unit];
+  document.getElementById('cv-ft').textContent  = feet >= 1000 ? feet.toLocaleString('en-US', {maximumFractionDigits:1}) : r(feet, 2);
+  document.getElementById('cv-yd').textContent  = r(feet / 3, 2);
+  document.getElementById('cv-sm').textContent  = r(feet / 5280, 4);
+  document.getElementById('cv-nm').textContent  = r(feet / 6076, 4);
+  document.getElementById('cv-m').textContent   = r(feet / 3.28084, 2);
+  document.getElementById('cv-km').textContent  = r(feet / 3280.84, 4);
+  document.getElementById('cv-odo').textContent = r(feet / 528, 2);
+}
+</script>
+</body>
+</html>

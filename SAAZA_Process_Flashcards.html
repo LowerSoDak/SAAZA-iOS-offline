@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Process Flashcards</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f4f0;color:#1a1a1a;padding:1rem;min-height:100vh}
+a.back{display:inline-block;font-size:12px;color:#1D9E75;text-decoration:none;margin-bottom:12px}
+h1{font-size:20px;font-weight:600;margin-bottom:2px}
+.sub{font-size:13px;color:#666;margin-bottom:1.25rem}
+.tnav{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.tb{padding:5px 11px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:12px;color:#555}
+.tb.on{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:500}
+.prog{font-size:12px;color:#666;display:flex;justify-content:space-between;margin-bottom:10px}
+.bar{height:4px;background:#e0e0e0;border-radius:2px;margin-bottom:10px;overflow:hidden}
+.fill{height:100%;background:#1D9E75;border-radius:2px;transition:width .3s}
+.card{border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem;min-height:180px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;background:#fff;margin-bottom:10px}
+.card.ans{border-color:#1D9E75}
+.clabel{font-size:11px;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.clabel.g{color:#1D9E75}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:8px;margin-bottom:8px}
+.td{background:#E1F5EE;color:#0F6E56}
+.tp{background:#EEEDFE;color:#3C3489}
+.tg{background:#FAEEDA;color:#633806}
+.tm{background:#E6F1FB;color:#0C447C}
+.te{background:#FAECE7;color:#712B13}
+.ctext{font-size:14px;color:#1a1a1a;line-height:1.6;white-space:pre-line}
+.hint{font-size:12px;color:#aaa;margin-top:10px;text-align:center}
+.brow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.fb{padding:8px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;color:#555}
+.fb.ok{background:#EAF3DE;color:#27500A;border-color:#639922}
+.fb.no{background:#FCEBEB;color:#791F1F;border-color:#E24B4A}
+.nav{display:flex;gap:8px;margin-bottom:1rem}
+.done{background:#f7f7f5;border-radius:12px;padding:1rem;text-align:center;display:none;margin-top:1rem}
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:1.5rem;padding-bottom:1rem}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← Back to all tools</a>
+<h1>SAAZA Process Flashcards</h1>
+<p class="sub">SAAZA Unit 4 — Four phases, information gathering, preparation, site visit & final product</p>
+<div class="tnav">
+<button class="tb on" onclick="setT('all',this)">All cards</button>
+<button class="tb" onclick="setT('overview',this)">Overview</button>
+<button class="tb" onclick="setT('info',this)">Info gathering</button>
+<button class="tb" onclick="setT('prep',this)">Preparation</button>
+<button class="tb" onclick="setT('site',this)">Site visit</button>
+<button class="tb" onclick="setT('final',this)">Final product</button>
+</div>
+<div class="bar"><div class="fill" id="fill" style="width:0%"></div></div>
+<div class="prog"><span id="pr">Card 1</span><span id="sc">✓ 0  ✗ 0</span></div>
+<div class="card" id="cf" onclick="flip()">
+<div class="clabel">Question — tap to reveal</div>
+<div class="tag" id="tg"></div>
+<div class="ctext" id="cq"></div>
+<div class="hint">Tap card to see answer</div>
+</div>
+<div class="card ans" id="cb" onclick="flip()" style="display:none">
+<div class="clabel g">Answer — tap to go back</div>
+<div class="ctext" id="ca"></div>
+</div>
+<div class="brow" id="br" style="display:none">
+<button class="fb no" onclick="mark(0)">✗ Missed</button>
+<button class="fb" onclick="mark(2)">→ Skip</button>
+<button class="fb ok" onclick="mark(1)">✓ Got it</button>
+</div>
+<div class="nav">
+<button class="fb" style="flex:1" onclick="go(-1)">← Prev</button>
+<button class="fb" style="flex:1" onclick="shuf()">Shuffle ↺</button>
+<button class="fb" style="flex:1" onclick="go(1)">Next →</button>
+</div>
+<div class="done" id="dn">
+<div style="font-size:15px;font-weight:600;margin-bottom:6px">Deck complete!</div>
+<div style="font-size:13px;color:#666" id="fs"></div>
+<button class="fb" style="margin-top:10px" onclick="restart()">Restart ↺</button>
+</div>
+<div class="footer">SAAZA Process Flashcards — 136CRF — works offline, no internet required</div>
+<script>
+var D=[
+{t:'overview',q:'What are the four phases of the SAAZA process?',a:'1. Information Gathering — collection and consolidation of all pre-existing information\n2. Preparation — team planning, task assignment, logistics\n3. Site Visit — physical collection of ground truth data\n4. Final Product Development — synthesis of all data into a cohesive document for the requesting agency'},
+{t:'overview',q:'Which phase of the SAAZA process is the simplest?',a:'Site Visit — the physical survey\n"Everything is invisible except the final product"'},
+{t:'overview',q:'What is the Seven "P" Rule in SAAZA context?',a:'Proper Prior Planning Prevents Piss Poor Performance\nPlanning and preparation are essential — the physical survey is the simplest portion'},
+{t:'info',q:'What is the primary purpose of information gathering?',a:'To create an efficient and effective collection plan for the Site Visit\nCreates priorities to fill gaps in information\nAll information must still be validated on site'},
+{t:'info',q:'What are the nine information gathering sources?',a:'1. Previously completed surveys\n2. Satellite imagery\n3. Maps\n4. ATC supplemental info\n5. Weather reports\n6. Intelligence reports\n7. Host Nation (HN) points of contact\n8. Requestor criteria\n9. Available assets'},
+{t:'info',q:'Where are previously completed surveys found?',a:'Talon Point and Zone Availability Reports (ZARs)\nNIPR: https://talonpoint.net/\nSIPR: https://talonpoint.snlca.nro.smil.mil/TalonPoint/home'},
+{t:'info',q:'Why are previously completed surveys the best source of info?',a:'May still be current\nWill outline previous areas of concern\nBest source of info for a specific location'},
+{t:'info',q:'What satellite imagery sources are available?',a:'S-2 Products\nGoogle Earth\nHAWG-VIEW'},
+{t:'info',q:'What requestor criteria must be confirmed before the site visit?',a:'T/M/S specific NATOPS info:\nGlideslopes\nGradients\nAirframe mission weight for fixed-wing\nLZ size requirements\nSupplemental requests\n"Your assessment depends on this information"'},
+{t:'info',q:'What available asset information must be confirmed?',a:'Logistics — air or ground insert, life support for time on station\nPersonnel — EAF integration, security attachment\nEquipment'},
+{t:'info',q:'How do you transition from information gathering to preparation?',a:'Determine what information you HAVE to identify what you DON\'T have\nPrioritize missing information\nMake a list of necessary tasks to accomplish the mission'},
+{t:'prep',q:'What are the eight preparation considerations?',a:'1. Mission requirements\n2. Limitations\n3. Available assets\n4. Task organization\n5. Mission briefing\n6. Rehearsals\n7. Equipment\n8. Staging'},
+{t:'prep',q:'What mission requirement information must be confirmed?',a:'LZ purpose (ALZ, HLZ, FARP, etc.)\nRequesting agency (T/M/S)\nSupplemental requests'},
+{t:'prep',q:'What limitations must be accounted for in preparation?',a:'Time (including time of day)\nPersonnel\nSecurity concerns'},
+{t:'prep',q:'What must the mission briefing accomplish?',a:'Team Leader must paint a clear and concise picture of the ground scheme of maneuver to EVERY member and all integrated personnel\nEspecially important with time constraints\nClear expectations of outputs'},
+{t:'prep',q:'What is task organization?',a:'Specific tasking for every member\nPrimary, secondary, and tertiary tasks assigned\nIntegration of EAF and security personnel'},
+{t:'site',q:'What is the most critical limitation during a site visit?',a:'TIME — it defines the scope of the survey\nUnlikely to get a second chance\nBad data = bad survey = loss of confidence'},
+{t:'site',q:'What are the time thresholds for hasty vs full survey?',a:'Hasty survey and assessment: < 6 hours\nFull survey and assessment: ≥ 12 hours'},
+{t:'site',q:'What is the scope difference between hasty and full surveys?',a:'Hasty — focuses on presence of MINIMUM criteria only, specific to T/M/S\nFull — provides maximum ground truth data, specific to T/M/S but provides enough info to tailor to other T/M/S'},
+{t:'site',q:'What is the Team Leader\'s role during the site visit?',a:'NOT solely a supervisor — must also participate\nSupervise all members and integrated personnel\nEnsure plan is executed as briefed, or adjust as necessary'},
+{t:'site',q:'What is the key equipment concern during a site visit?',a:'Accountability of gear at ALL times\n"A DCP cone is an indicator to the enemy"'},
+{t:'final',q:'What are the three components of final product development?',a:'1. Data analysis and synthesis\n2. Product refinement\n3. Survey forms'},
+{t:'final',q:'How many CBR calculations result from a standard ALZ DCP evaluation?',a:'37 test locations × 3 layers = 111 CBR calculations\nResults in 1 controlling test location → 3 CBR calculations → 1 controlling layer → 1 CBR rating → 1 answer for allowable passes'},
+{t:'final',q:'How many longitudinal gradient readings and calculations for a C-130 ALZ?',a:'150 readings (20\' increments)\n15 averages of 200\' each\n1 cumulative 3,000\' average'},
+{t:'final',q:'How many transverse gradient readings for a C-130 ALZ?',a:'28 readings at 15\' intervals\n7 averages of 60\' each'},
+{t:'final',q:'What does product refinement include?',a:'LZ diagram\nPictures\nSurvey forms'},
+{t:'final',q:'Which survey form is used for fixed-wing (ALZ)?',a:'AF IRT 3822'},
+{t:'final',q:'Which survey form is used for helicopter/tilt-rotor (HLZ)?',a:'AF IRT 4303'},
+];
+var TG={overview:'td',info:'tp',prep:'tg',site:'tm',final:'te'};
+var TL={overview:'Overview',info:'Info Gathering',prep:'Preparation',site:'Site Visit',final:'Final Product'};
+var deck=[],idx=0,flipped=false,cor=0,wrg=0,topic='all';
+function build(){deck=topic==='all'?D.slice():D.filter(function(c){return c.t===topic;});idx=0;cor=0;wrg=0;show();}
+function setT(t,b){topic=t;document.querySelectorAll('.tb').forEach(function(x){x.classList.remove('on');});b.classList.add('on');build();}
+function show(){
+var done=idx>=deck.length;
+document.getElementById('dn').style.display=done?'block':'none';
+document.getElementById('cf').style.display=done?'none':'flex';
+document.getElementById('cb').style.display='none';
+document.getElementById('br').style.display='none';
+flipped=false;
+if(done){document.getElementById('fs').textContent='✓ '+cor+' correct   ✗ '+wrg+' missed   → '+(deck.length-cor-wrg)+' skipped';return;}
+var c=deck[idx];
+document.getElementById('cq').textContent=c.q;
+document.getElementById('ca').textContent=c.a;
+document.getElementById('tg').textContent=TL[c.t];
+document.getElementById('tg').className='tag '+TG[c.t];
+document.getElementById('pr').textContent='Card '+(idx+1)+' of '+deck.length;
+document.getElementById('sc').textContent='✓ '+cor+'  ✗ '+wrg;
+document.getElementById('fill').style.width=(deck.length>0?Math.round(cor/deck.length*100):0)+'%';
+}
+function flip(){flipped=!flipped;document.getElementById('cf').style.display=flipped?'none':'flex';document.getElementById('cb').style.display=flipped?'flex':'none';document.getElementById('br').style.display=flipped?'grid':'none';}
+function mark(r){if(r===1)cor++;else if(r===0)wrg++;idx++;show();}
+function go(d){var n=idx+d;if(n>=0&&n<deck.length){idx=n;flipped=false;show();}}
+function shuf(){for(var i=deck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=deck[i];deck[i]=deck[j];deck[j]=tmp;}idx=0;cor=0;wrg=0;show();}
+function restart(){idx=0;cor=0;wrg=0;document.getElementById('dn').style.display='none';show();}
+build();
+</script>
+</body>
+</html>

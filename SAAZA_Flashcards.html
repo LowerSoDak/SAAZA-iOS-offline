@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Flashcards</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f4f0;color:#1a1a1a;padding:1rem;min-height:100vh}
+h1{font-size:20px;font-weight:600;margin-bottom:2px}
+.sub{font-size:13px;color:#666;margin-bottom:1.25rem}
+.tnav{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.tb{padding:5px 11px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:12px;color:#555;transition:all .15s}
+.tb.on{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:500}
+.prog{font-size:12px;color:#666;display:flex;justify-content:space-between;margin-bottom:10px}
+.bar{height:4px;background:#e0e0e0;border-radius:2px;margin-bottom:10px;overflow:hidden}
+.fill{height:100%;background:#1D9E75;border-radius:2px;transition:width .3s}
+.card{border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem;min-height:180px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;background:#fff;margin-bottom:10px}
+.card.ans{border-color:#1D9E75}
+.clabel{font-size:11px;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.clabel.g{color:#1D9E75}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:8px;margin-bottom:8px}
+.ts{background:#E1F5EE;color:#0F6E56}
+.td{background:#FAEEDA;color:#633806}
+.tc{background:#E6F1FB;color:#0C447C}
+.tf{background:#EEEDFE;color:#3C3489}
+.tt{background:#FAECE7;color:#712B13}
+.ctext{font-size:14px;color:#1a1a1a;line-height:1.6;white-space:pre-line}
+.hint{font-size:12px;color:#aaa;margin-top:10px;text-align:center}
+.brow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.fb{padding:8px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;color:#555}
+.fb.ok{background:#EAF3DE;color:#27500A;border-color:#639922}
+.fb.no{background:#FCEBEB;color:#791F1F;border-color:#E24B4A}
+.nav{display:flex;gap:8px;margin-bottom:1rem}
+.done{background:#f7f7f5;border-radius:12px;padding:1rem;text-align:center;display:none;margin-top:1rem}
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:1.5rem;padding-bottom:1rem}
+</style>
+</head>
+<body>
+<a href="index.html" style="display:inline-block;font-size:12px;color:#1D9E75;text-decoration:none;margin-bottom:12px;">← Back to all tools</a>
+<h1>Soils &amp; Distresses</h1>
+<p class="sub">SAAZA Unit 3 — Soil identification, distress thresholds, CBR/DCP &amp; trig</p>
+<div class="tnav">
+<button class="tb on" onclick="setT('all',this)">All cards</button>
+<button class="tb" onclick="setT('soil',this)">Soil ID</button>
+<button class="tb" onclick="setT('dist',this)">Distresses</button>
+<button class="tb" onclick="setT('cbr',this)">CBR / DCP</button>
+<button class="tb" onclick="setT('trig',this)">Trig</button>
+</div>
+<div class="bar"><div class="fill" id="fill" style="width:0%"></div></div>
+<div class="prog"><span id="pr">Card 1</span><span id="sc">✓ 0  ✗ 0</span></div>
+<div class="card" id="cf" onclick="flip()">
+<div class="clabel">Question — tap to reveal</div>
+<div class="tag" id="tg"></div>
+<div class="ctext" id="cq"></div>
+<div class="hint">Tap card to see answer</div>
+</div>
+<div class="card ans" id="cb" onclick="flip()" style="display:none">
+<div class="clabel g">Answer — tap to go back</div>
+<div class="ctext" id="ca"></div>
+</div>
+<div class="brow" id="br" style="display:none">
+<button class="fb no" onclick="mark(0)">✗ Missed</button>
+<button class="fb" onclick="mark(2)">→ Skip</button>
+<button class="fb ok" onclick="mark(1)">✓ Got it</button>
+</div>
+<div class="nav">
+<button class="fb" style="flex:1" onclick="go(-1)">← Prev</button>
+<button class="fb" style="flex:1" onclick="shuf()">Shuffle ↺</button>
+<button class="fb" style="flex:1" onclick="go(1)">Next →</button>
+</div>
+<div class="done" id="dn">
+<div style="font-size:15px;font-weight:600;margin-bottom:6px">Deck complete!</div>
+<div style="font-size:13px;color:#666" id="fs"></div>
+<button class="fb" style="margin-top:10px" onclick="restart()">Restart ↺</button>
+</div>
+<div class="footer">SAAZA Soils &amp; Distresses Flashcards &mdash; 136CRF &mdash; works offline, no internet required</div>
+<script>
+var D=[
+{t:'soil',q:'What are the 3 phases of field soil identification?',a:'1. Visual Examination\n2. Sedimentation Test\n3. Plasticity Tests'},
+{t:'soil',q:'What does the first letter of a USCS soil symbol represent?',a:'Size Group — dominant soil type by weight:\nG = Gravel\nS = Sand\nM = Silt\nC = Clay\n(Pt and O are characteristics, not size groups)'},
+{t:'soil',q:'What does the second letter of a USCS symbol represent?',a:'Characteristic:\nW = Well-graded (size ratio)\nP = Poorly-graded (size ratio)\nH = High compressibility (plasticity — requires lab)\nL = Low compressibility (plasticity — requires lab)\nPt = Organic Peat (organics only)\nO = Organic Silts and Clays (organics only)'},
+{t:'soil',q:'Key question when starting USCS classification?',a:'"What do I have the most of by weight?" — determines your first letter'},
+{t:'soil',q:'At what sieve does gravel become sand?',a:'No. 4 sieve — passing No.4 and retained on No.200 = sand'},
+{t:'soil',q:'What are fines?',a:'Material passing the No. 200 sieve — no minimum size'},
+{t:'soil',q:'When do you need a sedimentation test?',a:'When borderline between sand and fines — determines more S or more M/C'},
+{t:'soil',q:'Sedimentation test settlement times?',a:'2 sec = coarse/fine sand\n30 sec = sand/fines\n10 min = coarse/fine silt\n1 hour = silt/clay'},
+{t:'soil',q:'When do you need a plasticity test?',a:'When sample is majority fines — determines Silt (M) vs Clay (C) and H or L'},
+{t:'soil',q:'What are the 5 plasticity tests?',a:'1. Dry Strength\n2. Roll/Thread\n3. Ribbon\n4. Wet Shake\n5. Cast'},
+{t:'soil',q:'Best USCS soil types for a landing surface?',a:'GW (excellent) and GP (good to excellent)'},
+{t:'soil',q:'Which USCS type is always unsuitable?',a:'Pt — organic peat. Not suitable for base or subbase'},
+{t:'soil',q:'What layer does MMT assess?',a:'Base layer only — EAF required for precision evaluation'},
+{t:'soil',q:'What does "poorly graded" mean?',a:'Mostly same-size particles — poor interlocking, less stable'},
+{t:'dist',q:'What system rates airfield distresses?',a:'SPACI — Semi-prepared Airfield Condition Index'},
+{t:'dist',q:'Pothole GREEN threshold?',a:'< 4" deep AND/OR < 15" diameter'},
+{t:'dist',q:'Pothole RED threshold?',a:'> 6" deep AND > 15" diameter'},
+{t:'dist',q:'Rut GREEN threshold?',a:'Exist but < 4" deep'},
+{t:'dist',q:'Rut RED threshold?',a:'> 6" deep'},
+{t:'dist',q:'Loose aggregate coverage GREEN?',a:'Covers < 1/10 of section'},
+{t:'dist',q:'Loose aggregate coverage RED?',a:'Covers > 1/2 of section'},
+{t:'dist',q:'Loose aggregate SIZE GREEN?',a:'Max 3/4", recommended 1/2"'},
+{t:'dist',q:'Loose aggregate SIZE RED?',a:'Max > 1"'},
+{t:'dist',q:'Dust GREEN threshold?',a:'Does not obstruct visibility'},
+{t:'dist',q:'Dust RED threshold?',a:'Thick, obstructs visibility'},
+{t:'dist',q:'Rolling Resistant Material GREEN?',a:'Exist but < 1" deep'},
+{t:'dist',q:'Rolling Resistant Material RED?',a:'> 3" deep'},
+{t:'dist',q:'Jet Blast Erosion GREEN?',a:'Exist but < 1" deep'},
+{t:'dist',q:'Stabilized Layer Failure GREEN?',a:'Exist but < 1" deep'},
+{t:'dist',q:'Stabilized Layer Failure RED?',a:'> 2" deep'},
+{t:'cbr',q:'What does CBR stand for and measure?',a:'California Bearing Ratio — soil weight-bearing capacity based on shearing resistance'},
+{t:'cbr',q:'What is one CBR cycle?',a:'One landing + one takeoff = one pass'},
+{t:'cbr',q:'What tool measures CBR in the field?',a:'Dynamic Cone Penetrometer (DCP)'},
+{t:'cbr',q:'How deep do you test with the DCP?',a:'36 inches'},
+{t:'cbr',q:'What is a DCP denial and what do you do?',a:'10 blows, no movement → relocate 12" and repeat. 3 denials = CBR 80'},
+{t:'cbr',q:'DCP handle > 5" from plumb — what do you do?',a:'Stop, relocate 6", repeat'},
+{t:'cbr',q:'How many people operate the DCP?',a:'2 personnel'},
+{t:'cbr',q:'Time estimate per DCP location?',a:'~7 minutes including movement'},
+{t:'cbr',q:'How many test locations for a standard 3,000\' KC-130 runway?',a:'37 locations'},
+{t:'cbr',q:'5 steps to complete a DCP data sheet?',a:'1. Record blows & depth\n2. Calc depth per blow set\n3. Divide by blows\n4. Look up CBR in Table 3 (ETL 09-6)\n5. ID layers, average CBR per layer'},
+{t:'cbr',q:'How do you identify layer transitions in DCP data?',a:'Significant change in CBR values = new layer'},
+{t:'cbr',q:'Which layer controls allowable passes?',a:'The weakest layer — always the controlling layer'},
+{t:'cbr',q:'Priority DCP locations when time is limited?',a:'Touchdown, braking, turnaround, point of rotation, weak/wet/repaired areas'},
+{t:'cbr',q:'Four soil layers surface to bottom?',a:'Surface → Base → Sub-base → Sub-grade'},
+{t:'trig',q:'When do you use inverse trig?',a:'When you know two sides and need the angle θ\narcTan, arcSin, or arcCos'},
+{t:'trig',q:'Formula to find obstruction height?',a:'Tan(θ) × Adj = Opp\nAdd observer height for true ground-to-top'},
+{t:'trig',q:'How to find straight-line distance (Hyp)?',a:'Know Opp → Hyp = Opp ÷ Sin(θ)\nKnow Adj → Hyp = Adj ÷ Cos(θ)'},
+{t:'trig',q:'When do you multiply vs divide?',a:'Multiply → solving for top row (Opp or Adj)\nDivide → solving for bottom row (Hyp)'},
+{t:'trig',q:'Which function uses Opp and Adj?',a:'Tan = Opp ÷ Adj'},
+{t:'trig',q:'Which function uses Opp and Hyp?',a:'Sin = Opp ÷ Hyp'},
+{t:'trig',q:'Which function uses Adj and Hyp?',a:'Cos = Adj ÷ Hyp'}
+];
+var TG={soil:'ts',dist:'td',cbr:'tc',trig:'tt'};
+var TL={soil:'Soil ID',dist:'Distresses',cbr:'CBR/DCP',trig:'Trig'};
+var deck=[],idx=0,flipped=false,cor=0,wrg=0,topic='all';
+function build(){deck=topic==='all'?D.slice():D.filter(function(c){return c.t===topic;});idx=0;cor=0;wrg=0;show();}
+function setT(t,b){topic=t;document.querySelectorAll('.tb').forEach(function(x){x.classList.remove('on');});b.classList.add('on');build();}
+function show(){
+var done=idx>=deck.length;
+document.getElementById('dn').style.display=done?'block':'none';
+document.getElementById('cf').style.display=done?'none':'flex';
+document.getElementById('cb').style.display='none';
+document.getElementById('br').style.display='none';
+flipped=false;
+if(done){document.getElementById('fs').textContent='✓ '+cor+' correct   ✗ '+wrg+' missed   → '+(deck.length-cor-wrg)+' skipped';return;}
+var c=deck[idx];
+document.getElementById('cq').textContent=c.q;
+document.getElementById('ca').textContent=c.a;
+document.getElementById('tg').textContent=TL[c.t];
+document.getElementById('tg').className='tag '+TG[c.t];
+document.getElementById('pr').textContent='Card '+(idx+1)+' of '+deck.length;
+document.getElementById('sc').textContent='✓ '+cor+'  ✗ '+wrg;
+document.getElementById('fill').style.width=(deck.length>0?Math.round(cor/deck.length*100):0)+'%';
+}
+function flip(){flipped=!flipped;document.getElementById('cf').style.display=flipped?'none':'flex';document.getElementById('cb').style.display=flipped?'flex':'none';document.getElementById('br').style.display=flipped?'grid':'none';}
+function mark(r){if(r===1)cor++;else if(r===0)wrg++;idx++;show();}
+function go(d){var n=idx+d;if(n>=0&&n<deck.length){idx=n;flipped=false;show();}}
+function shuf(){for(var i=deck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=deck[i];deck[i]=deck[j];deck[j]=tmp;}idx=0;cor=0;wrg=0;show();}
+function restart(){idx=0;cor=0;wrg=0;document.getElementById('dn').style.display='none';show();}
+build();
+</script>
+</body>
+</html>

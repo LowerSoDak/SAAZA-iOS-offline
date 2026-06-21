@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Equipment Checklist</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f4f0;color:#1a1a1a;line-height:1.5;padding:1.5rem 1rem;max-width:760px;margin:0 auto}
+a.back{display:inline-block;font-size:12px;color:#1D9E75;text-decoration:none;margin-bottom:12px}
+h1{font-size:22px;font-weight:600;margin-bottom:4px}
+.sub{font-size:13px;color:#666;margin-bottom:14px}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.seg button{flex:1;min-width:64px;border:1px solid #d8d8cf;background:#fff;color:#555;border-radius:9px;padding:9px 6px;font-size:13px;font-weight:600;cursor:pointer}
+.seg button.on{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 6px}
+.count{font-size:12px;color:#777;text-transform:uppercase;letter-spacing:.05em}
+.mini{font-size:12px;color:#1D9E75;background:none;border:none;cursor:pointer;padding:4px 6px}
+.cat{margin-top:16px}
+.cat-h{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+.item{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:11px 13px;margin-bottom:7px}
+.item .body{flex:1;cursor:pointer;min-width:0}
+.item input[type=checkbox]{width:19px;height:19px;accent-color:#1D9E75;flex-shrink:0;cursor:pointer}
+.item .qty{width:54px;flex-shrink:0;border:1px solid #d8d8cf;border-radius:7px;padding:7px 4px;font-size:13px;text-align:center;background:#fff;color:#1a1a1a}
+.item .qty:focus{outline:none;border-color:#1D9E75}
+.item .n{font-size:14px;font-weight:500}
+.item .note{font-size:12px;color:#888;margin-top:1px}
+.item.checked .n{color:#999;text-decoration:line-through}
+.item.checked .note{color:#bbb}
+.tag{display:inline-block;font-size:10px;font-weight:600;color:#0F6E56;background:#E1F5EE;border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.btn-row{margin:18px 0 6px}
+.btn{display:inline-block;background:#1D9E75;color:#fff;border:none;border-radius:9px;padding:11px 18px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none}
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:2rem;padding-bottom:1rem}
+.saved{font-size:11px;color:#1D9E75;margin-left:8px;opacity:0;transition:opacity .2s}
+.saved.show{opacity:1}
+@media print{a.back,.seg,.btn-row,.mini,.footer{display:none!important}.item{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<a class="back" href="index.html">&larr; Back to all tools</a>
+<h1>Equipment Checklist</h1>
+<p class="sub">Pre-survey gear list &mdash; load out and account for everything before you roll. Pick your survey type to see what it needs, or tap All. Enter how many of each you're bringing; checks and counts save automatically.</p>
+
+<div class="seg" id="seg">
+  <button class="on" data-v="all" onclick="setType('all')">All</button>
+  <button data-v="ALZ" onclick="setType('ALZ')">ALZ</button>
+  <button data-v="HLZ" onclick="setType('HLZ')">HLZ</button>
+  <button data-v="DZ" onclick="setType('DZ')">DZ</button>
+</div>
+
+<div class="bar">
+  <span class="count" id="count"></span>
+  <span><button class="mini" onclick="resetChecks()">Reset checks</button><span class="saved" id="saved">saved</span></span>
+</div>
+
+<div id="list"></div>
+
+<div class="btn-row">
+  <button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+</div>
+
+<div class="footer">136th Contingency Response Flight &mdash; rcarney94.github.io/saaza-calculator &mdash; works offline once loaded</div>
+
+<script>
+var GEAR=[
+  ["Navigation & measurement",[
+    ["DAGR (GPS receiver)","Coordinates & MSL elevation","all"],
+    ["Compass","Azimuths & obstacle bearings","all"],
+    ["ATAK-capable tablet","Situational awareness, mapping & shared overlays","all"],
+    ["Laser range finder (LRF)","Distances & obstacle heights &mdash; recommend Vectronix PLRF 15C","all"],
+    ["Clinometer","Slopes & obstacle angles","all"],
+    ["Line level + 20 ft rod/cord","Gradient reduction","ALZ,HLZ"],
+    ["100 ft measuring tape","Short distances & layout","all"],
+    ["Measuring wheel","Long ground distances (too coarse for a DZ)","ALZ"],
+    ["Stakes / pins + flagging tape","Mark stations & corners","all"]
+  ]],
+  ["Soil bearing (ALZ)",[
+    ["Dynamic Cone Penetrometer (DCP)","Soil bearing strength","ALZ"],
+    ["DCP drop hammer + spare cones","Run & maintain the DCP","ALZ"],
+    ["DCP data sheets + CBR conversion table","Record blows, convert to CBR","ALZ"]
+  ]],
+  ["Documentation",[
+    ["Camera or phone","Required photos","all"],
+    ["Phone/tablet with SAAZA tools loaded","Calculators & Field Guide, offline-ready","all"],
+    ["Power bank / spare batteries","Keep devices alive","all"],
+    ["AF IMT 3822 (printed)","ALZ survey form","ALZ"],
+    ["AF IMT 4303 (printed)","HLZ survey form","HLZ"],
+    ["AF IMT 3823 (printed)","DZ survey form","DZ"],
+    ["Field notebook + pencils","Paper backup &mdash; always write it down too","all"],
+    ["Clipboard / waterproof case","Protect the forms & notes","all"]
+  ]],
+  ["Marking & layout (as required)",[
+    ["Marking / spray paint","Mark points & lines","all"],
+    ["Panels / markers (VS-17 or equiv.)","Mark the zone / PI","HLZ,DZ"],
+    ["Reference stakes","Hold survey points","all"]
+  ]],
+  ["Comms, power & safety",[
+    ["Radio + comms plan / frequencies","Stay linked across teams","all"],
+    ["Eye & ear protection, gloves","DCP and field hazards","all"],
+    ["Hi-vis / signaling gear as required","Visibility on an active surface","all"],
+    ["Water, weather protection, sunscreen","Sustainment","all"]
+  ]]
+];
+var type="all", KEY="saaza_equip_v1", state={};
+try{ var s=localStorage.getItem(KEY); if(s){ var o=JSON.parse(s)||{}; for(var k in o){ var v=o[k]; state[k]=(v&&typeof v==="object")?{c:!!v.c,q:v.q||""}:{c:!!v,q:""}; } } }catch(e){}
+function st(key){ if(!state[key]) state[key]={c:false,q:""}; return state[key]; }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} var t=document.getElementById("saved"); t.classList.add("show"); setTimeout(function(){t.classList.remove("show");},900); }
+function needs(types){ return type==="all" || types==="all" || types.split(",").indexOf(type)>=0; }
+function setType(t){ type=t; [].forEach.call(document.querySelectorAll("#seg button"),function(b){ b.classList.toggle("on", b.getAttribute("data-v")===t); }); render(); }
+function toggle(key){ var x=st(key); x.c=!x.c; save(); render(); }
+function setQty(key,val){ st(key).q=val; save(); }
+function resetChecks(){ if(!confirm("Clear every check and quantity?")) return; state={}; save(); render(); }
+function esc(s){ return (s||"").replace(/&(?!amp;|mdash;|hellip;|larr;)/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function ek(key){ return key.replace(/'/g,"\\'"); }
+function render(){
+  var html="", total=0, done=0;
+  GEAR.forEach(function(cat){
+    var rows=cat[1].filter(function(it){ return needs(it[2]); });
+    if(!rows.length) return;
+    html+='<div class="cat"><div class="cat-h">'+esc(cat[0])+'</div>';
+    rows.forEach(function(it){
+      var key=it[0], x=st(key), c=!!x.c; total++; if(c) done++;
+      var tag = (type==="all" && it[2]!=="all") ? '<span class="tag">'+it[2].replace(/,/g," / ")+'</span>' : '';
+      html+='<div class="item'+(c?" checked":"")+'">'
+        +'<input type="checkbox" '+(c?"checked":"")+' onchange="toggle(\''+ek(key)+'\')">'
+        +'<span class="body" onclick="toggle(\''+ek(key)+'\')"><span class="n">'+esc(key)+tag+'</span><span class="note">'+esc(it[1])+'</span></span>'
+        +'<input type="number" class="qty" min="0" inputmode="numeric" placeholder="qty" value="'+esc(x.q)+'" oninput="setQty(\''+ek(key)+'\',this.value)">'
+        +'</div>';
+    });
+    html+='</div>';
+  });
+  document.getElementById("list").innerHTML=html;
+  document.getElementById("count").textContent=done+" of "+total+" packed"+(type!=="all"?" \u00b7 "+type:"");
+}
+render();
+</script>
+</body>
+</html>

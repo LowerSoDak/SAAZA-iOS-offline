@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Coordinate Converter</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: #f4f4f0; color: #1a1a1a; min-height: 100vh; padding: 1rem; }
+  h1 { font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .subtitle { font-size: 13px; color: #666; margin-bottom: 1rem; line-height: 1.5; }
+  .datum { display:inline-block; font-size: 11px; color:#0F6E56; background:#EAF3DE; border-radius:6px; padding:3px 9px; margin-bottom:1.1rem; font-weight:600; }
+  .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
+  .card.out { border-color:#1D9E75; border-width:1.5px; }
+  .card-title { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+  .card-desc { font-size: 12px; color: #666; margin-bottom: 14px; line-height: 1.5; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .field-grid-4 { display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:8px; margin-bottom:10px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11px; color: #666; }
+  .field input, .field select { width: 100%; padding: 7px 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; color: #1a1a1a; background: #fff; outline: none; }
+  .field input:focus, .field select:focus { border-color: #1D9E75; box-shadow: 0 0 0 2px rgba(29,158,117,0.15); }
+  .field-single { margin-bottom: 10px; }
+  .calc-btn { background: #1D9E75; color: #fff; border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .calc-btn:hover { background: #0F6E56; }
+  .err { font-size:12px; color:#a33; margin-top:8px; display:none; }
+  /* results */
+  .res-row { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid #f0f0f0; }
+  .res-row:last-child { border-bottom:none; }
+  .res-label { font-size:11px; color:#888; flex-shrink:0; padding-top:2px; min-width:96px; }
+  .res-val { font-family:"Courier New", monospace; font-size:14.5px; font-weight:600; color:#0F6E56; text-align:right; word-break:break-word; }
+  .res-val .sub { display:block; font-size:11px; color:#999; font-weight:400; font-family:-apple-system,sans-serif; }
+  .copy { background:none; border:1px solid #d5d5d5; border-radius:6px; font-size:10px; color:#777; padding:2px 7px; cursor:pointer; margin-left:6px; vertical-align:middle; }
+  .copy:hover { background:#f0f0f0; }
+  .maps { margin-top:12px; font-size:12px; }
+  .maps a { color:#1D9E75; text-decoration:none; font-weight:600; }
+  .maps a:hover { text-decoration:underline; }
+  .note { font-size:11px; color:#999; line-height:1.5; margin-top:10px; padding-top:10px; border-top:1px solid #f0f0f0; }
+  .footer { text-align: center; font-size: 11px; color: #aaa; margin-top: 1.5rem; padding-bottom: 1rem; }
+  .info-i { display:inline-flex; align-items:center; justify-content:center; width:17px; height:17px; border-radius:50%; background:#1D9E75; color:#fff; font:italic 700 11px/1 Georgia,serif; cursor:pointer; vertical-align:middle; margin-left:6px; user-select:none; }
+  .info-i:hover { background:#0F6E56; }
+  .info-box { display:none; background:#EAF3DE; border:1px solid #1D9E75; border-radius:8px; padding:11px 13px 11px 14px; font-size:12px; color:#27500A; line-height:1.6; margin:8px 0 4px; }
+  .info-box.show { display:block; }
+  .info-box ol { margin:6px 0 0; padding-left:18px; }
+  .info-box li { margin-bottom:5px; }
+  @media (max-width: 480px) {
+    .field-grid { grid-template-columns: 1fr; }
+    .field-grid-4 { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" style="display:inline-block;font-size:12px;color:#1D9E75;text-decoration:none;margin-bottom:12px;">← Back to all tools</a>
+<h1>Coordinate Converter</h1>
+<p class="subtitle">Convert between Lat/Long, Degrees-Minutes-Seconds, UTM (Easting/Northing), and MGRS. Enter any one format and the rest fill in.</p>
+<span class="datum">Datum: WGS 84</span>
+
+<!-- ============ RESULTS ============ -->
+<div class="card out">
+  <div class="card-title">All formats</div>
+  <div id="results">
+    <div class="res-row"><span class="res-label">Decimal degrees</span><span class="res-val" id="r-dd">—</span></div>
+    <div class="res-row"><span class="res-label">Deg / Min / Sec</span><span class="res-val" id="r-dms">—</span></div>
+    <div class="res-row"><span class="res-label">Deg-Dec-Min<span class="sub">(survey form)</span></span><span class="res-val" id="r-dm">—</span></div>
+    <div class="res-row"><span class="res-label">UTM</span><span class="res-val" id="r-utm">—</span></div>
+    <div class="res-row"><span class="res-label">MGRS</span><span class="res-val" id="r-mgrs">—</span></div>
+  </div>
+  <div class="maps" id="maps" style="display:none;">Open in: <a id="m-g" target="_blank" rel="noopener">Google Maps</a> &middot; <a id="m-a" target="_blank" rel="noopener">Apple Maps</a> &middot; <a id="m-o" target="_blank" rel="noopener">OpenStreetMap</a></div>
+  <div class="note">UTM/MGRS Easting &amp; Northing are rounded to the nearest meter (standard). For a published survey, treat your <b>DAGR</b> as source of record and confirm unit guidance — this tool is for field cross-check and conversion.</div>
+</div>
+
+<!-- ============ INPUTS ============ -->
+<div class="card">
+  <div class="card-title">Decimal degrees</div>
+  <div class="card-desc">Negative for South latitude / West longitude. (e.g. 43.96519905, -90.65933946)</div>
+  <div class="field-grid">
+    <div class="field"><label>Latitude</label><input type="number" step="any" id="dd-lat"/></div>
+    <div class="field"><label>Longitude</label><input type="number" step="any" id="dd-lon"/></div>
+  </div>
+  <button class="calc-btn" onclick="fromDD()">Convert</button>
+  <div class="err" id="dd-err"></div>
+</div>
+
+<div class="card">
+  <div class="card-title">Degrees, minutes, seconds</div>
+  <div class="card-desc">Latitude N/S, longitude E/W. (e.g. 43° 57' 54.717" N, 90° 39' 33.622" W)</div>
+  <div class="field-grid-4">
+    <div class="field"><label>Lat °</label><input type="number" step="any" id="dms-latd"/></div>
+    <div class="field"><label>Lat '</label><input type="number" step="any" id="dms-latm"/></div>
+    <div class="field"><label>Lat "</label><input type="number" step="any" id="dms-lats"/></div>
+    <div class="field"><label>N/S</label><select id="dms-lath"><option>N</option><option>S</option></select></div>
+  </div>
+  <div class="field-grid-4">
+    <div class="field"><label>Lon °</label><input type="number" step="any" id="dms-lond"/></div>
+    <div class="field"><label>Lon '</label><input type="number" step="any" id="dms-lonm"/></div>
+    <div class="field"><label>Lon "</label><input type="number" step="any" id="dms-lons"/></div>
+    <div class="field"><label>E/W</label><select id="dms-lonh"><option>W</option><option>E</option></select></div>
+  </div>
+  <button class="calc-btn" onclick="fromDMS()">Convert</button>
+  <div class="err" id="dms-err"></div>
+</div>
+
+<div class="card">
+  <div class="card-title">Standard UTM</div>
+  <div class="card-desc">Zone number, hemisphere, full Easting &amp; Northing in meters. (e.g. 15 N, E 687772, N 4870671)</div>
+  <div class="field-grid-4">
+    <div class="field"><label>Zone</label><input type="number" id="utm-zone"/></div>
+    <div class="field"><label>Hemi</label><select id="utm-hemi"><option>N</option><option>S</option></select></div>
+    <div class="field"><label>Easting</label><input type="number" step="any" id="utm-e"/></div>
+    <div class="field"><label>Northing</label><input type="number" step="any" id="utm-n"/></div>
+  </div>
+  <button class="calc-btn" onclick="fromUTM()">Convert</button>
+  <div class="err" id="utm-err"></div>
+</div>
+
+<div class="card">
+  <div class="card-title">MGRS / NATO UTM</div>
+  <div class="card-desc">Paste the full grid — spaces optional. (e.g. <span style="font-family:monospace;">15T XJ 87772 70671</span>)</div>
+  <div class="field-single field"><label>MGRS coordinate</label><input type="text" id="mgrs-in"/></div>
+  <button class="calc-btn" onclick="fromMGRS()">Convert</button>
+  <div class="err" id="mgrs-err"></div>
+</div>
+
+<div class="card out">
+  <div class="card-title">Azimuth — True / Grid / Magnetic <span class="info-i" onclick="toggleInfo('az-info')" title="How to use this tool">i</span></div>
+  <div class="info-box" id="az-info">
+    <b>How to use this</b>
+    <ol>
+      <li>Convert your position in one of the boxes above first — the grid convergence is figured from it.</li>
+      <li><b>Step 1:</b> enter your magnetic declination (tap the NOAA link if you don't know it). Needed only for magnetic conversions.</li>
+      <li><b>Step 2:</b> type your heading once, then pick the north you measured it from — <b>compass = Magnetic</b>, <b>map / protractor = Grid</b>.</li>
+      <li>Read the other two results. Shot it with a compass? Use the <b>Grid</b> value on your map. Measured it on the map? Use the <b>Magnetic</b> value to walk it with your compass.</li>
+    </ol>
+  </div>
+  <div class="card-desc">Convert a heading between the three norths. A reading off your <b>compass</b> is <b>Magnetic</b>; a reading off your <b>map / protractor</b> is <b>Grid</b>. Uses the position you entered above.</div>
+
+  <div class="res-row"><span class="res-label">Grid convergence</span><span class="res-val" id="az-conv">—</span></div>
+  <div style="font-size:11px;color:#888;line-height:1.5;margin-top:6px;">True ↔ Grid is figured automatically from your position (pure geometry — never changes). For Magnetic, fill in Step 1.</div>
+
+  <div style="margin-top:16px;font-size:12.5px;font-weight:700;color:#1a1a1a;">Step 1 &nbsp;·&nbsp; Your magnetic declination</div>
+  <div class="field-grid" style="margin-top:6px;">
+    <div class="field"><label>Declination (East = +, West = &minus;)</label><input type="number" step="any" id="az-decl" oninput="updateAz()"/></div>
+    <div class="field"><label>&nbsp;</label><div style="font-size:11px;color:#777;line-height:1.5;">Don't know it? <a href="https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml?useFullSite=true" target="_blank" rel="noopener" style="color:#1D9E75;font-weight:700;text-decoration:underline;">Look it up on NOAA &#8599;</a> — type in the lat/long shown above, set the date to today, and read the <b>Declination</b> value (e.g. 0.8&deg; E). You can also use your map's declination diagram or your DAGR. It drifts ~0.1&deg;/yr, so use a current value.</div></div>
+  </div>
+
+  <div style="margin-top:14px;font-size:12.5px;font-weight:700;color:#1a1a1a;">Step 2 &nbsp;·&nbsp; Your azimuth</div>
+  <div class="field-grid" style="margin-top:6px;">
+    <div class="field"><label>Heading in degrees (e.g. 270)</label><input type="number" step="any" id="az-val" oninput="updateAz()"/></div>
+    <div class="field"><label>I measured it from&hellip;</label><select id="az-ref" onchange="updateAz()"><option value="magnetic">Magnetic north (compass)</option><option value="grid">Grid north (map / protractor)</option><option value="true">True north</option></select></div>
+  </div>
+
+  <div id="az-out" style="display:none;margin-top:10px;">
+    <div class="res-row"><span class="res-label">True north</span><span class="res-val" id="az-t">—</span></div>
+    <div class="res-row"><span class="res-label">Grid north<span class="sub">use this on the map</span></span><span class="res-val" id="az-g">—</span></div>
+    <div class="res-row"><span class="res-label">Magnetic north<span class="sub">set this on your compass</span></span><span class="res-val" id="az-m">—</span></div>
+  </div>
+  <div style="font-size:11px;color:#888;line-height:1.5;margin-top:8px;display:none;" id="az-hint"></div>
+  <div class="err" id="az-err"></div>
+</div>
+
+<div class="footer">SAAZA Coordinate Converter &mdash; 136CRF &mdash; WGS 84 &middot; works offline</div>
+
+<script>
+// ===== WGS84 conversion core (verified against 43.96519905,-90.65933946 = 15T XJ 87772 70671) =====
+var A=6378137.0, F=1/298.257223563, K0=0.9996;
+var E2=F*(2-F), EP2=E2/(1-E2), D2R=Math.PI/180, R2D=180/Math.PI;
+var BANDS="CDEFGHJKLMNPQRSTUVWX";
+
+function latBand(lat){ if(lat<-80)return 'A'; if(lat>=84)return 'X'; var i=Math.floor((lat+80)/8); if(i>19)i=19; return BANDS.charAt(i); }
+function bandSouthLat(b){ return -80+8*BANDS.indexOf(b); }
+function bandIsNorth(b){ return BANDS.indexOf(b)>=10; }
+function colSet(z){ var s=z%3; return s===1?"ABCDEFGH":s===2?"JKLMNPQR":"STUVWXYZ"; }
+function rowSet(z){ return (z%2===1)?"ABCDEFGHJKLMNPQRSTUV":"FGHJKLMNPQRSTUVABCDE"; }
+function pad5(v){ return ('00000'+Math.floor(v)).slice(-5); }
+
+function latLonToUTM(lat, lon){
+  var zone=Math.floor((lon+180)/6)+1;
+  if(lat>=56&&lat<64&&lon>=3&&lon<12) zone=32;
+  if(lat>=72&&lat<84){ if(lon>=0&&lon<9)zone=31; else if(lon>=9&&lon<21)zone=33; else if(lon>=21&&lon<33)zone=35; else if(lon>=33&&lon<42)zone=37; }
+  var cm=(zone-1)*6-180+3, latR=lat*D2R, dLon=(lon-cm)*D2R;
+  var N=A/Math.sqrt(1-E2*Math.sin(latR)*Math.sin(latR));
+  var T=Math.tan(latR)*Math.tan(latR), C=EP2*Math.cos(latR)*Math.cos(latR), Aa=Math.cos(latR)*dLon;
+  var M=A*((1-E2/4-3*E2*E2/64-5*E2*E2*E2/256)*latR-(3*E2/8+3*E2*E2/32+45*E2*E2*E2/1024)*Math.sin(2*latR)+(15*E2*E2/256+45*E2*E2*E2/1024)*Math.sin(4*latR)-(35*E2*E2*E2/3072)*Math.sin(6*latR));
+  var easting=K0*N*(Aa+(1-T+C)*Math.pow(Aa,3)/6+(5-18*T+T*T+72*C-58*EP2)*Math.pow(Aa,5)/120)+500000.0;
+  var northing=K0*(M+N*Math.tan(latR)*(Aa*Aa/2+(5-T+9*C+4*C*C)*Math.pow(Aa,4)/24+(61-58*T+T*T+600*C-330*EP2)*Math.pow(Aa,6)/720));
+  if(lat<0) northing+=10000000.0;
+  return {zone:zone, hemisphere:(lat>=0?'N':'S'), easting:easting, northing:northing, band:latBand(lat)};
+}
+function utmToLatLon(zone, hemisphere, easting, northing){
+  var x=easting-500000.0, y=northing; if(hemisphere==='S')y-=10000000.0;
+  var cm=(zone-1)*6-180+3, M=y/K0, mu=M/(A*(1-E2/4-3*E2*E2/64-5*E2*E2*E2/256));
+  var e1=(1-Math.sqrt(1-E2))/(1+Math.sqrt(1-E2));
+  var phi=mu+(3*e1/2-27*Math.pow(e1,3)/32)*Math.sin(2*mu)+(21*e1*e1/16-55*Math.pow(e1,4)/32)*Math.sin(4*mu)+(151*Math.pow(e1,3)/96)*Math.sin(6*mu)+(1097*Math.pow(e1,4)/512)*Math.sin(8*mu);
+  var N1=A/Math.sqrt(1-E2*Math.sin(phi)*Math.sin(phi)), T1=Math.tan(phi)*Math.tan(phi), C1=EP2*Math.cos(phi)*Math.cos(phi);
+  var R1=A*(1-E2)/Math.pow(1-E2*Math.sin(phi)*Math.sin(phi),1.5), D=x/(N1*K0);
+  var lat=phi-(N1*Math.tan(phi)/R1)*(D*D/2-(5+3*T1+10*C1-4*C1*C1-9*EP2)*Math.pow(D,4)/24+(61+90*T1+298*C1+45*T1*T1-252*EP2-3*C1*C1)*Math.pow(D,6)/720);
+  var lon=cm+R2D*((D-(1+2*T1+C1)*Math.pow(D,3)/6+(5-2*C1+28*T1-3*C1*C1+8*EP2+24*T1*T1)*Math.pow(D,5)/120)/Math.cos(phi));
+  return {lat:lat*R2D, lon:lon};
+}
+function utmToMGRS(zone, easting, northing, band){
+  var E=Math.round(easting), N=Math.round(northing);
+  var col=Math.floor(E/100000), colL=colSet(zone).charAt(col-1);
+  var row=Math.floor((N%2000000)/100000), rowL=rowSet(zone).charAt(row);
+  var e=E%100000, n=N%100000;
+  return {gzd:zone+band, digraph:colL+rowL, e:e, n:n, string:zone+band+' '+colL+rowL+' '+pad5(e)+' '+pad5(n)};
+}
+function mgrsToUTM(zone, band, colL, rowL, e, n){
+  var col=colSet(zone).indexOf(colL)+1, easting=col*100000+e;
+  var row=rowSet(zone).indexOf(rowL), nMod=row*100000+n;
+  var cm=(zone-1)*6-180+3, minN=latLonToUTM(bandSouthLat(band), cm).northing;
+  var k=Math.round((minN-nMod)/2000000), northing=nMod+k*2000000;
+  var hemi=bandIsNorth(band)?'N':'S';
+  for(var t=0;t<2;t++){ var ll=utmToLatLon(zone,hemi,easting,northing); if(ll.lat>=bandSouthLat(band)-0.5 && ll.lat<bandSouthLat(band)+8.5)break; northing+=(ll.lat<bandSouthLat(band))?2000000:-2000000; }
+  return {zone:zone, hemisphere:hemi, easting:easting, northing:northing};
+}
+
+// grid convergence: angle from true north to grid north, + = grid north EAST of true north
+function gridConvergence(lat, lon, zone){
+  var cm=(zone-1)*6-180+3, dLon=(lon-cm)*D2R, latR=lat*D2R;
+  var eta2=EP2*Math.cos(latR)*Math.cos(latR);
+  var C=dLon*Math.sin(latR)*(1+(dLon*dLon*Math.cos(latR)*Math.cos(latR)/3)*(1+3*eta2));
+  return C*R2D;
+}
+function norm360(a){ a%=360; if(a<0)a+=360; return a; }
+
+// ===== formatting =====
+function toDMS(v,isLat){ var h=v>=0?(isLat?'N':'E'):(isLat?'S':'W'); v=Math.abs(v); var d=Math.floor(v),mf=(v-d)*60,m=Math.floor(mf),s=(mf-m)*60; return d+'\u00b0 '+m+"' "+s.toFixed(3)+'" '+h; }
+function toDM(v,isLat){ var h=v>=0?(isLat?'N':'E'):(isLat?'S':'W'); v=Math.abs(v); var d=Math.floor(v),m=(v-d)*60; var dd=isLat?('0'+d).slice(-2):('00'+d).slice(-3); return h+' '+dd+'\u00b0 '+m.toFixed(3)+"'"; }
+
+function parseMGRS(s){
+  s=s.toUpperCase().replace(/\s+/g,'');
+  var m=s.match(/^(\d{1,2})([C-HJ-NP-X])([A-HJ-NP-Z])([A-HJ-NP-V])(\d*)$/);
+  if(!m) return null;
+  var digits=m[5]; if(digits.length%2!==0) return null;
+  var half=digits.length/2;
+  var e=half?+ (digits.slice(0,half)+'00000').slice(0,5):0;
+  var n=half?+ (digits.slice(half)+'00000').slice(0,5):0;
+  return {zone:+m[1], band:m[2], c1:m[3], c2:m[4], e:e, n:n};
+}
+
+function showErr(id,msg){ var el=document.getElementById(id); el.textContent=msg; el.style.display='block'; }
+function clearErrs(){ ['dd-err','dms-err','utm-err','mgrs-err'].forEach(function(i){document.getElementById(i).style.display='none';}); }
+
+var CUR=null;
+function renderAll(lat, lon){
+  if(!isFinite(lat)||!isFinite(lon)||lat<-80||lat>84){ showErr('dd-err','Latitude must be between 80\u00b0S and 84\u00b0N for UTM/MGRS.'); return; }
+  document.getElementById('r-dd').textContent  = lat.toFixed(8)+', '+lon.toFixed(8);
+  document.getElementById('r-dms').textContent = toDMS(lat,true)+'   '+toDMS(lon,false);
+  document.getElementById('r-dm').textContent  = toDM(lat,true)+'   '+toDM(lon,false);
+  var u=latLonToUTM(lat,lon);
+  document.getElementById('r-utm').innerHTML = 'Zone '+u.zone+u.band+'  '+u.hemisphere+'<span class="sub">E '+Math.round(u.easting)+'   N '+Math.round(u.northing)+'</span>';
+  var m=utmToMGRS(u.zone,u.easting,u.northing,u.band);
+  document.getElementById('r-mgrs').innerHTML = m.string+' <button class="copy" onclick="copyTxt(\''+m.string+'\')">copy</button><span class="sub">'+m.gzd+' &middot; '+m.digraph+' &middot; E '+m.e+' &middot; N '+m.n+'</span>';
+  var maps=document.getElementById('maps'); maps.style.display='block';
+  document.getElementById('m-g').href='https://www.google.com/maps?q='+lat+','+lon;
+  document.getElementById('m-a').href='https://maps.apple.com/?q='+lat+','+lon;
+  document.getElementById('m-o').href='https://www.openstreetmap.org/?mlat='+lat+'&mlon='+lon+'#map=15/'+lat+'/'+lon;
+  CUR={lat:lat, lon:lon, zone:u.zone, conv:gridConvergence(lat,lon,u.zone)};
+  document.getElementById('az-conv').innerHTML = (CUR.conv>=0?'+':'')+CUR.conv.toFixed(2)+'\u00b0<span class="sub">grid north is '+(CUR.conv>=0?'east':'west')+' of true north</span>';
+  updateAz();
+}
+function updateAz(){
+  if(!CUR) return;
+  var azv=parseFloat(document.getElementById('az-val').value);
+  var declRaw=parseFloat(document.getElementById('az-decl').value);
+  var D=isNaN(declRaw)?null:declRaw;
+  var out=document.getElementById('az-out'), hint=document.getElementById('az-hint');
+  hint.style.display='none';
+  if(isNaN(azv)){ out.style.display='none'; return; }
+  var ref=document.getElementById('az-ref').value, azTrue;
+  if(ref==='true') azTrue=azv;
+  else if(ref==='grid') azTrue=azv+CUR.conv;
+  else { if(D===null){ out.style.display='none'; hint.innerHTML='&#8593;&nbsp; Add your declination in Step 1 to convert a compass (magnetic) heading.'; hint.style.display='block'; return; } azTrue=azv+D; }
+  out.style.display='block';
+  document.getElementById('az-t').textContent=norm360(azTrue).toFixed(1)+'\u00b0';
+  document.getElementById('az-g').textContent=norm360(azTrue-CUR.conv).toFixed(1)+'\u00b0';
+  document.getElementById('az-m').textContent=(D===null)?'\u2014 add declination in Step 1':norm360(azTrue-D).toFixed(1)+'\u00b0';
+}
+function copyTxt(t){ if(navigator.clipboard) navigator.clipboard.writeText(t); }
+function toggleInfo(id){ document.getElementById(id).classList.toggle('show'); }
+
+function num(id){ var v=parseFloat(document.getElementById(id).value); return isNaN(v)?null:v; }
+
+function fromDD(){ clearErrs(); var lat=num('dd-lat'),lon=num('dd-lon'); if(lat===null||lon===null) return; renderAll(lat,lon); }
+function fromDMS(){
+  clearErrs();
+  if(num('dms-latd')===null||num('dms-lond')===null) return;
+  var d=num('dms-latd')||0,m=num('dms-latm')||0,s=num('dms-lats')||0;
+  var d2=num('dms-lond')||0,m2=num('dms-lonm')||0,s2=num('dms-lons')||0;
+  var lat=Math.abs(d)+m/60+s/3600; if(document.getElementById('dms-lath').value==='S')lat=-lat;
+  var lon=Math.abs(d2)+m2/60+s2/3600; if(document.getElementById('dms-lonh').value==='W')lon=-lon;
+  renderAll(lat,lon);
+}
+function fromUTM(){
+  clearErrs();
+  var z=parseInt(document.getElementById('utm-zone').value,10), e=num('utm-e'), n=num('utm-n');
+  if(isNaN(z)||z<1||z>60||e===null||n===null) return;
+  var ll=utmToLatLon(z, document.getElementById('utm-hemi').value, e, n);
+  renderAll(ll.lat, ll.lon);
+}
+function fromMGRS(){
+  clearErrs();
+  var raw=document.getElementById('mgrs-in').value.trim();
+  if(!raw) return;
+  var p=parseMGRS(raw);
+  if(!p){ showErr('mgrs-err','Could not read that \u2014 use e.g. 15T XJ 87772 70671 (zone, band, 2-letter square, even number of digits).'); return; }
+  var mu=mgrsToUTM(p.zone,p.band,p.c1,p.c2,p.e,p.n);
+  var ll=utmToLatLon(mu.zone,mu.hemisphere,mu.easting,mu.northing);
+  renderAll(ll.lat, ll.lon);
+}
+
+// wire every input to convert live as you type — no button needed (buttons still work too)
+['dd-lat','dd-lon'].forEach(function(id){ document.getElementById(id).addEventListener('input', fromDD); });
+['dms-latd','dms-latm','dms-lats','dms-lond','dms-lonm','dms-lons'].forEach(function(id){ document.getElementById(id).addEventListener('input', fromDMS); });
+['dms-lath','dms-lonh'].forEach(function(id){ document.getElementById(id).addEventListener('change', fromDMS); });
+['utm-zone','utm-e','utm-n'].forEach(function(id){ document.getElementById(id).addEventListener('input', fromUTM); });
+document.getElementById('utm-hemi').addEventListener('change', fromUTM);
+document.getElementById('mgrs-in').addEventListener('input', fromMGRS);
+</script>
+</body>
+</html>

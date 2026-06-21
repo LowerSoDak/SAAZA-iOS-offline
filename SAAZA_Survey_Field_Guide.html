@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Survey Field Guide</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: #f4f4f0; color: #1a1a1a; padding: 1rem; }
+  a.back { display:inline-block; font-size:12px; color:#1D9E75; text-decoration:none; margin-bottom:12px; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 2px; }
+  .subtitle { font-size: 13px; color: #666; margin-bottom: .9rem; line-height:1.5; }
+  details.help { margin-bottom: 1rem; font-size:12.5px; }
+  details.help summary { cursor:pointer; color:#1D9E75; font-weight:600; }
+  details.help .hbody { margin-top:8px; color:#555; line-height:1.55; background:#fff; border:1px solid #e0e0e0; border-radius:10px; padding:11px 14px; }
+  details.help .hbody li { margin:4px 0 4px 18px; }
+  .seg { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+  .seg button { flex:1; min-width:90px; padding:9px 10px; border:1px solid #ccc; border-radius:9px; background:#fff; cursor:pointer; font-size:13px; color:#555; font-weight:600; }
+  .seg button.on { background:#1D9E75; color:#fff; border-color:#1D9E75; }
+  .ctrl-card { background:#fff; border:1px solid #e0e0e0; border-radius:12px; padding:1rem 1.1rem; margin-bottom:1rem; }
+  .ctrl-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .ctrl-row label { font-size:13px; color:#444; font-weight:600; }
+  .ctrl-row input.sz { width:64px; padding:7px 10px; border:1px solid #ccc; border-radius:8px; font-size:15px; text-align:center; }
+  .summary { margin-top:10px; font-size:12px; color:#555; }
+  .summary .s-pill { display:inline-block; border-radius:6px; padding:2px 9px; margin:0 4px 4px 0; font-size:11.5px; font-weight:600; }
+  .s-TL{background:#EAF3DE;color:#27500A}.s-DCP{background:#FBF1DE;color:#7a5a00}.s-SM{background:#E6F0F8;color:#0C447C}
+  .roster { display:flex; flex-direction:column; gap:9px; margin-top:8px; }
+  .team-box { border:1px solid #e3e3dd; border-radius:10px; padding:9px 11px; }
+  .team-box.t-TL { border-left:4px solid #1D9E75; }
+  .team-box.t-DCP { border-left:4px solid #E0A93B; }
+  .team-box.t-SM { border-left:4px solid #0C6CB8; }
+  .tb-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; gap:8px; }
+  .tb-label { font-size:12.5px; font-weight:700; color:#333; }
+  .tb-x { border:none; background:none; color:#c0392b; font-size:17px; line-height:1; cursor:pointer; padding:0 2px; }
+  .tb-empty { font-size:11.5px; color:#a59a6a; font-style:italic; margin-bottom:5px; }
+  .mrow { display:flex; gap:7px; align-items:center; margin-bottom:5px; }
+  .mrow:last-child { margin-bottom:0; }
+  .mrow input { flex:1; min-width:0; padding:6px 9px; border:1px solid #ccc; border-radius:7px; font-size:13px; }
+  .mrow select.msel { flex:none; font-size:11.5px; border:1px solid #cdd6dd; border-radius:6px; padding:6px 6px; background:#fff; color:#444; max-width:44%; }
+  .add-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+  .add-btn { font-size:12px; border:1px dashed #bbb; background:#fafafa; color:#555; border-radius:8px; padding:7px 11px; cursor:pointer; }
+  .et-title { font-size:12.5px; font-weight:700; color:#333; margin:14px 0 6px; }
+  .et-sub { font-weight:400; color:#999; font-size:11px; }
+  .et-row { border-top:1px solid #ececec; padding:8px 2px; }
+  .et-team { font-size:12px; font-weight:600; color:#333; margin-bottom:4px; }
+  .et-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+  .d-TL{background:#1D9E75}.d-DCP{background:#E0A93B}.d-SM{background:#0C6CB8}
+  .et-none { color:#bbb; font-size:11.5px; }
+  .et-gear-list { margin:3px 0 0 20px; }
+  .et-gear-list li { font-size:12px; color:#444; margin:2px 0; }
+  .et-tools { font-size:11.5px; color:#555; margin-top:5px; line-height:1.6; }
+  .et-tools-h { color:#1D9E75; font-weight:600; }
+  .et-tools a, .tool-ref a { color:#1D9E75 !important; text-decoration:none; }
+  .et-tools a:hover, .tool-ref a:hover { text-decoration:underline; }
+  .et .pill, .kit .pill { display:inline-block; background:#eef0ee; border:1px solid #dde0dd; border-radius:20px; padding:2px 9px; margin:2px 3px 2px 0; font-size:11px; color:#333; }
+  .plan { margin-top:13px; font-size:12.5px; line-height:1.55; color:#23415c; background:#EEF6FB; border-left:3px solid #0C6CB8; border-radius:0 8px 8px 0; padding:10px 12px; }
+  .plan b { color:#0C447C; }
+  .phase { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#1D9E75; margin:18px 0 8px; padding-bottom:5px; border-bottom:1px solid #e2e2dc; cursor:pointer; display:flex; align-items:center; justify-content:space-between; }
+  .phase .caret { font-size:11px; color:#9aa39e; transition:transform .15s; }
+  .phase.collapsed .caret { transform:rotate(-90deg); }
+  .phase-group.collapsed { display:none; }
+  .focus-bar { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:2px 0 14px; }
+  .focus-h { font-size:12px; color:#666; font-weight:600; margin-right:2px; }
+  .focus-btn { font-size:12px; border:1px solid #ccc; background:#fff; color:#555; border-radius:20px; padding:5px 12px; cursor:pointer; }
+  .focus-btn.on { background:#1D9E75; color:#fff; border-color:#1D9E75; }
+  .progress { font-size:12px; color:#1D9E75; font-weight:600; margin-left:auto; }
+  .focus-note { font-size:12px; color:#0C447C; background:#EEF6FB; border-radius:8px; padding:8px 11px; margin-bottom:11px; }
+  .time-est { font-size:12px; color:#444; margin-top:11px; background:#f7f6f1; border:1px solid #ececdf; border-radius:8px; padding:9px 12px; line-height:1.5; }
+  .survey-timer { margin-top:9px; background:#fff; border:1px solid #ececdf; border-radius:8px; padding:10px 12px; }
+  .st-main { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .st-left { display:flex; align-items:baseline; gap:9px; }
+  .st-label { font-size:11px; font-weight:600; color:#888; text-transform:uppercase; letter-spacing:.05em; }
+  .st-clock { font-size:25px; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:.5px; color:#14241f; }
+  .st-btns { display:flex; gap:6px; }
+  .st-btn { border:1px solid #1D9E75; background:#1D9E75; color:#fff; border-radius:7px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; }
+  .st-btn.running { background:#C0392B; border-color:#C0392B; }
+  .st-btn.st-reset { background:#fff; color:#888; border-color:#d8d8cf; padding:8px 12px; }
+  .st-status { font-size:12px; color:#666; margin-top:8px; line-height:1.45; }
+  .st-status.over { color:#9a3b2f; font-weight:600; }
+  .st-status.ontrack { color:#0F6E56; }
+  @media print { .st-btns { display:none !important; } }
+  .photo-chk { margin-top:9px; background:#fff; border:1px solid #ececdf; border-radius:8px; overflow:hidden; }
+  .pc-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; cursor:pointer; user-select:none; }
+  .pc-title { font-size:13px; font-weight:600; color:#14241f; }
+  .pc-right { display:flex; align-items:center; gap:8px; }
+  .pc-count { font-size:12px; font-weight:600; color:#1D9E75; background:#E1F5EE; border-radius:999px; padding:2px 10px; }
+  .pc-count.done { background:#1D9E75; color:#fff; }
+  .pc-caret { color:#999; font-size:11px; transition:transform .15s; }
+  .photo-chk.open .pc-caret { transform:rotate(90deg); }
+  .pc-body { display:none; padding:0 12px 4px; }
+  .photo-chk.open .pc-body { display:block; }
+  .pc-item { display:flex; align-items:flex-start; gap:9px; padding:8px 0; border-top:1px solid #f0efe6; font-size:13px; color:#333; cursor:pointer; }
+  .pc-item input { margin-top:1px; width:18px; height:18px; accent-color:#1D9E75; flex-shrink:0; }
+  .pc-item.checked { color:#999; }
+  .pc-item.checked .pc-label { text-decoration:line-through; }
+  .pc-note { font-size:11.5px; color:#999; padding:8px 0 4px; line-height:1.4; border-top:1px solid #f0efe6; margin-top:2px; }
+  .azc { margin-top:9px; background:#fff; border:1px solid #ececdf; border-radius:8px; overflow:hidden; }
+  .azc-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; cursor:pointer; user-select:none; }
+  .azc-title { font-size:13px; font-weight:600; color:#14241f; }
+  .azc-caret { color:#999; font-size:11px; transition:transform .15s; }
+  .azc.open .azc-caret { transform:rotate(90deg); }
+  .azc-body { display:none; padding:0 12px 11px; }
+  .azc.open .azc-body { display:block; }
+  .azc-grid { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+  .azc-f { flex:1; min-width:110px; }
+  .azc-f label { display:block; font-size:11px; color:#777; margin-bottom:3px; }
+  .azc-f input, .azc-f select { width:100%; padding:8px; font-size:14px; border:1px solid #d8d8cf; border-radius:7px; background:#fff; color:#1a1a1a; }
+  .azc-f input:focus, .azc-f select:focus { outline:none; border-color:#1D9E75; }
+  .azc-out { display:flex; gap:8px; margin-top:10px; }
+  .azc-o { flex:1; text-align:center; background:#f7f6f1; border:1px solid #ececdf; border-radius:8px; padding:8px 4px; }
+  .azc-o .lab { font-size:10px; color:#888; text-transform:uppercase; letter-spacing:.04em; }
+  .azc-o .val { font-size:17px; font-weight:700; color:#14241f; font-variant-numeric:tabular-nums; margin-top:2px; }
+  .azc-note { font-size:11px; color:#888; line-height:1.45; margin-top:9px; }
+  .azc-note a { color:#1D9E75; font-weight:600; }
+  .te-h { font-weight:600; color:#1a1a1a; }
+  .te-sub { color:#999; }
+  .chk-wrap { margin-left:auto; display:flex; align-items:center; gap:4px; font-size:10px; color:#b0b0b0; text-transform:uppercase; letter-spacing:.03em; cursor:pointer; flex:none; }
+  .chk-wrap input { width:19px; height:19px; cursor:pointer; accent-color:#1D9E75; }
+  .step.done { opacity:.55; }
+  .step.done .step-title { text-decoration:line-through; color:#888; }
+  .step { background:#fff; border:1px solid #e0e0e0; border-radius:12px; padding:12px 14px; margin-bottom:9px; }
+  .step.opt { border-style:dashed; border-color:#c9b876; background:#fffdf5; }
+  .step.opt-off { background:#fafafa; border-color:#e4e4e4; }
+  .step.opt-off .step-title { color:#7a7a7a; }
+  .step.opt-off .step-detail { color:#9a9a9a; }
+  .opt-tag { display:inline-block; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#8a6d00; background:#f3e7bf; border-radius:5px; padding:1px 6px; margin-left:6px; vertical-align:middle; }
+  .step-ctrls { margin-left:auto; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .step-ctrls .chk-wrap { margin-left:0; }
+  .opt-toggle { display:flex; align-items:center; gap:4px; font-size:10px; color:#8a6d00; text-transform:uppercase; letter-spacing:.03em; cursor:pointer; flex:none; }
+  .opt-toggle input { width:19px; height:19px; cursor:pointer; accent-color:#1D9E75; }
+  .step-head { display:flex; gap:10px; align-items:flex-start; }
+  .step-num { flex:none; width:25px; height:25px; border-radius:50%; background:#1D9E75; color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .step-title { font-size:14px; font-weight:600; color:#1a1a1a; line-height:1.3; }
+  .step-detail { font-size:12.5px; color:#555; line-height:1.55; margin:5px 0 0 35px; }
+  .step-meta { margin:8px 0 0 35px; display:flex; flex-direction:column; gap:6px; }
+  .chips { display:flex; flex-wrap:wrap; gap:5px; align-items:center; }
+  .chip { font-size:11px; border-radius:6px; padding:2px 8px; }
+  .chip-eq { background:#eef0ee; border:1px solid #dde0dd; color:#333; }
+  .chip-team { font-weight:600; }
+  .chip-TL { background:#EAF3DE; color:#27500A; }
+  .chip-SM { background:#E6F0F8; color:#0C447C; }
+  .chip-DCP { background:#FBF1DE; color:#7a5a00; }
+  select.asel { font-size:11px; border:1px solid #cdd6dd; border-radius:6px; padding:3px 5px; background:#fff; color:#0C6CB8; }
+  .crew { font-size:11px; color:#888; }
+  .ref { font-size:11.5px; }
+  .ref a { color:#0C6CB8; text-decoration:none; }
+  .ref a:hover { text-decoration:underline; }
+  .ref-label { color:#888; }
+  .btn-row { display:flex; gap:8px; margin:4px 0 16px; }
+  .btn { background:#1D9E75; color:#fff; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer; }
+  .placeholder { background:#fff; border:1px dashed #cfcfc8; border-radius:12px; padding:24px 18px; text-align:center; color:#888; font-size:13px; line-height:1.6; }
+  .footer { text-align:center; font-size:11px; color:#aaa; margin-top:1.5rem; padding-bottom:2rem; }
+  .share-card { display:flex; gap:14px; align-items:flex-start; background:#fff; border:1px solid #e0e0e0; border-radius:12px; padding:14px; margin-bottom:1rem; }
+  .qr-wrap { flex:none; }
+  svg.qr { width:132px; height:132px; background:#fff; border:1px solid #eee; border-radius:8px; padding:6px; display:block; }
+  .share-h { font-size:13px; font-weight:700; color:#1a1a1a; margin-bottom:5px; }
+  .share-txt p { font-size:12px; color:#555; line-height:1.55; margin-bottom:8px; }
+  .share-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .share-url { font-size:11.5px; color:#0C6CB8; text-decoration:none; word-break:break-all; }
+  .copy-btn { font-size:11.5px; border:1px solid #cdd6dd; background:#fafafa; color:#0C6CB8; border-radius:7px; padding:6px 11px; cursor:pointer; white-space:nowrap; }
+  @media (max-width:480px){ .share-card{ flex-direction:column; align-items:center; text-align:center; } .share-row{ justify-content:center; } }
+  .lock-btn { background:#C0392B; border-color:#C0392B; color:#fff; }
+  .lock-btn.locked { background:#1D9E75; border-color:#1D9E75; color:#fff; }
+  .qr-note { font-size:11px; color:#999; max-width:140px; line-height:1.4; }
+  .ro-banner { background:#EAF3DE; border:1px solid #cfe3b8; color:#27500A; font-size:12.5px; font-weight:600; border-radius:10px; padding:10px 13px; margin-bottom:1rem; }
+  body.ro .seg, body.ro .ctrl-row, body.ro details.help, body.ro .share-card, body.ro .plan { display:none !important; }
+  .print-only { display:none; }
+  @media print {
+    body { background:#fff; padding:0; }
+    a.back, .seg, .btn-row, .ctrl-row, .add-row, .tb-x, input.sz, select.msel, select.asel, details.help, .copy-btn, .focus-bar, .chk-wrap, .caret, .opt-toggle, .step.opt-off { display:none !important; }
+    .phase-group.collapsed { display:block !important; }
+    .ctrl-card, .step, .team-box, .share-card { border:1px solid #bbb; break-inside:avoid; }
+    .step-num, .chip, .chip-team, .phase, .plan, .s-pill, .et-dot, svg.qr { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">&larr; Back to all tools</a>
+<h1>Survey Field Guide</h1>
+<p class="subtitle">Step-by-step, in order, for running a zone survey &mdash; what to do, the gear each team needs, who you've put on it, and the reference behind it. Keeps the whole survey organized and delegated for any Team Lead &mdash; first survey or fiftieth.</p>
+
+<div id="ro-banner" class="ro-banner" style="display:none"></div>
+<details class="help">
+  <summary>How to use this &mdash; tap to expand</summary>
+  <div class="hbody">
+    <ol style="margin:0">
+      <li>Set your <b>team size</b>. The tool auto-builds a Team Lead, a DCP team, and a survey/measure team, and assigns everyone.</li>
+      <li>Need to split the work? <b>+ Add DCP team</b> / <b>+ Add Survey team</b> creates another team (e.g. two DCP teams of 3). Move anyone with the <b>dropdown next to their name</b> &mdash; including <b>Assist TL</b> to put a hand on the Team Lead's tasks.</li>
+      <li>Each task carries a <b>team dropdown</b> &mdash; hand any task to a specific team (give gradients to your strongest crew). The DCP holes split across all DCP teams by default.</li>
+      <li>The <b>equipment table</b> shows exactly what each team must grab &mdash; check it before anyone leaves the truck.</li>
+      <li>Each task links the <b>app tool</b> to use for it (and the exact tab) &mdash; e.g. the DCP team gets DCP Test Locations + DCP Calculator, a gradients crew gets the Gradient Calculator on the right tab. Each team's tools are also rolled up under <b>"What each team needs."</b></li>
+      <li><b>Print / Save as PDF</b> captures the whole thing, teams and all.</li>
+      <li><b>Hand-off:</b> the QR card on this page (and on the printout) opens this same live guide for any teammate &mdash; references and slide decks included.</li>
+      <li><b>In the field:</b> tap <b>Focus</b> to show only one team's tasks (great for a new teammate), <b>check off</b> each step as you finish it (saved on your device), and tap a <b>phase header</b> to collapse it.</li>
+    </ol>
+  </div>
+</details>
+
+<div class="seg" id="type-seg">
+  <button class="on" data-v="ALZ" onclick="setType(this)">ALZ (fixed-wing)</button>
+  <button data-v="HLZ" onclick="setType(this)">HLZ (helicopter)</button>
+  <button data-v="DZ" onclick="setType(this)">DZ (drop zone)</button>
+</div>
+
+<div class="ctrl-card">
+  <div class="ctrl-row">
+    <label for="team">Team size (including you, the TL):</label>
+    <input type="number" id="team" class="sz" min="1" max="16" value="6" oninput="render()">
+  </div>
+  <div class="summary" id="summary"></div>
+  <div class="roster" id="roster"></div>
+  <div id="equip"></div>
+  <div class="plan" id="plan"></div>
+  <div class="time-est" id="time-est"></div>
+  <div class="survey-timer" id="survey-timer">
+    <div class="st-main">
+      <div class="st-left"><span class="st-label">Survey timer</span><span class="st-clock" id="st-clock">00:00:00</span></div>
+      <div class="st-btns">
+        <button class="st-btn" id="st-toggle" onclick="timerToggle()">Start</button>
+        <button class="st-btn st-reset" id="st-reset" onclick="timerReset()">Reset</button>
+      </div>
+    </div>
+    <div class="st-status" id="st-status"></div>
+  </div>
+  <div class="photo-chk" id="photo-chk"></div>
+  <div class="azc" id="azc">
+    <div class="azc-head" onclick="azcToggle()"><span class="azc-title">🧭 Azimuth converter</span><span class="azc-caret">▶</span></div>
+    <div class="azc-body">
+      <div class="azc-grid">
+        <div class="azc-f"><label>Declination (E +)</label><input type="number" step="any" id="azc-decl" inputmode="decimal" oninput="azcUpdate()" placeholder="e.g. 3.5"></div>
+        <div class="azc-f"><label>Grid convergence (E +)</label><input type="number" step="any" id="azc-conv" inputmode="decimal" oninput="azcUpdate()" placeholder="0"></div>
+      </div>
+      <div class="azc-grid">
+        <div class="azc-f" style="flex:2"><label>Azimuth</label><input type="number" step="any" id="azc-val" inputmode="decimal" oninput="azcUpdate()" placeholder="0–360°"></div>
+        <div class="azc-f" style="flex:2"><label>Measured from</label><select id="azc-ref" onchange="azcUpdate()"><option value="magnetic">Magnetic (compass)</option><option value="grid">Grid (map)</option><option value="true">True</option></select></div>
+      </div>
+      <div class="azc-out">
+        <div class="azc-o"><div class="lab">True</div><div class="val" id="azc-t">—</div></div>
+        <div class="azc-o"><div class="lab">Grid</div><div class="val" id="azc-g">—</div></div>
+        <div class="azc-o"><div class="lab">Magnetic</div><div class="val" id="azc-m">—</div></div>
+      </div>
+      <div class="azc-note">Compass reading = <b>Magnetic</b>; map/protractor = <b>Grid</b>. Declination &amp; convergence come from your map margin or DAGR (convergence is usually small &mdash; leave blank if unknown). For exact convergence figured from coordinates, use the full <a href="SAAZA_Coordinate_Converter.html">Coordinate Converter</a>.</div>
+    </div>
+  </div>
+</div>
+
+<div class="btn-row">
+  <button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+</div>
+
+<div class="share-card">
+  <div class="qr-wrap" id="qr-holder"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 43 43" class="qr" role="img" aria-label="QR code linking to the live Survey Field Guide"><path stroke="#14241f" d="M3 3.5h7m2 0h2m1 0h2m1 0h4m1 0h1m2 0h1m1 0h1m1 0h2m1 0h7m-37 1h1m5 0h1m2 0h5m5 0h1m2 0h1m4 0h2m1 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h3m1 0h2m2 0h3m2 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m4 0h1m1 0h2m1 0h1m2 0h4m2 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h2m4 0h2m1 0h1m1 0h2m1 0h1m3 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h2m6 0h1m1 0h1m1 0h3m1 0h5m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h4m1 0h3m5 0h1m1 0h2m2 0h1m-28 1h1m1 0h5m5 0h1m1 0h2m2 0h1m3 0h1m1 0h3m1 0h1m1 0h5m-35 1h1m1 0h2m1 0h1m2 0h1m3 0h5m6 0h1m3 0h5m2 0h2m-36 1h1m1 0h1m1 0h1m1 0h1m2 0h3m1 0h1m3 0h2m2 0h1m4 0h3m1 0h3m1 0h3m-37 1h2m1 0h3m1 0h3m1 0h1m2 0h1m1 0h1m4 0h2m4 0h1m3 0h2m3 0h1m-36 1h1m4 0h4m1 0h1m1 0h2m1 0h2m4 0h1m1 0h2m2 0h5m2 0h2m-33 1h2m1 0h1m1 0h3m1 0h1m2 0h6m1 0h1m1 0h1m2 0h1m2 0h1m-32 1h2m4 0h5m4 0h3m3 0h2m4 0h2m1 0h4m2 0h1m-36 1h2m1 0h1m2 0h1m4 0h1m2 0h1m1 0h3m1 0h2m3 0h4m1 0h2m-33 1h1m1 0h1m3 0h1m5 0h1m1 0h3m2 0h1m5 0h7m2 0h1m1 0h1m-37 1h6m3 0h4m2 0h1m2 0h1m4 0h1m1 0h1m2 0h2m1 0h1m1 0h1m1 0h1m-34 1h1m3 0h1m1 0h4m1 0h4m1 0h1m3 0h1m2 0h4m1 0h2m2 0h3m-37 1h1m1 0h2m1 0h1m1 0h1m2 0h4m1 0h1m4 0h4m3 0h3m6 0h1m-37 1h3m1 0h4m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h2m4 0h3m1 0h2m1 0h2m-34 1h1m3 0h2m1 0h4m1 0h3m1 0h1m1 0h3m2 0h1m4 0h1m4 0h1m1 0h1m-34 1h1m1 0h5m2 0h1m2 0h2m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h5m1 0h2m-37 1h4m1 0h1m1 0h1m1 0h2m2 0h1m1 0h2m4 0h1m2 0h1m1 0h1m1 0h5m2 0h1m-35 1h1m1 0h1m1 0h3m1 0h1m2 0h2m4 0h1m3 0h5m2 0h2m3 0h2m-36 1h1m1 0h2m5 0h5m1 0h3m1 0h2m7 0h2m1 0h1m1 0h1m-34 1h1m1 0h2m1 0h5m2 0h1m1 0h1m5 0h1m1 0h1m2 0h3m2 0h1m1 0h1m2 0h2m-37 1h1m1 0h2m4 0h1m2 0h1m4 0h1m1 0h1m1 0h4m2 0h1m1 0h3m1 0h1m-33 1h1m1 0h2m1 0h2m1 0h5m4 0h1m1 0h1m2 0h12m-26 1h1m1 0h1m1 0h1m3 0h5m1 0h2m1 0h1m1 0h2m3 0h2m-34 1h7m2 0h4m1 0h4m2 0h2m2 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h3m-37 1h1m5 0h1m1 0h1m2 0h1m1 0h1m1 0h4m2 0h1m6 0h1m3 0h2m2 0h1m-37 1h1m1 0h3m1 0h1m1 0h3m2 0h4m5 0h1m2 0h8m1 0h3m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h3m2 0h5m2 0h1m1 0h4m1 0h2m2 0h1m-37 1h1m1 0h3m1 0h1m1 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m5 0h2m-37 1h1m5 0h1m7 0h2m4 0h3m3 0h1m1 0h1m1 0h1m1 0h1m3 0h1m-37 1h7m1 0h2m1 0h1m2 0h4m4 0h1m2 0h2m5 0h1m2 0h2"/></svg></div>
+  <div class="share-txt">
+    <div class="share-h">Hand this guide to your team</div>
+    <p>Scan the code (or open the link) and each teammate gets <b>this exact live guide</b> on their own phone &mdash; every reference and slide link works. Sharing a PDF instead? Those links still open as long as there's a signal, and this QR jumps anyone to the live version.</p>
+    <div class="share-row"><a class="share-url" id="sfg-url" href="https://rcarney94.github.io/saaza-calculator/SAAZA_Survey_Field_Guide.html" target="_blank" rel="noopener">rcarney94.github.io/saaza-calculator/SAAZA_Survey_Field_Guide.html</a><button class="copy-btn" onclick="copyUrl(this)">Copy link</button></div>
+    <div class="share-row"><button class="copy-btn lock-btn" id="lock-btn" onclick="lockShare(this)">🔒 Lock &amp; share my current setup</button></div>
+  </div>
+</div>
+
+<div class="print-only" id="print-head"></div>
+<div class="focus-bar" id="focus-bar"></div>
+<div id="steps"></div>
+
+<div class="footer">Survey Field Guide &mdash; 136CRF &middot; DAFMAN 13-217 + SAAZA Units 1&ndash;4 &middot; Approved for Public Release</div>
+
+<script>
+/* ---------- references ---------- */
+var R = {
+  lz:    {l:"DAFMAN 13-217, Ch 4 \u2014 LZ Operations", u:"refs/dafman13-217.pdf#page=42"},
+  surv:  {l:"DAFMAN 13-217 \u00a74.2.5\u20134.2.6 \u2014 LZ surveys", u:"refs/dafman13-217.pdf#page=43"},
+  t42:   {l:"DAFMAN 13-217 Table 4.2 \u2014 LZ dimensions, slopes & obstacle clearance", u:"refs/dafman13-217.pdf#page=42"},
+  cbr:   {l:"DAFMAN 13-217 \u00a74.2 \u2014 controlling CBR", u:"refs/dafman13-217.pdf#page=45"},
+  etl979:{l:"ETL 97-9 \u2014 C-17 semi-prepared airfield criteria (CBR / passes)", u:"refs/ETL_97-9.pdf"},
+  tspwg: {l:"TSPWG 3-260-03.02-19 \u2014 airfield pavement evaluation (surface distress / DCP)", u:"refs/TSPWG_3_260_03_02_19.pdf"},
+  ufc:   {l:"UFC 3-260-01 \u2014 airfield & heliport planning/design", u:"refs/ufc_3_260_01_2019_c3.pdf"},
+  hlz:   {l:"DAFMAN 13-217, Ch 5 \u2014 HLZ operations & AF 4303", u:"refs/dafman13-217.pdf#page=71"},
+  dz:    {l:"DAFMAN 13-217, Ch 3 \u2014 Drop Zone operations & AF 3823", u:"refs/dafman13-217.pdf#page=9"}
+};
+
+/* ---------- ALZ steps (team = function: TL / SM / DCP) ---------- */
+var STEPS = { ALZ: [
+ {ph:"Set up your reference", t:"Anchor on the approach-end centerline", d:"Walk to the end aircraft land toward and stand on the centerline at the start of the usable surface. This is your reference point for everything that follows.", eq:["Compass","AF 3822"], team:"TL", crew:1, refs:[R.surv]},
+ {ph:"Set up your reference", t:"Shoot the runway heading", d:"Point the compass straight down the centerline. The magnetic heading gives the runway number (178\u00b0 \u2192 round to 180 \u2192 \u201cRunway 18\u201d). Record it.", eq:["Compass"], team:"TL", crew:1, refs:[R.lz]},
+ {ph:"Set up your reference", t:"Identify corners, ends & overruns", d:"Physically locate the four corners, both centerline ends, and where each overrun starts and stops \u2014 your map of what you're about to measure.", eq:["AF 3822"], team:"TL", crew:1, refs:[R.t42]},
+ {ph:"Coordinates & elevation", t:"DAGR fix \u2014 approach end", d:"Record the grid (WGS-84, lat/long to the nearest 1/1000 minute, or MGRS) and the MSL elevation at the approach-end centerline.", eq:["DAGR"], team:"TL", crew:1, refs:[R.surv]},
+ {ph:"Coordinates & elevation", t:"DAGR fix \u2014 departure end", d:"Same at the far-end centerline: grid + elevation.", eq:["DAGR"], team:"TL", crew:1, refs:[R.surv]},
+ {ph:"Coordinates & elevation", t:"DAGR fix \u2014 center", d:"Same at the runway center. (The Coordinate Converter turns any of these into the formats the form wants.)", eq:["DAGR"], team:"TL", crew:1, refs:[R.surv]},
+ {ph:"Photos", t:"360\u00b0 panorama from center", d:"From the runway center, take an overlapping full-circle set of photos.", eq:["Camera"], team:"TL", crew:1, refs:[R.surv]},
+ {ph:"Photos", t:"Directional & obstacle photos", d:"Shoot down the runway both directions, each overrun, and every obstacle. (Detailed surface-distress photos go with the SPACI survey, step 18.)", eq:["Camera"], team:"TL", crew:1, refs:[R.surv]},
+ {ph:"Dimensions", t:"Runway length", d:"Wheel the centerline heel-to-toe, or laser end-to-end. Record actual feet \u2014 not minimums.", eq:["Measuring wheel","LRF"], team:"SM", crew:1, refs:[R.t42]},
+ {ph:"Dimensions", t:"Runway width", d:"Edge-to-edge of usable surface, perpendicular to the centerline, at several spots.", eq:["Measuring wheel","LRF"], team:"SM", crew:1, refs:[R.t42]},
+ {ph:"Dimensions", t:"Overruns", d:"Length out from each runway end, and width.", eq:["Measuring wheel","LRF"], team:"SM", crew:1, refs:[R.t42]},
+ {ph:"Dimensions", t:"Shoulders (Zone A) & graded area (Zone B)", d:"Widths on both sides, plus the transverse drop out to each zone edge \u2014 checked at several stations along the runway (tie them to your transverse stations). Use Gradient \u2192 Zone A/B for the 2\u20329\u2033 / 6\u20323\u2033 limits.", eq:["Measuring wheel","Clinometer","LRF"], team:"SM", crew:1, refs:[R.t42]},
+ {ph:"Gradients", t:"Longitudinal \u2014 200\u2032 sections", d:"Down the centerline, shoot each 200\u2032 section with the clinometer (angle) + LRF (distance) \u2014 \u224815 sections for a 3,000\u2032 strip \u2014 then feed them to Gradient \u2192 Longitudinal profile (\u00b13% cumulative, \u00b11.5%/200\u2032). The 20\u2032 line-level method is the optional, more-detailed backup.", eq:["Clinometer","LRF","Line level (opt.)"], team:"SM", crew:2, refs:[R.t42]},
+ {ph:"Gradients", t:"Transverse \u2014 cross-slope per side", d:"Cross-slope from the centerline out to each edge, at several stations along the runway. Line level (15\u2032 segments) or clinometer + LRF. Course data set for a 3,000\u2032 ALZ: 28 readings \u2192 7 \u00d7 60\u2032 averages (~7 stations). Reduce with Gradient \u2192 Transverse (\u00b10.5\u20133%).", eq:["Line level","Clinometer","LRF"], team:"SM", crew:2, refs:[R.t42]},
+ {ph:"Soil strength (DCP)", t:"DCP at the ALZ pattern (\u224837 holes)", d:"Touchdown, braking, centerline, main-gear wheel paths, turnarounds, overruns, plus any wet/soft/patched spots. Two-person job: one drives the cone and calls blows, one records blows-vs-depth to ~36\u2033, three layers per hole. (DCP Test Locations shows where each hole goes; DCP Calculator \u2192 CBR.)", eq:["DCP"], team:"DCP", crew:2, refs:[R.etl979,R.tspwg,R.cbr]},
+ {ph:"Obstacles", t:"Shoot each approach/departure obstacle", d:"For towers, trees, poles, terrain: compass azimuth, LRF distance, and clinometer angle to the top.", eq:["Compass","LRF","Clinometer"], team:"TL", crew:1, refs:[R.t42]},
+ {ph:"Obstacles", t:"Record location, distance & angle", d:"Log each obstacle's raw numbers. (LZ Trig \u2192 height; Gradient \u2192 Glideslope gives the run:rise vs 35:1 / 20:1. Just collect here.)", eq:["AF 3822"], team:"TL", crew:1, refs:[R.t42]},
+ {ph:"Surface & wrap-up", t:"Surface condition \u2014 SPACI distress survey", d:"Walk the surface section by section and document the 8 SPACI distress types (type, severity, and extent); photograph each one. This drives the surface-condition rating \u2014 score it with the SPACI Calculator.", eq:["Camera","AF 3822"], team:"TL", crew:1, refs:[R.tspwg]},
+ {ph:"Surface & wrap-up", t:"General surface notes", d:"Surface type / composition (asphalt, dirt, gravel, matting), drainage, FOD/debris, and any existing markings.", eq:["AF 3822"], team:"TL", crew:1, refs:[R.surv]},
+ {ph:"Surface & wrap-up", t:"Account for ALL your gear", d:"Especially DCP cones \u2014 a left-behind cone is a signature to the enemy.", eq:[], team:"TL", crew:1, refs:[]},
+ {ph:"Surface & wrap-up", t:"Confirm the AF 3822 is complete", d:"Every block has data before you depart. Write as you go, never from memory \u2014 you usually don't get a second trip.", eq:["AF 3822"], team:"TL", crew:1, refs:[R.surv]},
+ {ph:"When you finish \u2014 cross-team support", t:"Survey team \u2014 when your tasks are done, reinforce the DCP team", d:"Multi-capable airman: when your part is finished, the mission isn't. Once your assigned dimensions, gradients, and zone work are complete, link up with the DCP team. If they're still punching holes, split up and reinforce them \u2014 drive cone, call or record blows, or take over a test location so the line keeps moving and no one burns out. If a third DCP set is staged, grab it and start testing.", eq:[], team:"SM", crew:1, refs:[], assist:true},
+ {ph:"When you finish \u2014 cross-team support", t:"DCP team \u2014 when your holes are done, reinforce the survey team", d:"Multi-capable airman: when your part is finished, the mission isn't. Once your assigned test locations are complete, check in with the survey team and the TL. If they're still working, lend a set of hands \u2014 gradient runs, obstacle shoots, dimensions, or whatever is still outstanding.", eq:[], team:"DCP", crew:1, refs:[], assist:true}
+],
+
+HLZ: [
+ {ph:"Set up & approach", t:"Set your approach/departure axis", d:"Stand at the site and pick the approach/departure path \u2014 ideally into the prevailing wind and over the lowest obstacles. This axis drives everything else you survey.", eq:["Compass","AF 4303"], team:"TL", crew:1, refs:[R.hlz]},
+ {ph:"Set up & approach", t:"Size it for the worst-case aircraft", d:"Always survey for the maximum size and number of helicopters the area can support. That decides how many landing points you need and how far apart they sit.", eq:["AF 4303"], team:"TL", crew:1, refs:[R.hlz]},
+ {ph:"Set up & approach", t:"List restricted quadrants", d:"Note any quadrant where obstacles restrict approach or departure \u2014 the aircrew has to know which directions are closed.", eq:["Compass","AF 4303"], team:"TL", crew:1, refs:[R.hlz]},
+ {ph:"Coordinates & elevation", t:"DAGR fix \u2014 HLZ center & landing points", d:"With the DAGR, record grid (WGS-84 / MGRS) and MSL elevation at the HLZ center and at each landing point.", eq:["DAGR"], team:"TL", crew:1, refs:[R.hlz]},
+ {ph:"Photos", t:"360\u00b0 + approach + obstacles", d:"From center, shoot a full 360, then down each approach/departure path, then every obstacle you'll record.", eq:["Camera"], team:"TL", crew:1, refs:[R.hlz]},
+ {ph:"Dimensions & spacing", t:"Landing-point size & rotor spacing", d:"Measure each landing point and the spacing between points. Two-rotor aircraft need a full blade-length of spacing for blade clearance; single-rotor need a blade-length between points. Size to the largest aircraft.", eq:["Measuring wheel / tape","LRF"], team:"SM", crew:1, refs:[R.hlz]},
+ {ph:"Dimensions & spacing", t:"Overall usable area", d:"Measure the overall usable HLZ area edge to edge so the planners know the total footprint.", eq:["Measuring wheel / tape","LRF"], team:"SM", crew:1, refs:[R.hlz]},
+ {ph:"Gradients", t:"Ground slope \u2014 longitudinal & sideslope", d:"Measure the slope along the approach (longitudinal) and across it (sideslope) with the clinometer. Avoid slopes over 7\u00b0, and never land downslope \u2014 flag the safe landing direction.", eq:["Clinometer","LRF"], team:"SM", crew:1, refs:[R.hlz]},
+ {ph:"Obstacles & glideslope", t:"Shoot obstacles & check the 10:1", d:"For every obstacle on the approach/departure: compass azimuth, LRF distance, clinometer angle. The landing point must sit at least 10\u00d7 the obstacle height away \u2014 the 10:1 glideslope applies to all helicopters.", eq:["Compass","LRF","Clinometer"], team:"TL", crew:1, refs:[R.hlz]},
+ {ph:"Surface", t:"Ground composition & hazards", d:"Record surface type/composition and firmness (will it hold the gear?), plus FOD and loose debris, dust / brownout potential, vegetation, and any slope hazards. This is the AF 4303 HLZ Surface Data block.", eq:["Camera","AF 4303"], team:"TL", crew:1, refs:[R.hlz]},
+ {ph:"Surface", t:"Ground-bearing spot-check", d:"Only if the surface looks soft, boggy, or rutted and you need to be sure it'll hold an aircraft: drive one or two DCP tests in the suspect spots and compute the CBR. This is a quick spot-check to confirm bearing capacity \u2014 not the full ALZ pattern. Switch it on when you find soft ground.", eq:["DCP","DCP hammer"], team:"SM", crew:2, refs:[R.cbr], opt:true},
+ {ph:"Wrap-up", t:"Account for ALL your gear", d:"Account for every piece of equipment before you step off \u2014 nothing left on the LZ.", eq:[], team:"TL", crew:1, refs:[]},
+ {ph:"Wrap-up", t:"Confirm the AF 4303 is complete", d:"Every block \u2014 header, routing, coordinating, approach/departure, coordinates, HLZ surface data, remarks, and the diagram \u2014 has data before you depart. Write as you go.", eq:["AF 4303"], team:"TL", crew:1, refs:[R.hlz]},
+ {ph:"When you finish \u2014 cross-team support", t:"Survey team \u2014 when your tasks are done, reinforce the others", d:"Multi-capable airman: when your part is finished, the mission isn't. Once your assigned tasks are complete, check in with the TL and any other survey teams still working. Pitch in on remaining gradient measurements, obstacle shoots, surface documentation, or \u2014 if the ground-bearing spot-check is in play \u2014 the DCP. Help wherever the work still is.", eq:[], team:"SM", crew:1, refs:[], assist:true}
+],
+
+DZ: [
+ {ph:"Set up & mission", t:"Identify the DZ & run-in", d:"Identify the leading edge, the trailing edge, and the run-in heading(s). Remember a DZ survey is three-dimensional \u2014 length, width, and altitude.", eq:["Compass","AF 3823"], team:"TL", crew:1, refs:[R.dz]},
+ {ph:"Set up & mission", t:"Set the mission type & minimums", d:"Determine the drop type \u2014 CDS (400\u00d7400 yd / 600 ft), Personnel (600\u00d7600 yd / 1000 ft), or Heavy Equipment (600\u00d71000 yd / 1100 ft) \u2014 then apply the cumulative adjustments for extra jumpers/containers/platforms, altitude, and night. Split each adjustment half to each side/end unless the table says otherwise.", eq:["AF 3823"], team:"TL", crew:1, refs:[R.dz]},
+ {ph:"Point of Impact", t:"Establish the PI", d:"Place the Point of Impact using the minimums, altitude, and night rules (\u201cMANFAS\u201d). For a circular DZ the PI is normally the center so it works for multiple run-in headings.", eq:["DAGR","AF 3823"], team:"TL", crew:1, refs:[R.dz]},
+ {ph:"Coordinates & elevation", t:"DAGR fix \u2014 PI, edges & corners", d:"With the DAGR, record grid (WGS-84 / MGRS) and elevation for the PI, the leading and trailing edges, and the corners.", eq:["DAGR"], team:"TL", crew:1, refs:[R.dz]},
+ {ph:"Photos", t:"360\u00b0 + run-in + obstacles", d:"From the PI, shoot a full 360, down the run-in line, and every obstacle.", eq:["Camera"], team:"TL", crew:1, refs:[R.dz]},
+ {ph:"Dimensions", t:"Survey the usable length \u00d7 width", d:"Measure the actual usable length and width with the LRF (and the corner GPS fixes) and compare against the mission minimums (after your adjustments). Mark the leading and trailing edges. A measuring wheel is useless at DZ scale \u2014 shoot it with the LRF.", eq:["LRF"], team:"SM", crew:1, refs:[R.dz]},
+ {ph:"Obstacles", t:"Obstacles in & around the DZ", d:"Find obstacles inside the DZ and in the surrounding clearance / approach. For each: compass azimuth, LRF distance, clinometer angle, and a photo. Report them back to the TL for the 3823.", eq:["Compass","LRF","Clinometer","Camera"], team:"SM", crew:1, refs:[R.dz]},
+ {ph:"Surface", t:"Drop-surface hazards", d:"Walk the surface and record anything that could hurt a jumper or damage a load \u2014 rocks, stumps, holes, standing water, fences, steep slope \u2014 plus the surface composition. Photograph it and report back to the TL.", eq:["Camera"], team:"SM", crew:1, refs:[R.dz]},
+ {ph:"Wrap-up", t:"Markings & day/night", d:"Note PI and DZ markings and any day vs night marking requirements for the mission.", eq:["AF 3823"], team:"TL", crew:1, refs:[R.dz]},
+ {ph:"Wrap-up", t:"Account for ALL your gear", d:"Account for every piece of equipment before you step off \u2014 nothing left on the DZ.", eq:[], team:"TL", crew:1, refs:[]},
+ {ph:"Wrap-up", t:"Confirm the AF 3823 is complete", d:"Every block has data before you depart. Write as you go, never from memory \u2014 you usually don't get a second trip.", eq:["AF 3823"], team:"TL", crew:1, refs:[R.dz]},
+ {ph:"When you finish \u2014 cross-team support", t:"Survey team \u2014 when your tasks are done, reinforce the others", d:"Multi-capable airman: when your part is finished, the mission isn't. Once your assigned tasks are complete, check in with the TL and any other survey teams still working. Pitch in on dimensions, obstacle shoots, or surface-hazard documentation that's still outstanding. Help wherever the work still is.", eq:[], team:"SM", crew:1, refs:[], assist:true}
+]
+};
+
+var TEAM_LABEL = {TL:"Team Lead", SM:"Survey/measure team", DCP:"DCP team"};
+var type = "ALZ";
+var KEY_NAMES = "saaza_sfg_names_v1";
+var BASE = "https://rcarney94.github.io/saaza-calculator/";
+function absUrl(u){ return /^https?:/.test(u) ? u : BASE+u; }
+
+/* class slide decks (practical how-to) */
+var S = {
+  u1:    {l:"SAAZA Unit 1 \u2014 gradient, glideslope & trig methods", u:"slides/slides_unit1.pdf"},
+  u23:   {l:"SAAZA Unit 2.3 \u2014 ALZ / fixed-wing criteria & layout", u:"slides/slides_unit2_3.pdf"},
+  u4:    {l:"SAAZA Unit 4 \u2014 survey process (step-by-step how-to)", u:"slides/slides_unit4.pdf"},
+  soil:  {l:"SAAZA Unit 3 \u2014 soil ID & DCP / CBR", u:"slides/slides_unit3_soil.pdf"},
+  spaci: {l:"SAAZA Unit 3 \u2014 SPACI surface distress", u:"slides/slides_unit3_spaci.pdf"},
+  u5:    {l:"SAAZA Unit 5 \u2014 completion & AF 3822", u:"slides/slides_unit5.pdf"},
+  u22:   {l:"SAAZA Unit 2.2 \u2014 HLZ / helicopter criteria", u:"slides/slides_unit2_2.pdf"},
+  u21:   {l:"SAAZA Unit 2.1 \u2014 DZ / drop zone criteria", u:"slides/slides_unit2_1.pdf"}
+};
+function slideFor(s){
+  if(s.assist) return null;
+  if(type==="HLZ"){
+    if(/Ground-bearing/.test(s.t))       return {l:"SAAZA Unit 3 \u2014 Dynamic Cone Penetrometer (how-to)", u:S.soil.u+"#page=57"};
+    if(s.ph==="Dimensions & spacing")    return {l:"SAAZA Unit 2.2 \u2014 landing points & rotor spacing", u:S.u22.u+"#page=11"};
+    if(s.ph==="Gradients")               return {l:"SAAZA Unit 2.2 \u2014 ground gradients (avoid >7\u00b0)", u:S.u22.u+"#page=13"};
+    if(s.ph==="Obstacles & glideslope")  return {l:"SAAZA Unit 2.2 \u2014 imaginary surface / 10:1 glideslope", u:S.u22.u+"#page=16"};
+    if(s.ph==="Surface")                 return {l:"SAAZA Unit 2.2 \u2014 HLZ surface data block", u:S.u22.u+"#page=24"};
+    if(/4303 is complete/.test(s.t))     return {l:"SAAZA Unit 2.2 \u2014 AF 4303 walkthrough", u:S.u22.u+"#page=18"};
+    if(s.ph==="Set up & approach")       return {l:"SAAZA Unit 2.2 \u2014 HLZ survey criteria", u:S.u22.u+"#page=9"};
+    return {l:"SAAZA Unit 4 \u2014 site visit (field execution)", u:S.u4.u+"#page=44"};
+  }
+  if(type==="DZ"){
+    if(/mission type/.test(s.t))         return {l:"SAAZA Unit 2.1 \u2014 mission minimums (CDS / Pers / HE)", u:S.u21.u+"#page=12"};
+    if(s.ph==="Set up & mission")        return {l:"SAAZA Unit 2.1 \u2014 anatomy of a drop zone", u:S.u21.u+"#page=11"};
+    if(s.ph==="Point of Impact")         return {l:"SAAZA Unit 2.1 \u2014 PI placement / MANFAS", u:S.u21.u+"#page=17"};
+    if(s.ph==="Dimensions")              return {l:"SAAZA Unit 2.1 \u2014 DZ dimensions & minimums", u:S.u21.u+"#page=12"};
+    return {l:"SAAZA Unit 4 \u2014 site visit (field execution)", u:S.u4.u+"#page=44"};
+  }
+  if(s.ph==="Gradients")            return {l:"SAAZA Unit 1 \u2014 gradient method & reduction", u:S.u1.u+"#page=63"};
+  if(s.ph==="Obstacles")            return {l:"SAAZA Unit 1 \u2014 trigonometry (obstacle height)", u:S.u1.u+"#page=46"};
+  if(s.ph==="Soil strength (DCP)")  return {l:"SAAZA Unit 3 \u2014 Dynamic Cone Penetrometer (how-to)", u:S.soil.u+"#page=57"};
+  if(/SPACI/.test(s.t))             return {l:"SAAZA Unit 3 \u2014 SPACI inspection steps", u:S.spaci.u+"#page=4"};
+  if(s.ph==="Dimensions")           return {l:"SAAZA Unit 2.3 \u2014 actual surfaces (runway / overrun / zones)", u:S.u23.u+"#page=14"};
+  if(/3822 is complete/.test(s.t))  return {l:"SAAZA Unit 5 \u2014 AF 3822 walkthrough", u:S.u5.u+"#page=12"};
+  return {l:"SAAZA Unit 4 \u2014 site visit (field execution)", u:S.u4.u+"#page=44"};
+}
+
+/* app tools needed to accomplish each task (with the exact tab to use) */
+function tool(l,u){ return {l:l, u:u}; }
+function toolsFor(s){
+  var L=[];
+  if(s.assist) return L;
+  if(type==="HLZ"){
+    if(/Ground-bearing/.test(s.t)) L.push(tool("DCP Calculator","SAAZA_DCP_Calculator.html"));
+    if(s.ph==="Coordinates & elevation") L.push(tool("Coordinate Converter","SAAZA_Coordinate_Converter.html"));
+    if(s.ph==="Gradients") L.push(tool("Gradient Calculator \u2192 Grade tab (check \u22647\u00b0)","SAAZA_Gradient_Calculator.html#tab=grade"));
+    if(s.ph==="Obstacles & glideslope"){ L.push(tool("LZ Trig Calculator","SAAZA_LZ_Trig_Calculator.html")); L.push(tool("Gradient Calculator \u2192 Glideslope tab (10:1)","SAAZA_Gradient_Calculator.html#tab=glide")); }
+    return L;
+  }
+  if(type==="DZ"){
+    if(/mission type/.test(s.t)) L.push(tool("DZ Calculator","SAAZA_DZ_Calculator.html"));
+    if(s.ph==="Point of Impact") L.push(tool("DZ Calculator","SAAZA_DZ_Calculator.html"));
+    if(s.ph==="Coordinates & elevation") L.push(tool("Coordinate Converter","SAAZA_Coordinate_Converter.html"));
+    if(s.ph==="Obstacles") L.push(tool("LZ Trig Calculator","SAAZA_LZ_Trig_Calculator.html"));
+    return L;
+  }
+  if(s.ph==="Coordinates & elevation") L.push(tool("Coordinate Converter","SAAZA_Coordinate_Converter.html"));
+  if(/Longitudinal/.test(s.t)) L.push(tool("Gradient Calculator \u2192 Longitudinal profile tab","SAAZA_Gradient_Calculator.html#tab=profile"));
+  if(/Transverse/.test(s.t)) L.push(tool("Gradient Calculator \u2192 Transverse tab","SAAZA_Gradient_Calculator.html#tab=trans"));
+  if(/Shoulders/.test(s.t)) L.push(tool("Gradient Calculator \u2192 Zone A/B tab","SAAZA_Gradient_Calculator.html#tab=zone"));
+  if(s.ph==="Soil strength (DCP)"){ L.push(tool("DCP Test Locations","SAAZA_DCP_Layout.html")); L.push(tool("DCP Calculator","SAAZA_DCP_Calculator.html")); }
+  if(/Shoot each approach/.test(s.t)) L.push(tool("LZ Trig Calculator","SAAZA_LZ_Trig_Calculator.html"));
+  if(/Record location, distance/.test(s.t)){ L.push(tool("LZ Trig Calculator","SAAZA_LZ_Trig_Calculator.html")); L.push(tool("Gradient Calculator \u2192 Glideslope tab","SAAZA_Gradient_Calculator.html#tab=glide")); }
+  if(/SPACI/.test(s.t)) L.push(tool("SPACI Calculator","SAAZA_SPACI_Calculator.html"));
+  return L;
+}
+function toolsForTeam(t){
+  var seen={}, list=[];
+  STEPS[type].forEach(function(s,i){
+    if(!stepActive(i)) return;
+    var a=assignOf(i), inT=(a==="SPLIT")?(t.func==="DCP"):(a===t.uid);
+    if(inT) toolsFor(s).forEach(function(to){ if(!seen[to.l]){ seen[to.l]=1; list.push(to); } });
+  });
+  return list;
+}
+
+/* ---------- state ---------- */
+var members = [];        // {id, name, teamId}
+var teams = [];          // {uid, func}   func: TL | DCP | SM
+var manualAssign = {};   // {type: {stepIdx: uid|'SPLIT'}}
+var teamCounter = 0;
+var readonly = false;
+var lockedState = false, QR_DEFAULT = null, URL_DEFAULT = "", URLTXT_DEFAULT = "";
+var focusTeam = null, collapsed = {}, done = {}, KEY_DONE = "saaza_sfg_done_v1";
+var optOn = {}, KEY_OPT = "saaza_sfg_opt_v1";
+function loadOpt(){ try{ var s=localStorage.getItem(KEY_OPT); optOn=s?JSON.parse(s):{}; }catch(e){ optOn={}; } }
+function saveOpt(){ try{ localStorage.setItem(KEY_OPT, JSON.stringify(optOn)); }catch(e){} }
+function optActive(i){ var mm=optOn[type]||{}; return !!mm[i]; }
+function stepActive(i){ var s=STEPS[type][i]; return !(s && s.opt) || optActive(i); }
+function toggleOpt(i,on){ if(!optOn[type]) optOn[type]={}; optOn[type][i]=on; saveOpt(); markStale(); renderAll(); }
+function loadDone(){ try{ var s=localStorage.getItem(KEY_DONE); return s?JSON.parse(s):{}; }catch(e){ return {}; } }
+function saveDone(){ try{ localStorage.setItem(KEY_DONE, JSON.stringify(done)); }catch(e){} }
+
+function loadNames(){ try{var s=localStorage.getItem(KEY_NAMES); return s?JSON.parse(s):[];}catch(e){return [];} }
+function saveNames(){ try{localStorage.setItem(KEY_NAMES, JSON.stringify(members.map(function(m){return m.name;})));}catch(e){} }
+function escapeHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function memberById(id){ for(var i=0;i<members.length;i++) if(members[i].id===id) return members[i]; return null; }
+function teamByUid(uid){ for(var i=0;i<teams.length;i++) if(teams[i].uid===uid) return teams[i]; return null; }
+function teamsOf(f){ return teams.filter(function(t){return t.func===f;}); }
+function memOf(uid){ return members.filter(function(m){return m.teamId===uid;}); }
+function teamNum(t){ var l=teamsOf(t.func); for(var i=0;i<l.length;i++) if(l[i].uid===t.uid) return i+1; return 1; }
+function shortLabel(t){ if(t.func==="TL") return "Team Lead"; return (t.func==="DCP"?"DCP ":"Survey ")+teamNum(t); }
+function fullBase(t){ if(t.func==="TL") return "Team Lead"; return (t.func==="DCP"?"DCP Team ":"Survey Team ")+teamNum(t); }
+function teamLabel(t){
+  var names = memOf(t.uid).map(function(m){return m.name.trim();}).filter(Boolean);
+  return fullBase(t) + (names.length ? " ("+names.join(", ")+")" : "");
+}
+function newTeam(func){ return {uid: ++teamCounter, func:func}; }
+function ma(){ if(!manualAssign[type]) manualAssign[type]={}; return manualAssign[type]; }
+
+/* ---------- allocation ---------- */
+function allocate(n){
+  var avail=n-1, dcp=0, sm=0;
+  if(type!=="ALZ"){ return {dcp:0, sm:Math.max(0,avail)}; }   // HLZ/DZ: no DCP team \u2014 all measuring hands
+  if(avail<=1){ return {dcp:0, sm:Math.max(0,avail)}; }
+  function take(k){ var t=Math.min(k,avail); avail-=t; return t; }
+  dcp+=take(2); sm+=take(2); dcp+=take(1); sm+=avail;
+  return {dcp:dcp, sm:sm};
+}
+function buildMembers(n){
+  var saved=loadNames(), a=allocate(n), id=1, i;
+  teamCounter=0; teams=[]; members=[]; manualAssign={};
+  var tl=newTeam("TL"); teams.push(tl);
+  members.push({id:0, name:saved[0]||"", teamId:tl.uid});
+  var d1=null, s1=null;
+  if(a.dcp>0){ d1=newTeam("DCP"); teams.push(d1); }
+  if(a.sm>0 || a.dcp===0){ s1=newTeam("SM"); teams.push(s1); }
+  for(i=0;i<a.dcp;i++){ members.push({id:id, name:saved[id]||"", teamId:d1.uid}); id++; }
+  for(i=0;i<a.sm;i++){ members.push({id:id, name:saved[id]||"", teamId:s1.uid}); id++; }
+}
+
+/* ---------- team / member actions ---------- */
+function addTeam(func){
+  var t=newTeam(func); teams.push(t);
+  // auto-staff the new team by pulling one person from the largest same-type team that has 2+
+  var donors=teamsOf(func).filter(function(x){return x.uid!==t.uid;}).sort(function(a,b){return memOf(b.uid).length-memOf(a.uid).length;});
+  if(donors.length){ var pool=memOf(donors[0].uid); if(pool.length>=2){ pool[pool.length-1].teamId=t.uid; } }
+  renderAll();
+}
+function removeTeam(uid){
+  var t=teamByUid(uid); if(!t || t.func==="TL") return;
+  var sameFunc = teamsOf(t.func).filter(function(x){return x.uid!==uid;});
+  var dest = sameFunc[0] || teamsOf("SM").filter(function(x){return x.uid!==uid;})[0] || teams.filter(function(x){return x.func!=="TL" && x.uid!==uid;})[0];
+  memOf(uid).forEach(function(m){ m.teamId = dest ? dest.uid : teams[0].uid; });
+  Object.keys(manualAssign).forEach(function(ty){ Object.keys(manualAssign[ty]).forEach(function(k){ if(manualAssign[ty][k]===uid) delete manualAssign[ty][k]; }); });
+  teams = teams.filter(function(x){return x.uid!==uid;});
+  renderAll();
+}
+function moveTo(id,uid){ var m=memberById(id); if(m){ m.teamId=parseInt(uid,10); renderAll(); } }
+function onName(id,val){
+  var m=memberById(id); if(!m) return;
+  m.name=val; saveNames(); saveRoster();
+  var t=teamByUid(m.teamId), lbl=document.getElementById("lbl-"+m.teamId);
+  if(lbl && t) lbl.textContent=teamLabel(t);
+  markStale(); renderSteps(); renderEquip();
+}
+
+/* ---------- task assignment ---------- */
+function defaultAssign(i){
+  var s=STEPS[type][i];
+  if(s.team==="TL"){ var tl=teamsOf("TL")[0]; return tl?tl.uid:null; }
+  if(s.team==="DCP"){ return "SPLIT"; }
+  var sm=teamsOf("SM");
+  if(sm.length===0) return null;
+  if(sm.length===1) return sm[0].uid;
+  if(type==="ALZ" && sm.length===2){ return /Longitudinal|Transverse/.test(s.t) ? sm[0].uid : sm[1].uid; }
+  var smSteps=[]; STEPS[type].forEach(function(x,j){ if(x.team==="SM") smSteps.push(j); });
+  return sm[Math.max(0,smSteps.indexOf(i)) % sm.length].uid;   // round-robin across survey teams
+}
+function assignOf(i){
+  var m=ma()[i];
+  if(m!==undefined){ if(m==="SPLIT") return "SPLIT"; if(teamByUid(m)) return m; }
+  return defaultAssign(i);
+}
+function assignStep(i,val){ ma()[i] = (val==="SPLIT")?"SPLIT":parseInt(val,10); markStale(); renderSteps(); renderEquip(); renderTime(); saveRoster(); }
+
+function gearForTeam(t){
+  var set={}, steps=STEPS[type];
+  steps.forEach(function(s,i){
+    if(!stepActive(i)) return;
+    var a=assignOf(i), inT;
+    if(a==="SPLIT") inT=(t.func==="DCP"); else inT=(a===t.uid);
+    if(inT) s.eq.forEach(function(e){ set[e.replace(" (opt.)","")]=1; });
+  });
+  return Object.keys(set);
+}
+
+/* ---------- rendering ---------- */
+function teamSelect(m){
+  var opts = teams.map(function(t){
+    var lbl=(t.func==="TL")?"Assist TL":shortLabel(t);
+    return '<option value="'+t.uid+'"'+(t.uid===m.teamId?' selected':'')+'>'+lbl+'</option>';
+  }).join("");
+  return '<select class="msel" onchange="moveTo('+m.id+',this.value)">'+opts+'</select>';
+}
+function teamBox(t){
+  var mems=memOf(t.uid);
+  var h='<div class="team-box t-'+t.func+'"><div class="tb-head"><span class="tb-label" id="lbl-'+t.uid+'">'+teamLabel(t)+'</span>';
+  if(t.func!=="TL") h+='<button class="tb-x" onclick="removeTeam('+t.uid+')" title="remove team">\u00d7</button>';
+  h+='</div>';
+  if(!mems.length && t.func!=="TL") h+='<div class="tb-empty">No members \u2014 move someone here with their dropdown.</div>';
+  mems.forEach(function(m){
+    h+='<div class="mrow"><input type="text" value="'+escapeHtml(m.name)+'" placeholder="name" oninput="onName('+m.id+',this.value)">';
+    if(m.id!==0) h+=teamSelect(m);
+    h+='</div>';
+  });
+  return h+'</div>';
+}
+function renderRoster(){
+  if(readonly){
+    var hh="";
+    teamsOf("TL").concat(teamsOf("DCP"),teamsOf("SM")).forEach(function(t){
+      hh+='<div class="team-box t-'+t.func+'"><div class="tb-head"><span class="tb-label">'+teamLabel(t)+'</span></div></div>';
+    });
+    document.getElementById("roster").innerHTML=hh;
+    return;
+  }
+  var h="";
+  teamsOf("TL").forEach(function(t){h+=teamBox(t);});
+  teamsOf("DCP").forEach(function(t){h+=teamBox(t);});
+  teamsOf("SM").forEach(function(t){h+=teamBox(t);});
+  var addH='<div class="add-row">';
+  if(type==="ALZ") addH+='<button class="add-btn" onclick="addTeam(\'DCP\')">+ Add DCP team</button>';
+  addH+='<button class="add-btn" onclick="addTeam(\'SM\')">+ Add Survey/measure team</button></div>';
+  h+=addH;
+  document.getElementById("roster").innerHTML=h;
+}
+function renderSummary(){
+  function ppl(f){ return teams.filter(function(t){return t.func===f;}).reduce(function(a,t){return a+memOf(t.uid).length;},0); }
+  var nd=teamsOf("DCP").length, ns=teamsOf("SM").length, tlN=ppl("TL");
+  var h='<span class="s-pill s-TL">Team Lead'+(tlN>1?' (+'+(tlN-1)+' assist)':'')+'</span>';
+  h+='<span class="s-pill s-DCP">DCP: '+ppl("DCP")+(nd>1?' \u00b7 '+nd+' teams':'')+'</span>';
+  h+='<span class="s-pill s-SM">Survey/measure: '+ppl("SM")+(ns>1?' \u00b7 '+ns+' teams':'')+'</span>';
+  document.getElementById("summary").innerHTML=h;
+}
+function minFor(s){
+  if(s.assist) return 0;
+  var t=s.t;
+  if(/DCP at the ALZ/.test(t)) return 220;
+  if(/Longitudinal/.test(t)) return 50;
+  if(/Transverse/.test(t)) return 35;
+  if(/SPACI/.test(t)) return 30;
+  if(/Ground-bearing/.test(t)) return 30;
+  if(/usable length/.test(t)) return 25;
+  if(/rotor spacing/.test(t)) return 20;
+  if(/Ground slope/.test(t)) return 20;
+  if(/check the 10:1|Obstacles in/.test(t)) return 20;
+  if(/Ground composition|Drop-surface/.test(t)) return 18;
+  if(/Establish the PI/.test(t)) return 15;
+  if(/DAGR fix/.test(t)) return 10;
+  if(/Identify the DZ|mission type|Markings/.test(t)) return 10;
+  if(/Overall usable area/.test(t)) return 10;
+  if(/Shoulders/.test(t)) return 15;
+  if(/Shoot each approach/.test(t)) return 15;
+  if(/corners, ends/.test(t)) return 10;
+  if(/Directional|360/.test(t)) return 10;
+  if(/Runway length|Runway width|Overruns/.test(t)) return 10;
+  if(/General surface/.test(t)) return 10;
+  if(/is complete/.test(t)) return 10;
+  if(/runway heading/.test(t)) return 3;
+  return 5;
+}
+function fmtMins(m){ m=Math.round(m); if(m<60) return "~"+m+" min"; var h=Math.floor(m/60), mm=m%60; return "~"+h+"h"+(mm?" "+mm+"m":""); }
+function timeWindow(){
+  var steps=STEPS[type]; if(!steps) return null;
+  var tl=0, dcp=0, smT={}, smU=0;
+  steps.forEach(function(s,i){
+    if(!stepActive(i)) return;
+    var m=minFor(s), a=assignOf(i);
+    if(s.team==="TL") tl+=m;
+    else if(s.team==="DCP") dcp+=m;
+    else { if(a && a!=="SPLIT" && teamByUid(a)) smT[a]=(smT[a]||0)+m; else smU+=m; }
+  });
+  // a track only runs in parallel if it actually has people; otherwise its work falls on the lead (serial)
+  var leadExtra=0, dcpTrack=0;
+  var dcpTeams=teamsOf("DCP").filter(function(t){return memOf(t.uid).length>0;});
+  if(dcp>0){ if(dcpTeams.length>0) dcpTrack=dcp/dcpTeams.length; else leadExtra+=dcp; }
+  if(smU>0) leadExtra+=smU;
+  var smTrack=0, smTotal=smU;
+  Object.keys(smT).forEach(function(k){
+    smTotal+=smT[k];
+    if(memOf(+k).length>0) smTrack=Math.max(smTrack, smT[k]);
+    else leadExtra+=smT[k];
+  });
+  return { serial: tl+dcp+smTotal, parallel: Math.max(tl+leadExtra, dcpTrack, smTrack) };
+}
+/* ---------- survey timer (item 5) ---------- */
+var KEY_TIMER="saaza_sfg_timer_v1", timer={running:false,startedAt:0,accumulated:0}, timerInt=null;
+function loadTimer(){ try{ var s=localStorage.getItem(KEY_TIMER); if(s){ var t=JSON.parse(s); timer.running=!!t.running; timer.startedAt=t.startedAt||0; timer.accumulated=t.accumulated||0; } }catch(e){} }
+function saveTimer(){ try{ localStorage.setItem(KEY_TIMER, JSON.stringify(timer)); }catch(e){} }
+function timerElapsed(){ return timer.accumulated + (timer.running ? (Date.now()-timer.startedAt) : 0); }
+function fmtClock(ms){ var s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60; function p(n){return (n<10?"0":"")+n;} return p(h)+":"+p(m)+":"+p(ss); }
+function startTick(){ if(timerInt||!timer.running) return; timerInt=setInterval(renderTimer,1000); }
+function stopTick(){ if(timerInt){ clearInterval(timerInt); timerInt=null; } }
+function timerToggle(){
+  if(timer.running){ timer.accumulated+=Date.now()-timer.startedAt; timer.running=false; stopTick(); }
+  else { timer.startedAt=Date.now(); timer.running=true; }
+  saveTimer(); renderTimer(); startTick();
+}
+function timerReset(){
+  if(timerElapsed()>0 && !confirm("Reset the survey timer to 00:00:00? This can't be undone.")) return;
+  timer.running=false; timer.startedAt=0; timer.accumulated=0; saveTimer(); stopTick(); renderTimer();
+}
+function renderTimer(){
+  var clk=document.getElementById("st-clock"); if(!clk) return;
+  var ms=timerElapsed();
+  clk.textContent=fmtClock(ms);
+  var btn=document.getElementById("st-toggle");
+  if(btn){ btn.textContent=timer.running?"Pause":(ms>0?"Resume":"Start"); btn.classList.toggle("running",timer.running); }
+  if(timer.running) startTick();
+  var stat=document.getElementById("st-status"); if(!stat) return;
+  var w=timeWindow(), est=w?w.parallel:null, em=ms/60000;
+  stat.className="st-status";
+  if(est==null){ stat.textContent="Pick a survey type above to compare against the time estimate."; return; }
+  if(ms===0){ stat.textContent="Estimate "+fmtMins(est)+" with your teams running in parallel. Start the timer when you step onto the zone."; return; }
+  if(em<=est){ stat.classList.add("ontrack"); stat.textContent="On track \u2014 about "+fmtMins(est-em)+" left of the "+fmtMins(est)+" estimate."; }
+  else { stat.classList.add("over"); stat.textContent=fmtMins(em-est)+" over the "+fmtMins(est)+" parallel estimate \u2014 reassess scope or push the pace."; }
+}
+function renderTime(){
+  renderTimer();
+  var el=document.getElementById("time-est"); if(!el) return;
+  var w=timeWindow(); if(!w){ el.innerHTML=""; return; }
+  el.innerHTML='<span class="te-h">\u23f1 Rough time window:</span> <b>'+fmtMins(w.parallel)+'</b> with your teams running in parallel <span class="te-sub">(one crew, serial: '+fmtMins(w.serial)+' \u2014 rough planning estimate)</span>';
+}
+function inFocus(i){
+  if(focusTeam===null) return true;
+  var s=STEPS[type][i];
+  if(s && s.assist){ var fa=teamByUid(focusTeam); return !!(fa && fa.func===s.team); }
+  var a=assignOf(i);
+  if(a==="SPLIT"){ var ft=teamByUid(focusTeam); return !!(ft && ft.func==="DCP"); }
+  return a===focusTeam;
+}
+function renderFocus(){
+  var bar=document.getElementById("focus-bar"); if(!bar) return;
+  if(!STEPS[type]){ bar.innerHTML=""; return; }
+  if(focusTeam!==null && !teamByUid(focusTeam)) focusTeam=null;
+  var h='<span class="focus-h">Focus:</span><button class="focus-btn'+(focusTeam===null?" on":"")+'" onclick="setFocus(null)">All tasks</button>';
+  teamsOf("TL").concat(teamsOf("DCP"),teamsOf("SM")).forEach(function(t){
+    h+='<button class="focus-btn'+(focusTeam===t.uid?" on":"")+'" onclick="setFocus('+t.uid+')">'+shortLabel(t)+'</button>';
+  });
+  h+='<span class="progress" id="progress"></span>';
+  bar.innerHTML=h;
+}
+function setFocus(uid){ focusTeam=uid; renderFocus(); renderSteps(); renderEquip(); }
+function toggleDone(i,cb){
+  if(!done[type]) done[type]={};
+  done[type][i]=cb.checked; saveDone();
+  var st=cb.closest(".step"); if(st) st.classList.toggle("done", cb.checked);
+  updateProgress();
+}
+function updateProgress(){
+  var p=document.getElementById("progress"); if(!p) return;
+  var steps=STEPS[type]; if(!steps){ p.textContent=""; return; }
+  var total=0, dn=0;
+  steps.forEach(function(s,i){
+    if(!stepActive(i)) return;
+    if(focusTeam!==null && !inFocus(i)) return;
+    total++; if(done[type] && done[type][i]) dn++;
+  });
+  p.textContent = total ? (dn+" / "+total+" done") : "";
+}
+function togglePhase(hdr){
+  var grp=hdr.nextElementSibling; if(!grp) return;
+  var ph=grp.getAttribute("data-phase");
+  collapsed[ph]=!collapsed[ph];
+  grp.classList.toggle("collapsed", collapsed[ph]);
+  hdr.classList.toggle("collapsed", collapsed[ph]);
+}
+function markStale(){
+  if(!lockedState) return;
+  lockedState=false;
+  var b=document.getElementById("lock-btn"); if(b){ b.textContent="\ud83d\udd12 Lock & share my current setup"; b.classList.remove("locked"); }
+  var holder=document.getElementById("qr-holder"); if(holder && QR_DEFAULT!=null) holder.innerHTML=QR_DEFAULT;
+  var el=document.getElementById("sfg-url"); if(el){ el.href=URL_DEFAULT; el.textContent=URLTXT_DEFAULT; }
+}
+
+function renderEquip(){
+  if(!STEPS[type]){ document.getElementById("equip").innerHTML=""; return; }
+  var order=teamsOf("TL").concat(teamsOf("DCP"),teamsOf("SM"));
+  if(focusTeam!==null) order=order.filter(function(t){return t.uid===focusTeam;});
+  var rows=order.map(function(t){
+    var g=gearForTeam(t);
+    var gh = g.length ? '<ul class="et-gear-list">'+g.map(function(x){return '<li>'+x+'</li>';}).join("")+'</ul>' : '<span class="et-none">no tasks assigned</span>';
+    var tl=toolsForTeam(t);
+    var th = tl.length ? '<div class="et-tools"><span class="et-tools-h">\ud83d\udee0\ufe0f Tools:</span> '+tl.map(function(to){return '<a href="'+absUrl(to.u)+'" target="_blank" rel="noopener">'+to.l+'</a>';}).join(" &middot; ")+'</div>' : '';
+    return '<div class="et-row"><div class="et-team"><span class="et-dot d-'+t.func+'"></span>'+teamLabel(t)+'</div>'+gh+th+'</div>';
+  }).join("");
+  document.getElementById("equip").innerHTML='<div class="et-title">What each team needs <span class="et-sub">(gear from the truck + the app tools for their tasks)</span></div>'+rows;
+}
+function planText(n){
+  if(n<=1) return "<b>Solo.</b> Run every task in sequence \u2014 prioritize safety-of-flight data and consider a hasty scope.";
+  if(type==="HLZ"){
+    if(n<=3) return "<b>You + "+(n-1)+".</b> You take coordinates, photos, obstacles, and surface; your crew measures the landing points, usable area, and slopes.";
+    return "<b>You + "+(n-1)+".</b> Run a survey/measure team on the landing points, area, and slopes while you handle coordinates, photos, obstacles, surface, and QC. Add survey teams (use + Add team) to split a large HLZ.";
+  }
+  if(type==="DZ"){
+    if(n<=3) return "<b>You + "+(n-1)+".</b> You set up the DZ \u2014 identify it, set the mission type & minimums, establish the PI \u2014 then take the coordinates and photos and QC the 3823; your crew measures the dimensions and works the DZ for obstacles and surface hazards.";
+    return "<b>You + "+(n-1)+".</b> Run survey teams on dimensions, obstacles, and surface hazards while you handle DZ setup, the PI, coordinates, photos, and the 3823. Add survey teams (use + Add team) to cover a large DZ faster.";
+  }
+  if(n===2) return "<b>You + 1.</b> Do the two-person tasks (DCP, gradients) together; one operates, one records.";
+  if(n<=4) return "<b>You + "+(n-1)+".</b> A DCP team and a survey/measure team run in parallel. You record, run surface/SPACI, and QC.";
+  return "<b>You + "+(n-1)+".</b> With this many, split into multiple teams (use + Add team) so DCP holes and survey tasks all run at once \u2014 extra hands speed the line. You supervise, take coordinates/obstacles/SPACI, and QC the 3822.";
+}
+function chip(cls,txt){ return '<span class="chip '+cls+'">'+txt+'</span>'; }
+function assignSelect(i,func,a){
+  var opts="";
+  if(func==="DCP"){
+    opts+='<option value="SPLIT"'+(a==="SPLIT"?' selected':'')+'>Split across DCP teams</option>';
+    teamsOf("DCP").forEach(function(t){ opts+='<option value="'+t.uid+'"'+(a===t.uid?' selected':'')+'>'+shortLabel(t)+'</option>'; });
+  } else {
+    teamsOf("SM").forEach(function(t){ opts+='<option value="'+t.uid+'"'+(a===t.uid?' selected':'')+'>'+shortLabel(t)+'</option>'; });
+  }
+  return '<select class="asel" onchange="assignStep('+i+',this.value)">'+opts+'</select>';
+}
+function stepMetaTeam(i,s){
+  if(s.assist){
+    var fn = s.team==="DCP" ? "All DCP teams" : (s.team==="SM" ? "All survey teams" : "Team Lead");
+    return chip("chip-team chip-"+s.team, fn);
+  }
+  if(s.team==="TL"){
+    var tl=teamsOf("TL")[0];
+    return chip("chip-team chip-TL", tl?teamLabel(tl):"Team Lead");
+  }
+  var a=assignOf(i), labelTxt;
+  if(s.team==="DCP"){
+    var dcps=teamsOf("DCP");
+    if(a==="SPLIT") labelTxt = dcps.length>1 ? dcps.map(teamLabel).join(" & ")+" \u2014 split the holes" : (dcps[0]?teamLabel(dcps[0]):"(no DCP team)");
+    else { var t=teamByUid(a); labelTxt=t?teamLabel(t):"(unassigned)"; }
+  } else {
+    var t2=(a&&a!=="SPLIT")?teamByUid(a):null; labelTxt=t2?teamLabel(t2):"(unassigned)";
+  }
+  var out=chip("chip-team chip-"+s.team,labelTxt);
+  if(!readonly && teamsOf(s.team).length>1) out+=assignSelect(i,s.team,a);
+  return out;
+}
+function renderSteps(){
+  var n=parseInt(document.getElementById("team").value)||1;
+  var steps=STEPS[type], box=document.getElementById("steps"), ph=document.getElementById("print-head");
+  if(!steps){
+    box.innerHTML='<div class="placeholder"><b>'+type+' guide is coming next.</b><br>The ALZ guide is fully built so you can review the format \u2014 the same step / equipment / delegation / reference layout will be mirrored here, verified against the '+(type==="HLZ"?"helicopter (Unit 2.2, DAFMAN Ch 5)":"drop zone (Unit 2.1, DAFMAN Ch 3)")+' criteria.</div>';
+    ph.innerHTML=""; updateProgress(); return;
+  }
+  ph.innerHTML=type+" Survey Field Guide \u2014 team of "+n+" \u00b7 printed "+new Date().toLocaleDateString();
+  var head="";
+  if(focusTeam!==null){ var ft=teamByUid(focusTeam); if(ft) head='<div class="focus-note">Showing '+teamLabel(ft)+'\u2019s tasks only \u2014 tap \u201cAll tasks\u201d for the full survey.</div>'; }
+  var html=head, lastPhase=null, open=false;
+  steps.forEach(function(s,i){
+    if(!inFocus(i)) return;
+    if(s.ph!==lastPhase){
+      if(open) html+='</div>';
+      var c = collapsed[s.ph] ? " collapsed" : "";
+      html+='<div class="phase'+c+'" onclick="togglePhase(this)">'+escapeHtml(s.ph)+'<span class="caret">\u25be</span></div>';
+      html+='<div class="phase-group'+c+'" data-phase="'+escapeHtml(s.ph)+'">';
+      open=true; lastPhase=s.ph;
+    }
+    var isOpt=!!s.opt, on=optActive(i), off=isOpt && !on;
+    if(off && readonly) return;   // a shared/locked plan that didn't include it stays hidden
+    var dn=(done[type] && done[type][i]) && !off;
+    html+='<div class="step'+(dn?" done":"")+(isOpt?" opt":"")+(off?" opt-off":"")+'">';
+    html+='<div class="step-head"><div class="step-num">'+(i+1)+'</div><div class="step-title">'+s.t+(isOpt?' <span class="opt-tag">optional</span>':'')+'</div>';
+    html+='<div class="step-ctrls">';
+    if(isOpt && !readonly) html+='<label class="opt-toggle"><input type="checkbox" onchange="toggleOpt('+i+',this.checked)"'+(on?" checked":"")+'><span>include</span></label>';
+    if(!off) html+='<label class="chk-wrap"><input type="checkbox" class="chk" onchange="toggleDone('+i+',this)"'+(dn?" checked":"")+'><span>done</span></label>';
+    html+='</div></div>';
+    html+='<div class="step-detail">'+s.d+'</div>';
+    if(!off){
+      html+='<div class="step-meta">';
+      if(s.assist){
+        html+='<div class="chips">'+stepMetaTeam(i,s)+'</div>';
+      } else {
+        html+='<div class="chips">'+stepMetaTeam(i,s)+'<span class="crew">'+(s.crew===2?"\ud83d\udc65 2-person":"1 person")+'</span><span class="crew">\u23f1 '+fmtMins(minFor(s))+'</span></div>';
+      }
+      if(s.eq.length) html+='<div class="chips">'+s.eq.map(function(e){return chip("chip-eq",e);}).join("")+'</div>';
+      if(s.refs && s.refs.length) s.refs.forEach(function(rf){ html+='<div class="ref"><span class="ref-label">\ud83d\udcc4 </span><a href="'+absUrl(rf.u)+'" target="_blank" rel="noopener">'+rf.l+'</a></div>'; });
+      var sl=slideFor(s);
+      if(sl) html+='<div class="ref"><span class="ref-label">\ud83d\udcca </span><a href="'+absUrl(sl.u)+'" target="_blank" rel="noopener">'+sl.l+'</a></div>';
+      toolsFor(s).forEach(function(to){ html+='<div class="ref tool-ref"><span class="ref-label">\ud83d\udee0\ufe0f </span><a href="'+absUrl(to.u)+'" target="_blank" rel="noopener">'+to.l+'</a></div>'; });
+      html+='</div>';
+    }
+    html+='</div>';
+  });
+  if(open) html+='</div>';
+  box.innerHTML=html;
+  updateProgress();
+}
+function renderPlan(){
+  document.getElementById("plan").innerHTML='<b>Suggested starting point</b> &mdash; '+planText(parseInt(document.getElementById("team").value)||1);
+}
+
+/* ---------- inline azimuth converter (item 12) ---------- */
+/* Same convention as the full Coordinate Converter: True = Magnetic + declination,
+   True = Grid + convergence, both East-positive. Convergence here is entered by hand
+   (no position on this screen); leave blank to treat grid as true. */
+var azcOpen=false;
+function azcToggle(){ azcOpen=!azcOpen; var el=document.getElementById('azc'); if(el) el.classList.toggle('open', azcOpen); }
+function azcN360(a){ a=a%360; if(a<0) a+=360; return a; }
+function azcUpdate(){
+  var v=parseFloat(document.getElementById('azc-val').value);
+  var dRaw=parseFloat(document.getElementById('azc-decl').value);
+  var cRaw=parseFloat(document.getElementById('azc-conv').value);
+  var D=isNaN(dRaw)?null:dRaw, C=isNaN(cRaw)?0:cRaw;
+  var ref=document.getElementById('azc-ref').value;
+  var t=document.getElementById('azc-t'), g=document.getElementById('azc-g'), m=document.getElementById('azc-m');
+  if(isNaN(v)){ t.textContent='\u2014'; g.textContent='\u2014'; m.textContent='\u2014'; return; }
+  var azTrue;
+  if(ref==='true') azTrue=v;
+  else if(ref==='grid') azTrue=v+C;
+  else { if(D===null){ t.textContent='\u2014'; g.textContent='\u2014'; m.textContent='need decl.'; return; } azTrue=v+D; }
+  t.textContent=azcN360(azTrue).toFixed(1)+'\u00b0';
+  g.textContent=azcN360(azTrue-C).toFixed(1)+'\u00b0';
+  m.textContent=(D===null)?'need decl.':azcN360(azTrue-D).toFixed(1)+'\u00b0';
+}
+/* ---------- photo checklist (item 10) ---------- */
+var PHOTOS={
+  ALZ:["360\u00b0 panorama from runway center","Down the runway \u2014 approach direction","Down the runway \u2014 departure direction","Each overrun \u2014 from the runway end, facing outward down the centerline (both ends)","Every obstacle you'll record","Surface distresses \u2014 each SPACI type / area","Existing markings or features"],
+  HLZ:["360\u00b0 panorama from center","Each approach / departure path","Touchdown point(s) & landing surface","Every obstacle around the perimeter","Slope / terrain features","Surface conditions & hazards"],
+  DZ:["360\u00b0 panorama from the PI","Down the run-in line","Point of Impact area","Every obstacle in & around the DZ","Drop-surface hazards (rocks, stumps, water, fences, slope)","Markings / reference points"]
+};
+var KEY_PHOTOS="saaza_sfg_photos_v1", photoDone={}, photoOpen=false;
+function loadPhotos(){ try{ var s=localStorage.getItem(KEY_PHOTOS); if(s) photoDone=JSON.parse(s)||{}; }catch(e){ photoDone={}; } }
+function savePhotos(){ try{ localStorage.setItem(KEY_PHOTOS, JSON.stringify(photoDone)); }catch(e){} }
+function togglePhotoPanel(){ photoOpen=!photoOpen; renderPhotos(); }
+function togglePhoto(i){ if(!photoDone[type]) photoDone[type]={}; photoDone[type][i]=!photoDone[type][i]; savePhotos(); renderPhotos(); }
+function renderPhotos(){
+  var el=document.getElementById("photo-chk"); if(!el) return;
+  var list=PHOTOS[type];
+  if(!list){ el.className="photo-chk"; el.innerHTML=""; return; }
+  var dn=photoDone[type]||{}, n=0; for(var k=0;k<list.length;k++) if(dn[k]) n++;
+  var done=(n===list.length);
+  el.className="photo-chk"+(photoOpen?" open":"");
+  var h='<div class="pc-head" onclick="togglePhotoPanel()"><span class="pc-title">\ud83d\udcf7 Photo checklist</span><span class="pc-right"><span class="pc-count'+(done?" done":"")+'">'+n+' of '+list.length+'</span><span class="pc-caret">\u25b6</span></span></div><div class="pc-body">';
+  for(var i=0;i<list.length;i++){ var c=!!dn[i]; h+='<label class="pc-item'+(c?" checked":"")+'"><input type="checkbox" '+(c?"checked":"")+' onchange="togglePhoto('+i+')"><span class="pc-label">'+escapeHtml(list[i])+'</span></label>'; }
+  h+='<div class="pc-note">Tick each shot as you take it. Keep the originals on your camera or phone \u2014 this is a count, not photo storage.</div></div>';
+  el.innerHTML=h;
+}
+function renderAll(){ markStale(); renderRoster(); renderSummary(); renderEquip(); renderPlan(); renderTime(); renderPhotos(); renderFocus(); renderSteps(); saveRoster(); }
+function setType(btn){
+  saveRoster();   // persist the current type's roster before switching
+  type=btn.dataset.v; focusTeam=null;
+  document.querySelectorAll("#type-seg button").forEach(function(b){b.classList.toggle("on", b===btn);});
+  if(!applyRosterFor()) render();   // restore this type's saved roster, else default build
+}
+/* ---------- roster persistence (size, teams, member assignments incl. Assist TL) ---------- */
+var KEY_ROSTER="saaza_sfg_roster_v1";
+function loadRosterMap(){ try{ var s=localStorage.getItem(KEY_ROSTER); return s?JSON.parse(s):{}; }catch(e){ return {}; } }
+function snapshotRoster(){
+  function tIdx(uid){ for(var i=0;i<teams.length;i++) if(teams[i].uid===uid) return i; return 0; }
+  var tlist=teams.map(function(t){return t.func;});
+  var mem=members.map(function(m){return [m.name, tIdx(m.teamId)];});
+  var asg={}, mm=manualAssign[type]||{};
+  Object.keys(mm).forEach(function(k){ var v=mm[k]; if(v==="SPLIT") asg[k]="S"; else { var t=teamByUid(v); if(t) asg[k]=tIdx(v); } });
+  return {tm:tlist, mb:mem, as:asg};
+}
+function saveRoster(){
+  if(readonly) return;   // a shared/locked plan must never overwrite the user's own saved roster
+  try{ var map=loadRosterMap(); map[type]=snapshotRoster(); localStorage.setItem(KEY_ROSTER, JSON.stringify(map)); }catch(e){}
+}
+function restoreRoster(snap){
+  if(!snap || !snap.tm || !snap.tm.length) return false;
+  teamCounter=0; teams=[]; members=[]; if(manualAssign[type]) delete manualAssign[type];
+  snap.tm.forEach(function(f){ teams.push(newTeam(f)); });
+  (snap.mb||[]).forEach(function(p,idx){ members.push({id:idx, name:(p[0]||""), teamId:(teams[p[1]]?teams[p[1]].uid:teams[0].uid)}); });
+  var mm=ma();
+  Object.keys(snap.as||{}).forEach(function(k){ var v=snap.as[k]; if(v==="S") mm[k]="SPLIT"; else if(teams[v]) mm[k]=teams[v].uid; });
+  return true;
+}
+function applyRosterFor(){   // restore the saved roster for the current type; returns false if none
+  var snap=loadRosterMap()[type];
+  if(snap && restoreRoster(snap)){
+    var ti=document.getElementById("team"); if(ti) ti.value=members.length;
+    renderAll();
+    return true;
+  }
+  return false;
+}
+/* ---------- share my setup (URL state) + read-only ---------- */
+function encodeState(){
+  var snap=snapshotRoster();
+  return encodeURIComponent(JSON.stringify({v:1, ty:type, tm:snap.tm, mb:snap.mb, as:snap.as, op:(optOn[type]||{})}));
+}
+function decodeState(str){
+  var st=JSON.parse(decodeURIComponent(str));
+  if(!st || st.v!==1) return false;
+  type=st.ty||"ALZ";
+  document.querySelectorAll("#type-seg button").forEach(function(b){b.classList.toggle("on", b.dataset.v===type);});
+  teamCounter=0; teams=[]; members=[]; manualAssign={};
+  (st.tm||["TL"]).forEach(function(f){ teams.push(newTeam(f)); });
+  (st.mb||[]).forEach(function(p,idx){ members.push({id:idx, name:(p[0]||""), teamId:(teams[p[1]]?teams[p[1]].uid:teams[0].uid)}); });
+  var mm=ma();
+  Object.keys(st.as||{}).forEach(function(k){
+    var v=st.as[k];
+    if(v==="S") mm[k]="SPLIT";
+    else if(teams[v]) mm[k]=teams[v].uid;
+  });
+  optOn={}; if(st.op) optOn[type]=st.op;
+  return true;
+}
+function lockShare(btn){
+  var url=BASE+"SAAZA_Survey_Field_Guide.html#g="+encodeState();
+  var el=document.getElementById("sfg-url");
+  el.href=url; el.textContent="Locked setup link \u2014 tap to open, or Copy link";
+  renderShareQR(url);
+  lockedState=true;
+  btn.classList.add("locked");
+  btn.textContent="\u2713 Setup locked \u2014 copy the link or scan the code";
+}
+function renderShareQR(url){
+  var holder=document.getElementById("qr-holder");
+  function draw(){
+    try{
+      var qr=qrcode(0,'L'); qr.addData(url); qr.make();
+      holder.innerHTML=qr.createSvgTag({cellSize:4, margin:2, scalable:true});
+      var svg=holder.querySelector("svg"); if(svg){ svg.setAttribute("class","qr"); svg.removeAttribute("width"); svg.removeAttribute("height"); }
+    }catch(e){ holder.innerHTML='<div class="qr-note">QR needs a connection to draw \u2014 the link works regardless.</div>'; }
+  }
+  if(window.qrcode){ draw(); return; }
+  var sc=document.createElement("script");
+  sc.src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
+  sc.onload=draw; sc.onerror=function(){ holder.innerHTML='<div class="qr-note">QR needs a connection to draw \u2014 the link works regardless.</div>'; };
+  document.head.appendChild(sc);
+}
+function applyMode(){
+  if(!readonly) return;
+  document.body.classList.add("ro");
+  var b=document.getElementById("ro-banner");
+  if(b){ b.style.display="block"; b.innerHTML="\ud83d\udd12 Read-only plan from your Team Lead \u2014 you can view and print it, but only the TL can change the teams."; }
+}
+
+function copyUrl(btn){
+  var u=document.getElementById("sfg-url").href;
+  try{ if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(u); }catch(e){}
+  var o=btn.textContent; btn.textContent="Copied!"; setTimeout(function(){btn.textContent=o;},1200);
+}
+
+function render(){
+  var n=parseInt(document.getElementById("team").value)||1; if(n<1) n=1;
+  buildMembers(n); renderAll();
+}
+
+function init(){
+  done = loadDone();
+  loadOpt();
+  loadTimer();
+  loadPhotos();
+  var holder=document.getElementById("qr-holder"); if(holder) QR_DEFAULT=holder.innerHTML;
+  var el=document.getElementById("sfg-url"); if(el){ URL_DEFAULT=el.href; URLTXT_DEFAULT=el.textContent; }
+  var h=location.hash||"";
+  var m=h.match(/[#&]g=([^&]+)/);
+  if(m){ try{ if(decodeState(m[1])) readonly=true; }catch(e){ readonly=false; } }
+  if(readonly){ var ti=document.getElementById("team"); if(ti) ti.value=members.length; renderAll(); }
+  else { if(!applyRosterFor()) render(); }
+  applyMode();
+  renderTimer(); startTick();
+}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Tools</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f4f0;color:#1a1a1a;min-height:100vh;padding:1.5rem 1rem}
+.header{margin-bottom:1.75rem}
+h1{font-size:22px;font-weight:600;margin-bottom:4px}
+.sub{font-size:13px;color:#666}
+.section-label{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.section{margin-bottom:1.75rem}
+.tool-card{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1rem 1.1rem;margin-bottom:8px;text-decoration:none;color:#1a1a1a;transition:border-color .15s}
+.tool-card:hover{border-color:#1D9E75}
+.icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.icon.green{background:#E1F5EE}
+.icon.purple{background:#EEEDFE}
+.icon.amber{background:#FAEEDA}
+.tool-name{font-size:15px;font-weight:500;margin-bottom:2px}
+.tool-desc{font-size:12px;color:#888}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:6px;background:#E1F5EE;color:#0F6E56;margin-left:6px;vertical-align:middle;font-weight:500}
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:2rem;padding-bottom:1rem}
+/* connectivity pill (item 3) */
+.net-pill{position:fixed;top:10px;right:10px;z-index:900;font-size:11px;font-weight:500;padding:4px 10px;border-radius:999px;display:flex;align-items:center;gap:6px;border:1px solid}
+.net-pill .net-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.net-pill.online{background:#E1F5EE;color:#0F6E56;border-color:#9FE1CB}
+.net-pill.online .net-dot{background:#1D9E75}
+.net-pill.offline{background:#FAEEDA;color:#633806;border-color:#FAC775}
+.net-pill.offline .net-dot{background:#BA7517}
+/* first-use disclaimer (item 1) */
+.disc-overlay{position:fixed;inset:0;background:rgba(26,26,26,.55);display:flex;align-items:center;justify-content:center;padding:1.25rem;z-index:1000}
+.disc-overlay[hidden]{display:none}
+.disc-card{background:#fff;border-radius:14px;max-width:460px;width:100%;padding:1.5rem 1.4rem;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.disc-card h2{font-size:18px;font-weight:600;margin-bottom:2px}
+.disc-card .disc-sub{font-size:12.5px;color:#1D9E75;font-weight:500;margin-bottom:12px;line-height:1.4}
+.disc-card p{font-size:13px;color:#333;line-height:1.55;margin-bottom:10px}
+.disc-card .disc-ack{font-size:12.5px;color:#555;font-style:italic;margin-bottom:16px;line-height:1.5}
+.disc-btn{display:block;width:100%;background:#1D9E75;color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:600;cursor:pointer}
+.disc-btn:active{background:#178463}
+</style>
+</head>
+<body>
+
+<div class="net-pill online" id="net-pill"><span class="net-dot"></span><span class="net-label">Online</span></div>
+
+<div class="disc-overlay" id="disc-overlay" hidden>
+  <div class="disc-card" role="dialog" aria-modal="true" aria-labelledby="disc-title">
+    <h2 id="disc-title">SAAZA Tools</h2>
+    <div class="disc-sub">Browser-based field reference suite for Survey and Assault Zone Assessment</div>
+    <p>This suite provides reference calculations, criteria summaries, and team-planning aids for ALZ, HLZ, and DZ surveys. It is intended to support &mdash; not replace &mdash; trained judgment, independent verification, and the governing publications (DAFMAN 13-217, UFC 3-260-01, TM 3-34.48-2, and associated ETLs).</p>
+    <p>All survey products, measurements, and submitted forms remain the sole responsibility of the Team Lead and survey personnel. Confirm all outputs against applicable doctrine before use in operational or safety-of-flight decisions.</p>
+    <div class="disc-ack">By continuing, you acknowledge that accuracy of survey products is your responsibility.</div>
+    <button class="disc-btn" id="disc-ack-btn">Acknowledge &amp; Continue</button>
+  </div>
+</div>
+
+<div class="header">
+  <h1>SAAZA Tools</h1>
+  <p class="sub">SAAZA Tools &mdash; Last updated June 20, 2026</p>
+</div>
+
+<div class="section">
+  <div class="section-label">Field tools</div>
+  <a class="tool-card" href="SAAZA_Team_Lead_Checklist.html">
+    <div class="icon green">✅</div>
+    <div>
+      <div class="tool-name">Team Lead Checklist <span class="badge">New</span></div>
+      <div class="tool-desc">The 4-phase SAAZA process start to finish — checkable, notes, saves progress. Excel version also in repo.</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_Survey_Field_Guide.html">
+    <div class="icon green">🧭</div>
+    <div>
+      <div class="tool-name">Survey Field Guide <span class="badge">New</span></div>
+      <div class="tool-desc">A step-by-step runner that keeps a zone survey organized and delegated start to finish — for any surveyor, first survey or fiftieth. Covers all three survey types — ALZ (AF 3822), HLZ (AF 4303, with an optional ground-bearing DCP spot-check you switch on for soft spots), and DZ (AF 3823) — and rebuilds the right crews for each (ALZ has a DCP team; HLZ/DZ don't). Enter your team size and it auto-builds the crews; add more survey teams, name members (teams show member names), and move people or hand individual tasks between teams for full flexibility. A per-team equipment table shows exactly what each crew grabs from the truck. Every step shows what to do, who's on it, and links to the governing publication, the exact class slide, and the app tool to use (right down to the tab). Absolute links survive a shared PDF, and the TL can share a locked, red-then-green read-only link/QR that opens the guide with the teams pre-built. In the field: focus to one team's tasks, check off steps, collapsible phases, and a rough time estimate. Print/save as PDF.</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_Equipment_Checklist.html">
+    <div class="icon green">🎒</div>
+    <div>
+      <div class="tool-name">Equipment Checklist <span class="badge">New</span></div>
+      <div class="tool-desc">Pre-survey gear loadout — pick your survey type (ALZ/HLZ/DZ) to see exactly what it needs, check items off as you pack, saves automatically. Print/save as PDF.</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_Field_Reference_Card.html">
+    <div class="icon green">🗂️</div>
+    <div>
+      <div class="tool-name">Field Reference Card <span class="badge">New</span></div>
+      <div class="tool-desc">One-page printable cheat sheet — ALZ/HLZ/DZ criteria, DCP rules, gradients, forms &amp; submission routing. The pocket backup to the digital tools.</div>
+    </div>
+  </a>
+</div>
+
+<div class="section">
+  <div class="section-label">Calculators</div>
+  <a class="tool-card" href="SAAZA_LZ_Trig_Calculator.html">
+    <div class="icon green">📐</div>
+    <div>
+      <div class="tool-name">LZ Trig Calculator</div>
+      <div class="tool-desc">Obstruction height, clearance check, elevation difference, unit conversions and more</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_SPACI_Calculator.html">
+    <div class="icon green">🛬</div>
+    <div>
+      <div class="tool-name">SPACI Calculator <span class="badge">New</span></div>
+      <div class="tool-desc">Score airfield surface condition — deduct values, q, and SPACI from TSPWG 3-260-03.02-19 (C-17 &amp; C-130)</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_DZ_Calculator.html">
+    <div class="icon green">🪂</div>
+    <div>
+      <div class="tool-name">Drop Zone Size &amp; PI Calculator <span class="badge">New</span></div>
+      <div class="tool-desc">Minimum DZ dimensions &amp; Point of Impact via MANFAS — or flip it: enter your DZ size to see the max CDS / Personnel / HE it supports (day/night, formation). All numbers from DAFMAN 13-217, shows every step</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_DCP_Calculator.html">
+    <div class="icon green">⛏️</div>
+    <div>
+      <div class="tool-name">DCP Calculator <span class="badge">New</span></div>
+      <div class="tool-desc">Blows → CBR → layers → controlling strength. Multi-hole, depth/CBR graph, exports the official DCP Data Sheet. TSPWG Tables 2-3/2-4.</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_DCP_Layout.html">
+    <div class="icon green">📍</div>
+    <div>
+      <div class="tool-name">DCP Test Locations <span class="badge">New</span></div>
+      <div class="tool-desc">Where to place DCP readings on an LZ — full vs. hasty survey toggle, plus the test procedure. ETL 97-9 / TSPWG.</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_Coordinate_Converter.html">
+    <div class="icon green">🧭</div>
+    <div>
+      <div class="tool-name">Coordinate Converter <span class="badge">New</span></div>
+      <div class="tool-desc">Convert between Lat/Long, DMS, UTM (Easting/Northing) &amp; MGRS — enter any format, get the rest, incl. deg-dec-min for the survey form. Also converts True/Grid/Magnetic azimuths (auto grid convergence). WGS 84.</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_Gradient_Calculator.html">
+    <div class="icon green">📈</div>
+    <div>
+      <div class="tool-name">Gradient &amp; Glideslope Calculator <span class="badge">New</span></div>
+      <div class="tool-desc">Grade/elevation/angle from clinometer + laser, the 20′ line-level reduction, longitudinal profile (±3% &amp; ±1.5%/200′), transverse gradient (±0.5–3% from CL), Zone A/B drop check (C-130 2′9″/6′3″), and glideslope clearance (C-130 35:1, C-17 20:1). Clinometer % or degrees throughout, field tips on every tab. Unit 1 + DAFMAN 13-217 Tbl 4.2, shows the work.</div>
+    </div>
+  </a>
+</div>
+
+<div class="section">
+  <div class="section-label">Search</div>
+  <a class="tool-card" href="SAAZA_Reference_Search.html">
+    <div class="icon green">🔍</div>
+    <div>
+      <div class="tool-name">Reference Search</div>
+      <div class="tool-desc">Search across 6 SAAZA publications simultaneously — 1,986 pages indexed</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_Quick_Reference_Search.html">
+    <div class="icon green">📋</div>
+    <div>
+      <div class="tool-name">Quick Reference Search</div>
+      <div class="tool-desc">Search all course slides — 395 slides across 8 units, includes all animated content</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_Glossary.html">
+    <div class="icon green">📖</div>
+    <div>
+      <div class="tool-name">Glossary &amp; Acronyms <span class="badge">New</span></div>
+      <div class="tool-desc">Every acronym and term used across the tools and course in one searchable place — filter by category or type to find a definition fast</div>
+    </div>
+  </a>
+</div>
+
+<div class="section">
+  <div class="section-label">Reference publications</div>
+  <a class="tool-card" href="refs/ufc_3_260_01_2019_c3.pdf">
+    <div class="icon green">📄</div>
+    <div>
+      <div class="tool-name">UFC 3-260-01</div>
+      <div class="tool-desc">Airfield and Heliport Planning and Design &mdash; 4 Feb 2019, Change 3: 4 Feb 2026 &mdash; 637 pp</div>
+    </div>
+  </a>
+  <a class="tool-card" href="refs/TM_3_34_48_2.pdf">
+    <div class="icon green">📄</div>
+    <div>
+      <div class="tool-name">TM 3-34.48-2</div>
+      <div class="tool-desc">Theater of Operations: Roads, Airfields, and Heliports — Airfield and Heliport Design &mdash; February 2016 &mdash; 416 pp</div>
+    </div>
+  </a>
+  <a class="tool-card" href="refs/dafman13-217.pdf">
+    <div class="icon green">📄</div>
+    <div>
+      <div class="tool-name">DAFMAN 13-217</div>
+      <div class="tool-desc">Drop Zone, Landing Zone, and Helicopter Landing Zone Operations &mdash; 22 Apr 2021, Change 1: 19 Apr 2022 &mdash; 159 pp</div>
+    </div>
+  </a>
+  <a class="tool-card" href="refs/TSPWG_3_260_03_02_19.pdf">
+    <div class="icon green">📄</div>
+    <div>
+      <div class="tool-name">TSPWG 3-260-03.02-19</div>
+      <div class="tool-desc">Tri-Service Pavements Working Group Manual — Airfield Pavement Evaluation Standards and Procedures &mdash; 19 Oct 2020 &mdash; 391 pp</div>
+    </div>
+  </a>
+  <a class="tool-card" href="refs/ETL_02-19.pdf">
+    <div class="icon amber">📄</div>
+    <div>
+      <div class="tool-name">ETL 02-19</div>
+      <div class="tool-desc">Airfield Pavement Evaluation Standards and Procedures &mdash; 12 Nov 2002 &mdash; 216 pp &mdash; Superseded by TSPWG 3-260-03.02-19</div>
+    </div>
+  </a>
+  <a class="tool-card" href="refs/ETL_97-9.pdf">
+    <div class="icon amber">📄</div>
+    <div>
+      <div class="tool-name">ETL 97-9</div>
+      <div class="tool-desc">Criteria and Guidance for C-17 Contingency and Training Operations on Semi-Prepared Airfields &mdash; 2002 revision &mdash; 168 pp</div>
+    </div>
+  </a>
+</div>
+
+<div class="section">
+  <div class="section-label">Course slide decks</div>
+  <a class="tool-card" href="slides/slides_unit1.pdf">
+    <div class="icon purple">📊</div>
+    <div>
+      <div class="tool-name">Unit 1 — Overview &amp; Math</div>
+      <div class="tool-desc">Definitions, publications, airfield categories, trig, gradient, glideslope &amp; measurement &mdash; 102 slides</div>
+    </div>
+  </a>
+  <a class="tool-card" href="slides/slides_unit2_1.pdf">
+    <div class="icon purple">📊</div>
+    <div>
+      <div class="tool-name">Unit 2.1 — Drop Zone Criteria</div>
+      <div class="tool-desc">DZ anatomy, mission types, dimensions, cumulative adjustments &amp; the MANFAS method &mdash; 27 slides</div>
+    </div>
+  </a>
+  <a class="tool-card" href="slides/slides_unit2_2.pdf">
+    <div class="icon purple">📊</div>
+    <div>
+      <div class="tool-name">Unit 2.2 — Helicopter LZ Criteria</div>
+      <div class="tool-desc">HLZ types, rotor spacing, ground gradients, the 10:1 glideslope &amp; Form 4303 &mdash; 34 slides</div>
+    </div>
+  </a>
+  <a class="tool-card" href="slides/slides_unit2_3.pdf">
+    <div class="icon purple">📊</div>
+    <div>
+      <div class="tool-name">Unit 2.3 — ALZ Fixed-Wing Criteria</div>
+      <div class="tool-desc">Runway dimensions, gradients, overruns, Zones A &amp; B &amp; imaginary surfaces &mdash; 39 slides</div>
+    </div>
+  </a>
+  <a class="tool-card" href="slides/slides_unit3_soil.pdf">
+    <div class="icon purple">📊</div>
+    <div>
+      <div class="tool-name">Unit 3 — Soils &amp; DCP / CBR</div>
+      <div class="tool-desc">Soil identification &amp; classification, CBR, and the Dynamic Cone Penetrometer procedure &mdash; 88 slides</div>
+    </div>
+  </a>
+  <a class="tool-card" href="slides/slides_unit3_spaci.pdf">
+    <div class="icon purple">📊</div>
+    <div>
+      <div class="tool-name">Unit 3 — SPACI Surface Distress</div>
+      <div class="tool-desc">Surface distress types &amp; the SPACI inspection (TSPWG 3-260-03.02-19) &mdash; 17 slides</div>
+    </div>
+  </a>
+  <a class="tool-card" href="slides/slides_unit4.pdf">
+    <div class="icon purple">📊</div>
+    <div>
+      <div class="tool-name">Unit 4 — SAAZA Process</div>
+      <div class="tool-desc">The four phases: information gathering, preparation, the site visit &amp; the final product &mdash; 63 slides</div>
+    </div>
+  </a>
+  <a class="tool-card" href="slides/slides_unit5.pdf">
+    <div class="icon purple">📊</div>
+    <div>
+      <div class="tool-name">Unit 5 — SAAZA Completion</div>
+      <div class="tool-desc">Completing &amp; submitting the survey — AF 3822 / 4303 &amp; Talon Point &mdash; 43 slides</div>
+    </div>
+  </a>
+</div>
+
+<div class="section">
+  <div class="section-label">Flashcard decks</div>
+  <a class="tool-card" href="SAAZA_Mega_Deck.html">
+    <div class="icon green">🃏</div>
+    <div>
+      <div class="tool-name">⭐ Mega Deck — All Units</div>
+      <div class="tool-desc">All 279 cards across all 8 units — filter by unit or shuffle everything</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_Overview_Flashcards.html">
+    <div class="icon amber">🃏</div>
+    <div>
+      <div class="tool-name">Unit 1 — Overview &amp; Math</div>
+      <div class="tool-desc">Definitions, publications, airfield categories, trig, gradient, glideslope &amp; measurement — 57 cards</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_DZ_Flashcards.html">
+    <div class="icon amber">🃏</div>
+    <div>
+      <div class="tool-name">Unit 2.1 — Drop Zone Criteria</div>
+      <div class="tool-desc">DZ anatomy, mission types, dimensions, adjustments &amp; MANFAS method — 31 cards</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_HLZ_Flashcards.html">
+    <div class="icon amber">🃏</div>
+    <div>
+      <div class="tool-name">Unit 2.2 — Helicopter LZ Criteria</div>
+      <div class="tool-desc">HLZ types, space requirements, gradients, glideslope &amp; Form 4303 — 21 cards</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_ALZ_Flashcards.html">
+    <div class="icon amber">🃏</div>
+    <div>
+      <div class="tool-name">Unit 2.3 — ALZ Fixed Wing Criteria</div>
+      <div class="tool-desc">Runway dimensions, gradients, overruns, Zones A &amp; B &amp; imaginary surfaces — 23 cards</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_Flashcards.html">
+    <div class="icon purple">🃏</div>
+    <div>
+      <div class="tool-name">Unit 3 — Soils &amp; Distresses</div>
+      <div class="tool-desc">Soil identification, distress thresholds, CBR/DCP &amp; trig — 51 cards</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_Forms_Flashcards.html">
+    <div class="icon purple">🃏</div>
+    <div>
+      <div class="tool-name">Units 3/5 — Survey Forms</div>
+      <div class="tool-desc">AF IMT 3822, AF IMT 4303 block-by-block &amp; Talon Point — 33 cards</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_Process_Flashcards.html">
+    <div class="icon amber">🃏</div>
+    <div>
+      <div class="tool-name">Unit 4 — SAAZA Process</div>
+      <div class="tool-desc">Four phases, information gathering, preparation, site visit &amp; final product — 27 cards</div>
+    </div>
+  </a>
+  <a class="tool-card" href="SAAZA_Completion_Flashcards.html">
+    <div class="icon amber">🃏</div>
+    <div>
+      <div class="tool-name">Unit 5 — SAAZA Completion</div>
+      <div class="tool-desc">AF IMT 3822, AF IMT 4303 &amp; Talon Point submission — 32 cards</div>
+    </div>
+  </a>
+</div>
+
+<div class="footer">136th Contingency Response Flight &mdash; rcarney94.github.io/saaza-calculator &mdash; works offline once loaded</div>
+
+<script>
+(function(){
+  /* ---- Item 3: connectivity pill ---- */
+  /* Reflects navigator.onLine and updates live on the browser's online/offline events.
+     Note: "online" here means the device has a network connection, not that GitHub Pages
+     is reachable. The tool works fully offline once loaded; this is just situational awareness. */
+  var pill=document.getElementById('net-pill');
+  function setNet(){
+    if(!pill) return;
+    var on=navigator.onLine;
+    pill.className='net-pill '+(on?'online':'offline');
+    var lbl=pill.querySelector('.net-label');
+    if(lbl) lbl.textContent=on?'Online':'Offline';
+  }
+  window.addEventListener('online',setNet);
+  window.addEventListener('offline',setNet);
+  setNet();
+
+  /* ---- Item 1: first-use disclaimer ---- */
+  /* Shows once per browser. Acknowledgement is stored in localStorage so it never
+     reappears unless the user clears site data. If localStorage is unavailable
+     (e.g. private mode), it fails safe by showing the disclaimer each load. */
+  var KEY='saaza_disclaimer_ack_v1';
+  var ov=document.getElementById('disc-overlay');
+  var acked=false;
+  try{ acked=localStorage.getItem(KEY)==='1'; }catch(e){}
+  if(ov && !acked) ov.hidden=false;
+  var btn=document.getElementById('disc-ack-btn');
+  if(btn) btn.addEventListener('click',function(){
+    try{ localStorage.setItem(KEY,'1'); }catch(e){}
+    if(ov) ov.hidden=true;
+  });
+})();
+</script>
+
+
+<link rel="manifest" href="manifest.json">
+<script>
+if ('serviceWorker' in navigator) {
+ window.addEventListener('load', ()=>navigator.serviceWorker.register('./service-worker.js'));
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Completion Flashcards</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f4f0;color:#1a1a1a;padding:1rem;min-height:100vh}
+a.back{display:inline-block;font-size:12px;color:#1D9E75;text-decoration:none;margin-bottom:12px}
+h1{font-size:20px;font-weight:600;margin-bottom:2px}
+.sub{font-size:13px;color:#666;margin-bottom:1.25rem}
+.tnav{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.tb{padding:5px 11px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:12px;color:#555}
+.tb.on{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:500}
+.prog{font-size:12px;color:#666;display:flex;justify-content:space-between;margin-bottom:10px}
+.bar{height:4px;background:#e0e0e0;border-radius:2px;margin-bottom:10px;overflow:hidden}
+.fill{height:100%;background:#1D9E75;border-radius:2px;transition:width .3s}
+.card{border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem;min-height:180px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;background:#fff;margin-bottom:10px}
+.card.ans{border-color:#1D9E75}
+.clabel{font-size:11px;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.clabel.g{color:#1D9E75}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:8px;margin-bottom:8px}
+.td{background:#E1F5EE;color:#0F6E56}
+.tp{background:#EEEDFE;color:#3C3489}
+.tg{background:#FAEEDA;color:#633806}
+.tm{background:#E6F1FB;color:#0C447C}
+.ctext{font-size:14px;color:#1a1a1a;line-height:1.6;white-space:pre-line}
+.hint{font-size:12px;color:#aaa;margin-top:10px;text-align:center}
+.brow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.fb{padding:8px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;color:#555}
+.fb.ok{background:#EAF3DE;color:#27500A;border-color:#639922}
+.fb.no{background:#FCEBEB;color:#791F1F;border-color:#E24B4A}
+.nav{display:flex;gap:8px;margin-bottom:1rem}
+.done{background:#f7f7f5;border-radius:12px;padding:1rem;text-align:center;display:none;margin-top:1rem}
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:1.5rem;padding-bottom:1rem}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← Back to all tools</a>
+<h1>SAAZA Completion Flashcards</h1>
+<p class="sub">SAAZA Unit 5 — AF IMT 3822, AF IMT 4303 & Talon Point submission</p>
+<div class="tnav">
+<button class="tb on" onclick="setT('all',this)">All cards</button>
+<button class="tb" onclick="setT('3822',this)">AF IMT 3822</button>
+<button class="tb" onclick="setT('4303',this)">AF IMT 4303</button>
+<button class="tb" onclick="setT('db',this)">Talon Point</button>
+</div>
+<div class="bar"><div class="fill" id="fill" style="width:0%"></div></div>
+<div class="prog"><span id="pr">Card 1</span><span id="sc">✓ 0  ✗ 0</span></div>
+<div class="card" id="cf" onclick="flip()">
+<div class="clabel">Question — tap to reveal</div>
+<div class="tag" id="tg"></div>
+<div class="ctext" id="cq"></div>
+<div class="hint">Tap card to see answer</div>
+</div>
+<div class="card ans" id="cb" onclick="flip()" style="display:none">
+<div class="clabel g">Answer — tap to go back</div>
+<div class="ctext" id="ca"></div>
+</div>
+<div class="brow" id="br" style="display:none">
+<button class="fb no" onclick="mark(0)">✗ Missed</button>
+<button class="fb" onclick="mark(2)">→ Skip</button>
+<button class="fb ok" onclick="mark(1)">✓ Got it</button>
+</div>
+<div class="nav">
+<button class="fb" style="flex:1" onclick="go(-1)">← Prev</button>
+<button class="fb" style="flex:1" onclick="shuf()">Shuffle ↺</button>
+<button class="fb" style="flex:1" onclick="go(1)">Next →</button>
+</div>
+<div class="done" id="dn">
+<div style="font-size:15px;font-weight:600;margin-bottom:6px">Deck complete!</div>
+<div style="font-size:13px;color:#666" id="fs"></div>
+<button class="fb" style="margin-top:10px" onclick="restart()">Restart ↺</button>
+</div>
+<div class="footer">SAAZA Completion Flashcards — 136CRF — works offline, no internet required</div>
+<script>
+var D=[
+{t:'3822',q:'What goes in blocks 1A and 1B of AF IMT 3822?',a:'1A: LZ Name (bird name or location)\n1B: HQ AMC/A3DT will update after submission if approved — leave blank'},
+{t:'3822',q:'What goes in blocks 2A and 2B of AF IMT 3822?',a:'2A: Country where LZ is located\n2B: State, province, or territory'},
+{t:'3822',q:'What goes in block 3 of AF IMT 3822?',a:'Map series, sheet number, edition, and date of map used (if used)'},
+{t:'3822',q:'What goes in block 4A of AF IMT 3822?',a:'Date physical survey was conducted\nTeam Leader name, grade, phone number, and unit'},
+{t:'3822',q:'What goes in block 4B of AF IMT 3822?',a:'Date reviewed, reviewer name, grade, phone number, unit and location, with signature\nUser, Safety Officer, Squadron/ACE/MAGTF Commander'},
+{t:'3822',q:'What goes in block 4C of AF IMT 3822?',a:'Date approved/disapproved\nSquadron/ACE/MAGTF Commander name, grade, phone number, unit and location, with signature'},
+{t:'3822',q:'Who is listed as LZ Controlling Agency/Unit on AF IMT 3822?',a:'YOU — the surveying unit, if surveying for operations you will support\nRange Control info goes below — gained during Information Gathering'},
+{t:'3822',q:'What is the unit of measure throughout AF IMT 3822?',a:'Feet — always actual ground data, NOT the minimums required'},
+{t:'3822',q:'What goes in blocks 9A/B of AF IMT 3822?',a:'WGS-84 coordinates for GPS derived (almost always)\nLat/long to nearest 1/1000th of a minute'},
+{t:'3822',q:'What goes in blocks 9C-E of AF IMT 3822?',a:'Grid Zone, easting and northing obtained from map (different than MGRS)'},
+{t:'3822',q:'What goes in blocks 9F-H of AF IMT 3822?',a:'Grid zone, square designator, 10-digit grid, and lat/longs to the nearest 1/1000th minute'},
+{t:'3822',q:'What goes in block 10A of AF IMT 3822?',a:'Type of surface — use letter identifier'},
+{t:'3822',q:'What goes in block 10B of AF IMT 3822?',a:'Thickness and strength (CBR) of each soil layer from the controlling point'},
+{t:'3822',q:'What goes in block 11A of AF IMT 3822?',a:'Glideslope ratio used to determine obstacle clearance for BOTH arrival AND departure zones'},
+{t:'3822',q:'What goes in block 11B of AF IMT 3822?',a:'Percentage of slope for longitudinal gradient\nUse "+" for upslope and "-" for downslope'},
+{t:'3822',q:'What goes in blocks 12A-H of AF IMT 3822?',a:'Percent slope for each gradient section\nUse "+" for upslope and "-" for downslope'},
+{t:'3822',q:'What goes in block 12I of AF IMT 3822?',a:'List any obstacle penetrations'},
+{t:'3822',q:'What must the LZ Diagram include on AF IMT 3822?',a:'North arrow, scale, runway dimensions and headings, overrun dimensions, obstacle locations with heights and distances, access roads, any relevant features'},
+{t:'4303',q:'What goes in blocks 1A/B and 2A/B of AF IMT 4303?',a:'Same as 3822:\n1A: LZ Name, 1B: HQ AMC update after approval\n2A: Country, 2B: State/province/territory'},
+{t:'4303',q:'What goes in block 6 of AF IMT 4303?',a:'Approach and departure axis information including ratios and any restricted/obstructed quadrants'},
+{t:'4303',q:'What goes in block 7 of AF IMT 4303?',a:'Coordinates — WGS-84 for GPS derived (almost always)\nPrimary run-in heading\nLat/long to nearest 1/1000th minute'},
+{t:'4303',q:'What goes in block 8A/B of AF IMT 4303?',a:'LZ Dimensions — length and width in feet'},
+{t:'4303',q:'What goes in block 8C of AF IMT 4303?',a:'Elevation in feet MSL'},
+{t:'4303',q:'What goes in block 8D of AF IMT 4303?',a:'Maximum T/M/S of requesting agency'},
+{t:'4303',q:'What goes in block 8E of AF IMT 4303?',a:'Obstructions to approach and departure — note which quadrants are affected'},
+{t:'4303',q:'What goes in block 8F of AF IMT 4303?',a:'LZ slope from approach angle'},
+{t:'4303',q:'What goes in block 9 of AF IMT 4303?',a:'Describe items from block 8E and other concerns\nInclude obstruction radials, heights, and surface conditions\nExample: "45\' palm trees from 310 radial to 035 radial"'},
+{t:'4303',q:'What must the HLZ diagram on AF IMT 4303 show?',a:'All obstructions with distances and heights\nApproach/departure axes\nScale and north arrow\nMagnetic variation (MVAR)\nLZ dimensions'},
+{t:'db',q:'What is Talon Point?',a:'The SAAZA database system where completed surveys are submitted, reviewed, approved, and stored\nNIPR: https://talonpoint.net/\nSIPR: https://talonpoint.snlca.nro.smil.mil/TalonPoint/home'},
+{t:'db',q:'What is the Talon Point routing sequence?',a:'1. Survey completed by MSAAZA/SAAZA Marine\n2. Routed for QC to EAF OIC/MAW Rep\n3. QC routes to MAG ASO/MAW DOS for Safety of Flight review\n4. ASO routes to MAG CO/MAW CG\n5. MAG CO/MAW CG approves or disapproves'},
+{t:'db',q:'What are Zone Availability Reports (ZARs)?',a:'Reports found in Talon Point that show the status and availability of previously surveyed zones\nBest starting point during the information gathering phase'},
+];
+var TG={'3822':'td','4303':'tp',db:'tg'};
+var TL={'3822':'AF IMT 3822','4303':'AF IMT 4303',db:'Talon Point'};
+var deck=[],idx=0,flipped=false,cor=0,wrg=0,topic='all';
+function build(){deck=topic==='all'?D.slice():D.filter(function(c){return c.t===topic;});idx=0;cor=0;wrg=0;show();}
+function setT(t,b){topic=t;document.querySelectorAll('.tb').forEach(function(x){x.classList.remove('on');});b.classList.add('on');build();}
+function show(){
+var done=idx>=deck.length;
+document.getElementById('dn').style.display=done?'block':'none';
+document.getElementById('cf').style.display=done?'none':'flex';
+document.getElementById('cb').style.display='none';
+document.getElementById('br').style.display='none';
+flipped=false;
+if(done){document.getElementById('fs').textContent='✓ '+cor+' correct   ✗ '+wrg+' missed   → '+(deck.length-cor-wrg)+' skipped';return;}
+var c=deck[idx];
+document.getElementById('cq').textContent=c.q;
+document.getElementById('ca').textContent=c.a;
+document.getElementById('tg').textContent=TL[c.t];
+document.getElementById('tg').className='tag '+TG[c.t];
+document.getElementById('pr').textContent='Card '+(idx+1)+' of '+deck.length;
+document.getElementById('sc').textContent='✓ '+cor+'  ✗ '+wrg;
+document.getElementById('fill').style.width=(deck.length>0?Math.round(cor/deck.length*100):0)+'%';
+}
+function flip(){flipped=!flipped;document.getElementById('cf').style.display=flipped?'none':'flex';document.getElementById('cb').style.display=flipped?'flex':'none';document.getElementById('br').style.display=flipped?'grid':'none';}
+function mark(r){if(r===1)cor++;else if(r===0)wrg++;idx++;show();}
+function go(d){var n=idx+d;if(n>=0&&n<deck.length){idx=n;flipped=false;show();}}
+function shuf(){for(var i=deck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=deck[i];deck[i]=deck[j];deck[j]=tmp;}idx=0;cor=0;wrg=0;show();}
+function restart(){idx=0;cor=0;wrg=0;document.getElementById('dn').style.display='none';show();}
+build();
+</script>
+</body>
+</html>

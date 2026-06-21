@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Gradient & Glideslope Calculator</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: #f4f4f0; color: #1a1a1a; min-height: 100vh; padding: 1rem; }
+  a.back { display:inline-block; font-size:12px; color:#1D9E75; text-decoration:none; margin-bottom:12px; }
+  h1 { font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .subtitle { font-size: 13px; color: #666; margin-bottom: 1.1rem; line-height:1.5; }
+  .nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.1rem; }
+  .nav-btn { padding: 7px 13px; border: 1px solid #ccc; border-radius: 8px; background: #fff; cursor: pointer; font-size: 12px; color: #555; white-space: nowrap; transition: all 0.15s; }
+  .nav-btn:hover { background: #f0f0f0; }
+  .nav-btn.active { background: #1D9E75; color: #fff; border-color: #1D9E75; font-weight: 500; }
+  .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
+  .card-title { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+  .card-desc { font-size: 12px; color: #666; margin-bottom: 14px; line-height: 1.5; }
+  .card-desc .ex { color:#888; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .field-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11px; color: #666; }
+  .field input, .field select { width: 100%; padding: 7px 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; color: #1a1a1a; background: #fff; outline: none; }
+  .field input:focus, .field select:focus { border-color: #1D9E75; box-shadow: 0 0 0 2px rgba(29,158,117,0.15); }
+  .calc-btn { background: #1D9E75; color: #fff; border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .calc-btn:hover { background: #0F6E56; }
+  .mini-btn { background:#fff; color:#0F6E56; border:1px solid #bcdfd1; border-radius:8px; padding:7px 13px; font-size:12px; font-weight:600; cursor:pointer; }
+  .mini-btn.danger { color:#a33; border-color:#e4bcbc; }
+  .result { margin-top: 12px; background: #f7f7f5; border-radius: 8px; padding: 12px 14px; display: none; }
+  .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 10px; }
+  .metric { background: #fff; border-radius: 8px; padding: 10px 12px; border: 1px solid #e5e5e5; }
+  .metric-label { font-size: 11px; color: #888; margin-bottom: 3px; }
+  .metric-val { font-size: 21px; font-weight: 600; color: #0F6E56; line-height:1.1; }
+  .metric-unit { font-size: 11px; color: #999; margin-left: 2px; }
+  .steps { font-size: 12px; color: #555; line-height: 1.8; white-space: pre-line; border-top: 1px solid #e5e5e5; padding-top: 8px; margin-top: 4px; font-family: "Courier New", monospace; }
+  .verdict { margin-top: 10px; padding: 9px 13px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+  .verdict.pass { background: #EAF3DE; color: #27500A; }
+  .verdict.fail { background: #FCEBEB; color: #791F1F; }
+  .verdict.info { background: #EEF6FB; color: #0C447C; }
+  .crit { font-size:11.5px; color:#0C447C; background:#EEF6FB; border-left:3px solid #0C6CB8; padding:8px 11px; border-radius:0 8px 8px 0; line-height:1.55; margin-bottom:13px; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .src-tag { display:block; font-size:11px; color:#999; margin-top:10px; font-style:italic; }
+  /* line-level table */
+  table.ll { width:100%; border-collapse:collapse; font-size:12.5px; }
+  table.ll th { text-align:left; font-size:10.5px; color:#888; font-weight:600; text-transform:uppercase; letter-spacing:.03em; padding:4px 5px; border-bottom:1px solid #e0e0e0; }
+  table.ll td { padding:4px 5px; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
+  table.ll td.lbl { color:#555; white-space:nowrap; }
+  table.ll input { width:100%; padding:6px 7px; border:1px solid #ccc; border-radius:7px; font-size:13px; outline:none; }
+  table.ll input:focus { border-color:#1D9E75; box-shadow:0 0 0 2px rgba(29,158,117,0.15); }
+  table.ll td.dec, table.ll td.pct { font-family:"Courier New",monospace; color:#0F6E56; white-space:nowrap; text-align:right; }
+  table.ll tr.cum td { border-top:2px solid #1D9E75; border-bottom:none; font-weight:700; padding-top:7px; color:#1a1a1a; }
+  table.ll tr.cum td.dec, table.ll tr.cum td.pct { color:#0F6E56; }
+  .prof-row { display:grid; grid-template-columns: 1fr 96px 34px; gap:8px; align-items:center; margin-bottom:7px; }
+  .prof-row .plabel { font-size:12px; color:#555; }
+  .prof-row input { width:100%; padding:7px 9px; border:1px solid #ccc; border-radius:8px; font-size:14px; outline:none; }
+  .prof-row input:focus { border-color:#1D9E75; box-shadow:0 0 0 2px rgba(29,158,117,0.15); }
+  .prof-row .xbtn { background:#fff; border:1px solid #e4bcbc; color:#a33; border-radius:7px; padding:6px 0; font-size:13px; cursor:pointer; }
+  .info-i { display:inline-flex; align-items:center; justify-content:center; width:17px; height:17px; border-radius:50%; background:#1D9E75; color:#fff; font-size:11px; font-style:italic; font-family:Georgia,"Times New Roman",serif; font-weight:700; cursor:pointer; vertical-align:middle; margin-left:6px; }
+  .info-box { background:#EEF6FB; border-left:3px solid #0C6CB8; border-radius:0 8px 8px 0; padding:11px 13px; margin:0 0 13px 0; font-size:12px; line-height:1.55; color:#23415c; }
+  .info-box b { color:#0C447C; }
+  .info-box ol { margin:7px 0 7px 18px; padding:0; }
+  .info-box li { margin-bottom:5px; }
+  .info-box .tip { margin-top:9px; padding-top:8px; border-top:1px solid #cfe2f0; }
+  .footer { text-align: center; font-size: 11px; color: #aaa; margin-top: 1.5rem; padding-bottom: 1rem; }
+  @media (max-width: 480px) {
+    .field-grid, .field-grid-3 { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">&larr; Back to all tools</a>
+<h1>Gradient &amp; Glideslope Calculator</h1>
+<p class="subtitle">Decimal/percent grade, line-level data reduction, longitudinal profile checks, and glideslope obstacle clearance &mdash; with the work shown.</p>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="show('grade',this)">Grade</button>
+  <button class="nav-btn" onclick="show('line',this)">Line-level reduction</button>
+  <button class="nav-btn" onclick="show('profile',this)">Longitudinal profile</button>
+  <button class="nav-btn" onclick="show('trans',this)">Transverse</button>
+  <button class="nav-btn" onclick="show('zone',this)">Zone A / B</button>
+  <button class="nav-btn" onclick="show('glide',this)">Glideslope</button>
+</div>
+
+<!-- ===================== GRADE ===================== -->
+<div class="section active" id="sec-grade">
+  <div class="card">
+    <div class="card-title">Grade, elevation &amp; angle <span class="info-i" onclick="toggleInfo('grade-info')" title="How to measure a slope in the field">i</span></div>
+    <div class="info-box" id="grade-info" style="display:none">
+      <b>Measuring a slope in the field</b>
+      <ol>
+        <li><b>Sight a target at your eye height.</b> The clinometer reads angle from level (0&deg;); a target at your instrument height makes the reading the true ground-to-ground slope.</li>
+        <li><b>Laser = slant, tape/wheel = horizontal.</b> Your rangefinder gives line-of-sight (slant) distance &mdash; keep the toggle on <b>slant</b>. Switch to horizontal only if you measured the distance flat along the ground.</li>
+        <li><b>Sign it.</b> Target above your sight line = <b>+</b>, below = <b>&minus;</b>.</li>
+      </ol>
+      The <b>angle alone sets the grade</b>; the <b>distance</b> turns it into the actual rise (elevation change) and run. Picking the wrong distance type changes your rise &mdash; the grade stays the same, but the elevation won&rsquo;t.
+    </div>
+    <div class="card-desc">Works from whatever you measured. In the field that&#39;s usually the <b>angle</b> (clinometer) and the <b>distance</b> (laser/tape) &mdash; that mode gives you grade, elevation, and run at once. Decimal grade = rise &divide; run; percent = decimal &times; 100. Always carry the +/&minus; sign (+ = up, &minus; = down).</div>
+    <div class="crit"><b>Criteria (DAFMAN 13-217, Tbl 4.2):</b> Longitudinal &le; <b>&plusmn;3%</b> cumulative (max change <b>&plusmn;1.5%</b> per 200&#39;). Transverse <b>&plusmn;0.5% to 3%</b> from centerline.</div>
+    <div class="field" style="margin-bottom:10px"><label>What do you have?</label>
+      <select id="g-solve" onchange="solveChange()">
+        <option value="ad">Angle &amp; distance (clinometer + laser) &mdash; field</option>
+        <option value="grade">Rise &amp; run (line level / tape)</option>
+        <option value="rise">Grade &amp; run &rarr; elevation</option>
+        <option value="run">Elevation &amp; grade &rarr; run</option>
+      </select>
+    </div>
+    <div class="field-grid">
+      <div class="field" id="wrap-ang" style="display:none"><label>Angle &mdash; signed (&minus; = down)</label><input type="text" id="g-ang" inputmode="text" oninput="calcGrade()"></div>
+      <div class="field" id="wrap-angu" style="display:none"><label>Angle unit</label>
+        <select id="g-ang-u" onchange="calcGrade()"><option value="deg">degrees (&deg;)</option><option value="pct">percent (%)</option></select>
+      </div>
+      <div class="field" id="wrap-dist" style="display:none"><label>Distance to point</label><input type="text" id="g-dist" inputmode="decimal" oninput="calcGrade()"></div>
+      <div class="field" id="wrap-distu" style="display:none"><label>Distance unit</label>
+        <select id="g-dist-u" onchange="calcGrade()"><option value="ft">feet</option><option value="m">meters</option><option value="yd">yards</option><option value="in">inches</option></select>
+      </div>
+      <div class="field" id="wrap-distt" style="display:none"><label>Distance type</label>
+        <select id="g-distt" onchange="calcGrade()"><option value="slant">Slant / line-of-sight (laser)</option><option value="horiz">Horizontal (taped / wheel)</option></select>
+      </div>
+      <div class="field" id="wrap-rise"><label>Elevation change / rise &mdash; signed</label><input type="text" id="g-rise" inputmode="text" oninput="calcGrade()"></div>
+      <div class="field" id="wrap-riseu"><label>Elevation unit</label>
+        <select id="g-rise-u" onchange="calcGrade()"><option value="ft">feet</option><option value="in">inches</option><option value="yd">yards</option><option value="m">meters</option></select>
+      </div>
+      <div class="field" id="wrap-grade" style="display:none"><label>Grade / angle &mdash; signed</label><input type="text" id="g-grade" inputmode="text" oninput="calcGrade()"></div>
+      <div class="field" id="wrap-gradeu" style="display:none"><label>Grade unit</label>
+        <select id="g-grade-u" onchange="calcGrade()"><option value="pct">percent (%)</option><option value="deg">degrees (&deg;)</option></select>
+      </div>
+      <div class="field" id="wrap-run"><label>Run (horizontal)</label><input type="text" id="g-run" inputmode="text" oninput="calcGrade()"></div>
+      <div class="field" id="wrap-runu"><label>Run unit</label>
+        <select id="g-run-u" onchange="calcGrade()"><option value="ft">feet</option><option value="in">inches</option><option value="yd">yards</option><option value="m">meters</option></select>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:4px"><label>Check against limit</label>
+      <select id="g-limit" onchange="calcGrade()">
+        <option value="none">None &mdash; just compute</option>
+        <option value="long">Longitudinal (&plusmn;3% max)</option>
+        <option value="trans">Transverse (&plusmn;0.5% to 3%)</option>
+      </select>
+    </div>
+    <div class="result" id="g-result"></div>
+  </div>
+</div>
+
+<!-- ===================== LINE-LEVEL ===================== -->
+<div class="section" id="sec-line">
+  <div class="card">
+    <div class="card-title">Line-level reduction &mdash; 200&#39; section <span class="info-i" onclick="toggleInfo('line-info')" title="How to run a line-level segment">i</span></div>
+    <div class="info-box" id="line-info" style="display:none">
+      <b>Running a line-level segment</b>
+      <ol>
+        <li><b>Stretch the 20-ft line</b> down the centerline (the way you&rsquo;re profiling), anchored at the ground at your near point.</li>
+        <li><b>Level it</b> &mdash; adjust the far end until the line level&rsquo;s bubble is centered. The line is now horizontal at your near-point height.</li>
+        <li><b>Measure the gap to the ground</b> at the far end, in <b>inches</b> &mdash; that&rsquo;s the rise for that 20 ft (the tab divides by 240&Prime;).</li>
+        <li><b>Sign it.</b> Ground falls away = <b>&minus;</b>, climbs toward the far end = <b>+</b>.</li>
+      </ol>
+      Ten segments = one 200&prime; section; the tab averages them into the section grade. Take that grade to the <b>Longitudinal profile</b> tab for the whole runway. Keep the line taut and the bubble truly centered &mdash; a sloppy level throws off every inch.
+    </div>
+    <div class="card-desc">Enter the rise (in <b>inches</b>, signed) read for each 20&#39; line-level segment. Each 20&#39; line = 240&quot; run, so decimal grade = rise&quot; &divide; 240. The cumulative is the section grade = total rise &divide; total run. <span class="ex">(leave a row blank if not measured)</span></div>
+    <div class="crit"><b>Longitudinal limit:</b> section / cumulative grade &le; <b>&plusmn;3%</b>.</div>
+    <table class="ll">
+      <thead><tr><th>Distance (ft)</th><th>Rise (in)</th><th>Decimal</th><th>Percent</th></tr></thead>
+      <tbody id="ll-rows"></tbody>
+    </table>
+    <div class="result" id="ll-result" style="display:block;background:transparent;padding:6px 0 0 0"></div>
+  </div>
+</div>
+
+<!-- ===================== PROFILE ===================== -->
+<div class="section" id="sec-profile">
+  <div class="card">
+    <div class="card-title">Longitudinal profile &mdash; whole runway <span class="info-i" onclick="toggleInfo('prof-info')" title="How to read each section in the field">i</span></div>
+    <div class="info-box" id="prof-info" style="display:none">
+      <b>Reading each section in the field</b>
+      <ol>
+        <li><b>Sight at your own eye height.</b> Standing beside your buddy on level ground, find the spot on him the clinometer reads <b>0%</b> &mdash; that&rsquo;s your instrument height. Mark it or have him hold a target there.</li>
+        <li><b>Shoot that same mark at 200&prime;.</b> It keeps the sight line parallel to the ground slope, so you read the <b>true grade</b>. Sighting his feet or head tilts the line and skews it (worse the closer he is).</li>
+        <li><b>Either scale works.</b> Read the % scale &rarr; type it in &ldquo;% grade.&rdquo; Read the degrees scale &rarr; flip the toggle to degrees. Same number, same section.</li>
+        <li><b>Carry the sign.</b> Buddy uphill = <b>+</b>, downhill = <b>&minus;</b>. The &plusmn;1.5%/200&prime; change check depends on it.</li>
+        <li><b>Same mark every section</b> as you leapfrog down the runway.</li>
+      </ol>
+      The clinometer gives the grade directly &mdash; you don&rsquo;t feed the laser <b>distance</b> into this tab; the 200&prime; just defines the section length.
+      <div class="tip"><b>Need a section&rsquo;s drop in feet instead?</b> Use the <b>Grade</b> tab&rsquo;s &ldquo;angle + distance (slant)&rdquo; mode &mdash; that&rsquo;s where the laser distance runs the sin/cos.</div>
+    </div>
+    <div class="card-desc">Enter each consecutive 200&#39; section&#39;s reading in order (signed) &mdash; grade % or the <b>clinometer angle</b> (toggle below). Checks both limits at once: overall cumulative &le; &plusmn;3%, and the change between any two adjacent sections &le; &plusmn;1.5%. <span class="ex">(a 3000&#39; runway = 15 sections)</span></div>
+    <div class="crit"><b>Both longitudinal limits:</b> cumulative &le; <b>&plusmn;3%</b> &nbsp;&bull;&nbsp; section-to-section change &le; <b>&plusmn;1.5%</b> per 200&#39;.</div>
+    <div class="field" style="margin-bottom:10px"><label>Readings in</label>
+      <select id="p-unit" onchange="profUnit()"><option value="pct">percent (% grade)</option><option value="deg">degrees (clinometer angle)</option></select>
+    </div>
+    <div id="prof-rows"></div>
+    <div style="display:flex;gap:8px;margin:6px 0 2px 0">
+      <button class="mini-btn" onclick="addSection()">+ Add section</button>
+      <button class="mini-btn danger" onclick="clearProfile()">Clear</button>
+    </div>
+    <div class="result" id="prof-result"></div>
+  </div>
+</div>
+
+<!-- ===================== TRANSVERSE ===================== -->
+<div class="section" id="sec-trans">
+  <div class="card">
+    <div class="card-title">Transverse gradient &mdash; cross-slope <span class="info-i" onclick="toggleInfo('trans-info')" title="How to measure transverse gradient">i</span></div>
+    <div class="info-box" id="trans-info" style="display:none">
+      <b>Measuring transverse gradient</b>
+      <ol>
+        <li><b>Measure from the centerline straight out to the edge</b>, perpendicular to the runway &mdash; that&rsquo;s the &ldquo;from centerline&rdquo; the criterion means. Do <b>each side</b>.</li>
+        <li><b>Read the cross-slope with the clinometer</b> (eye-height target), or break the half-width into <b>15&prime; segments</b> and read each &mdash; this tab averages them. One reading = one row.</li>
+        <li><b>Sign it.</b> Sloping down off the crown = <b>&minus;</b>, up = <b>+</b>. The window is checked on magnitude.</li>
+      </ol>
+      Needs <b>&plusmn;0.5% to 3%</b>: at least 0.5% so water drains, no more than 3% so it stays trafficable. <b>Crown caveat:</b> if the runway peaks at the centerline, measure each side on its own &mdash; reading straight across the full width nets to ~0 and hides the real slope. (Course method: 4 &times; 15&prime; readings &rarr; a 60&prime; average per station, 7 stations down the runway.)
+    </div>
+    <div class="card-desc">Enter the cross-slope from the centerline out to one edge &mdash; one reading, or several 15&prime; segments to be averaged. Checks the drainage / trafficability window. <span class="ex">(do each side; clinometer % or degrees)</span></div>
+    <div class="crit"><b>Transverse limit (DAFMAN 13-217, Tbl 4.2):</b> <b>&plusmn;0.5% to 3%</b> from centerline.</div>
+    <div class="field" style="margin-bottom:10px"><label>Readings in</label>
+      <select id="t-unit" onchange="transUnit()"><option value="pct">percent (% grade)</option><option value="deg">degrees (clinometer angle)</option></select>
+    </div>
+    <div id="trans-rows"></div>
+    <div style="display:flex;gap:8px;margin:6px 0 2px 0">
+      <button class="mini-btn" onclick="addTrans()">+ Add 15&prime; segment</button>
+      <button class="mini-btn danger" onclick="clearTrans()">Clear</button>
+    </div>
+    <div class="result" id="trans-result"></div>
+  </div>
+</div>
+
+<!-- ===================== ZONE A/B ===================== -->
+<div class="section" id="sec-zone">
+  <div class="card">
+    <div class="card-title">Zone A / B &mdash; transverse drop check <span class="info-i" onclick="toggleInfo('zone-info')" title="How to measure the zones in the field">i</span></div>
+    <div class="info-box" id="zone-info" style="display:none">
+      <b>Measuring the zones in the field</b>
+      <ol>
+        <li><b>Work from the edge of usable runway, straight out</b> (perpendicular to centerline). Zone A is the first 35&prime;; Zone B the next 25&prime; (60&prime; out total).</li>
+        <li><b>Read each zone&rsquo;s transverse slope</b> with the clinometer (same eye-height target, sighting across the zone), or measure the drop directly.</li>
+        <li><b>Sign it.</b> Sloping <b>down and away</b> from the runway = <b>&minus;</b> (normal, for drainage); rising above the runway edge = <b>+</b> (the tab flags it &mdash; that&rsquo;s an obstruction).</li>
+      </ol>
+      The limit is a vertical <b>drop</b> (Zone A 2&prime;9&Prime;, Zone B 6&prime;3&Prime;), not just a slope &mdash; the tab converts your grade to the real drop and checks it. <b>Zone B&rsquo;s drop is cumulative</b> from the runway edge. Zones wrap the whole runway, so check <b>both sides</b> and at several stations. (Zone A guards the outboard nacelle; Zone B reaches the wingtip.)
+    </div>
+    <div class="card-desc">Converts the transverse <b>grade</b> you measured across each zone into the actual <b>elevation drop</b> from the edge of usable runway, and checks it against the maximum allowable drop. Enter each grade signed (&minus; = sloping down away from the runway, which is normal). <span class="ex">(Zone B&#39;s drop is cumulative from the runway edge)</span></div>
+    <div class="crit" id="z-crit"></div>
+    <div class="field-grid">
+      <div class="field"><label>Aircraft / criteria</label>
+        <select id="z-ac" onchange="zoneAc()">
+          <option value="c130">C-130 ALZ &mdash; 35&#39;/2&#39;9&quot;, 25&#39;/6&#39;3&quot;</option>
+          <option value="custom">Custom widths &amp; drops&hellip;</option>
+        </select>
+      </div>
+      <div class="field"><label>Clinometer reading in</label>
+        <select id="z-unit" onchange="calcZone()"><option value="pct">percent (%)</option><option value="deg">degrees (&deg;)</option></select>
+      </div>
+    </div>
+    <div id="z-custom" style="display:none">
+      <div class="field-grid">
+        <div class="field"><label>Zone A width (ft)</label><input type="text" id="z-wa" inputmode="decimal" value="35" oninput="calcZone()"></div>
+        <div class="field"><label>Zone A max drop (ft)</label><input type="text" id="z-ma" inputmode="decimal" value="2.75" oninput="calcZone()"></div>
+        <div class="field"><label>Zone B width (ft)</label><input type="text" id="z-wb" inputmode="decimal" value="25" oninput="calcZone()"></div>
+        <div class="field"><label>Zone B max drop (ft)</label><input type="text" id="z-mb" inputmode="decimal" value="6.25" oninput="calcZone()"></div>
+      </div>
+    </div>
+    <div class="field-grid">
+      <div class="field"><label>Zone A transverse reading &mdash; signed</label><input type="text" id="z-a" inputmode="text" oninput="calcZone()"></div>
+      <div class="field"><label>Zone B transverse reading &mdash; signed</label><input type="text" id="z-b" inputmode="text" oninput="calcZone()"></div>
+    </div>
+    <div class="result" id="z-result"></div>
+  </div>
+</div>
+
+<!-- ===================== GLIDESLOPE ===================== -->
+<div class="section" id="sec-glide">
+  <div class="card">
+    <div class="card-title">Glideslope &mdash; obstacle clearance <span class="info-i" onclick="toggleInfo('glide-info')" title="How to work obstacles in the field">i</span></div>
+    <div class="info-box" id="glide-info" style="display:none">
+      <b>Working obstacles in the field</b>
+      <ol>
+        <li><b>The surface starts at the end of the overrun</b> (or end of usable), across the full width out to the outer corners of the B zones. Measure obstacles relative to that origin, not to where you stand.</li>
+        <li><b>Get two numbers per obstacle:</b> its <b>horizontal distance</b> from the origin (run) and its <b>height above the origin&rsquo;s elevation</b> (rise). A laser + clinometer shot gives these &mdash; let the <b>LZ Trig</b> tool turn the angle + slant range into height and horizontal distance, then bring them here.</li>
+        <li><b>Bigger ratio = shallower = safer.</b> C-130 needs 35:1, C-17 needs 20:1; an obstacle clears if its ratio is &ge; that (it sits below the surface).</li>
+      </ol>
+      Shoot <b>every</b> obstacle in the approach/departure path and find the <b>controlling</b> one &mdash; the <b>smallest ratio</b> (steepest line to clear). That&rsquo;s what restricts the approach.
+    </div>
+    <div class="card-desc">Glideslope ratio = run &divide; rise, written X:1. Enter the distance to the obstacle and its height above the surface origin (end of overrun / usable). The approach&ndash;departure surface rises 1 ft for every X ft of run. <span class="ex">(e.g. 6000&#39; to a 2000&#39; antenna = 3:1)</span></div>
+    <div class="crit"><b>Required glideslope (Imaginary Surfaces):</b> <b>C-130 = 35:1</b> &nbsp;&bull;&nbsp; <b>C-17 = 20:1</b>. An obstacle clears if its ratio is &ge; the required ratio (i.e. it sits below the surface).</div>
+    <div class="field-grid">
+      <div class="field"><label>Distance to obstacle (run)</label><input type="text" id="gs-run" inputmode="decimal" oninput="calcGlide()"></div>
+      <div class="field"><label>Obstacle height (rise)</label><input type="text" id="gs-rise" inputmode="decimal" oninput="calcGlide()"></div>
+      <div class="field"><label>Units</label>
+        <select id="gs-u" onchange="calcGlide()"><option value="ft">feet</option><option value="m">meters</option></select>
+      </div>
+      <div class="field"><label>Aircraft / required ratio</label>
+        <select id="gs-ac" onchange="acChange()">
+          <option value="35">C-130 &mdash; 35:1</option>
+          <option value="20">C-17 &mdash; 20:1</option>
+          <option value="custom">Custom&hellip;</option>
+        </select>
+      </div>
+    </div>
+    <div class="field" id="gs-custom-wrap" style="display:none;margin-bottom:4px"><label>Custom required ratio (X : 1)</label><input type="text" id="gs-custom" inputmode="decimal" oninput="calcGlide()"></div>
+    <div class="result" id="gs-result"></div>
+  </div>
+</div>
+
+<div class="footer">Gradient &amp; Glideslope &mdash; 136CRF &middot; SAAZA Unit 1 + DAFMAN 13-217 Table 4.2 &middot; works offline</div>
+
+<script>
+/* ---------- helpers ---------- */
+function toFeet(v,u){ return u==="ft"?v : u==="in"?v/12 : u==="yd"?v*3 : u==="m"?v*3.280839895 : v; }
+function num(id){ var raw=(document.getElementById(id).value||"").trim().replace(/,/g,""); if(raw===""||raw==="+"||raw==="-") return NaN; var x=parseFloat(raw); return isNaN(x)?NaN:x; }
+function fmtPct(x){ if(!isFinite(x)) return "\u2014"; if(Math.abs(x)<1e-9) return "0%"; var v=Math.abs(x).toFixed(3).replace(/\.?0+$/,""); return (x<0?"\u2212":"+")+v+"%"; }
+function fmtDec(x){ if(!isFinite(x)) return "\u2014"; if(Math.abs(x)<1e-12) return "0"; var v=Math.abs(x).toFixed(5).replace(/0+$/,"").replace(/\.$/,""); return (x<0?"\u2212":"+")+v; }
+function fmtDeg(d){ if(!isFinite(d)) return "\u2014"; if(Math.abs(d)<1e-9) return "0\u00b0"; var v=Math.abs(d).toFixed(2).replace(/\.?0+$/,""); return (d<0?"\u2212":"+")+v+"\u00b0"; }
+function ratioStr(run,rise){ if(rise===0||!isFinite(run/rise)) return "level (no rise)"; var r=Math.abs(run/rise); return (r>=10?r.toFixed(1):r.toFixed(2)).replace(/\.?0+$/,"")+":1"; }
+function toFtIn(feet){ if(!isFinite(feet)) return "\u2014"; var neg=feet<0, f=Math.abs(feet); var w=Math.floor(f), inch=Math.round((f-w)*12); if(inch>=12){w++;inch-=12;} return (neg?"\u2212":"")+w+"\u2032 "+inch+'\u2033'; }
+
+function show(id,btn){
+  var sec=document.getElementById("sec-"+id); if(!sec) return;
+  document.querySelectorAll(".section").forEach(function(s){s.classList.remove("active");});
+  sec.classList.add("active");
+  document.querySelectorAll(".nav-btn").forEach(function(b){b.classList.remove("active");});
+  if(btn){ btn.classList.add("active"); }
+  else { document.querySelectorAll(".nav-btn").forEach(function(b){ var oc=b.getAttribute("onclick")||""; if(oc.indexOf("'"+id+"'")>-1) b.classList.add("active"); }); }
+}
+window.addEventListener("load",function(){ var m=(location.hash||"").match(/tab=([a-z]+)/); if(m && document.getElementById("sec-"+m[1])) show(m[1],null); });
+function toggleInfo(id){ var e=document.getElementById(id); e.style.display=(e.style.display==="none"||!e.style.display)?"block":"none"; }
+
+/* ---------- GRADE ---------- */
+function solveChange(){
+  var s=document.getElementById("g-solve").value;
+  function sh(id,on){ document.getElementById(id).style.display=on?"flex":"none"; }
+  sh("wrap-rise", s==="grade"||s==="run");
+  sh("wrap-riseu", s==="grade"||s==="run");
+  sh("wrap-grade", s==="rise"||s==="run");
+  sh("wrap-gradeu", s==="rise"||s==="run");
+  sh("wrap-run", s==="grade"||s==="rise");
+  sh("wrap-runu", s==="grade"||s==="rise");
+  sh("wrap-ang", s==="ad");
+  sh("wrap-angu", s==="ad");
+  sh("wrap-dist", s==="ad");
+  sh("wrap-distu", s==="ad");
+  sh("wrap-distt", s==="ad");
+  calcGrade();
+}
+function calcGrade(){
+  var box=document.getElementById("g-result");
+  var solve=document.getElementById("g-solve").value;
+  var ru=document.getElementById("g-rise-u").value, nu=document.getElementById("g-run-u").value;
+  var riseF, runF, dec, pct, solvedRun=false, gDeg=false, gRaw=null, distF=null, slant=false, isAD=false;
+  if(solve==="grade"){
+    var rise=num("g-rise"), run=num("g-run");
+    if(isNaN(rise)||isNaN(run)){ box.style.display="none"; return; }
+    if(run===0){ box.style.display="block"; box.innerHTML='<div class="verdict fail">Run can\u2019t be zero \u2014 grade is undefined.</div>'; return; }
+    riseF=toFeet(rise,ru); runF=toFeet(run,nu); dec=riseF/runF; pct=dec*100;
+  } else if(solve==="rise"){
+    var g=num("g-grade"), run=num("g-run");
+    if(isNaN(g)||isNaN(run)){ box.style.display="none"; return; }
+    gRaw=g; gDeg=document.getElementById("g-grade-u").value==="deg";
+    if(gDeg) g=100*Math.tan(gRaw*Math.PI/180);
+    runF=toFeet(run,nu); dec=g/100; pct=g; riseF=dec*runF;
+  } else if(solve==="ad"){
+    isAD=true;
+    var ang=num("g-ang"), dist=num("g-dist");
+    if(isNaN(ang)||isNaN(dist)){ box.style.display="none"; return; }
+    gDeg=document.getElementById("g-ang-u").value==="deg"; gRaw=ang;
+    var theta = gDeg ? ang*Math.PI/180 : Math.atan(ang/100);
+    dec=Math.tan(theta); pct=dec*100;
+    distF=toFeet(dist, document.getElementById("g-dist-u").value);
+    slant=document.getElementById("g-distt").value==="slant";
+    if(slant){ riseF=distF*Math.sin(theta); runF=distF*Math.cos(theta); }
+    else { runF=distF; riseF=distF*Math.tan(theta); }
+    solvedRun=true;
+  } else {
+    var rise=num("g-rise"), g=num("g-grade");
+    if(isNaN(rise)||isNaN(g)){ box.style.display="none"; return; }
+    gRaw=g; gDeg=document.getElementById("g-grade-u").value==="deg";
+    if(gDeg) g=100*Math.tan(gRaw*Math.PI/180);
+    if(g===0){ box.style.display="block"; box.innerHTML='<div class="verdict fail">Grade can\u2019t be zero \u2014 run is undefined (level surface never reaches the rise).</div>'; return; }
+    riseF=toFeet(rise,ru); dec=g/100; pct=g; runF=Math.abs(riseF/dec); solvedRun=true;
+  }
+  var deg=Math.atan(dec)*180/Math.PI;
+  var h='<div class="result-grid">'+
+    '<div class="metric"><div class="metric-label">Decimal grade</div><div class="metric-val">'+fmtDec(dec)+'</div></div>'+
+    '<div class="metric"><div class="metric-label">Percent grade</div><div class="metric-val">'+fmtPct(pct)+'</div></div>'+
+    '<div class="metric"><div class="metric-label">Angle</div><div class="metric-val">'+fmtDeg(deg)+'</div></div>'+
+    '<div class="metric"><div class="metric-label">Elevation change</div><div class="metric-val" style="font-size:18px">'+toFtIn(riseF)+'</div></div>';
+  if(solvedRun) h+='<div class="metric"><div class="metric-label">Run (horizontal)</div><div class="metric-val" style="font-size:18px">'+runF.toFixed(1).replace(/\.?0+$/,"")+'<span class="metric-unit">ft</span></div></div>';
+  h+='<div class="metric"><div class="metric-label">Glideslope ratio</div><div class="metric-val" style="font-size:18px">'+ratioStr(runF,riseF)+'</div></div>'+
+    '</div>';
+  var st='';
+  if(isAD){
+    var dstr=distF.toFixed(2).replace(/\.?0+$/,"");
+    st+='angle \u03b8 = '+(gDeg?(gRaw+'\u00b0'):(gRaw+'% \u2192 '+fmtDeg(deg)))+'   distance = '+dstr+' ft ('+(slant?'slant':'horizontal')+')\n';
+    if(slant){
+      st+='rise = D \u00d7 sin\u03b8 = '+dstr+' \u00d7 sin('+Math.abs(deg).toFixed(2).replace(/\.?0+$/,"")+'\u00b0) = '+toFtIn(riseF)+'\n';
+      st+='run  = D \u00d7 cos\u03b8 = '+dstr+' \u00d7 cos('+Math.abs(deg).toFixed(2).replace(/\.?0+$/,"")+'\u00b0) = '+runF.toFixed(2).replace(/\.?0+$/,"")+' ft\n';
+    } else {
+      st+='run  = D (horizontal) = '+runF.toFixed(2).replace(/\.?0+$/,"")+' ft\n';
+      st+='rise = run \u00d7 tan\u03b8 = '+toFtIn(riseF)+'\n';
+    }
+    st+='grade = rise \u00f7 run = tan\u03b8 = '+fmtDec(dec)+' = '+fmtPct(pct);
+  } else {
+    if(gDeg) st+=gRaw+'\u00b0 \u2192 '+fmtPct(pct)+'  (100 \u00d7 tan)\n';
+    st+='elevation change (rise) = '+(riseF<0?"\u2212":"+")+Math.abs(riseF).toFixed(3).replace(/\.?0+$/,"")+' ft = '+toFtIn(riseF)+'\n'+
+       'run = '+runF.toFixed(2).replace(/\.?0+$/,"")+' ft\n'+
+       'grade = rise \u00f7 run = '+fmtDec(dec)+' = '+fmtPct(pct)+'\n'+
+       'angle = atan(grade) = '+fmtDeg(deg);
+  }
+  h+='<div class="steps">'+st+'</div>';
+  var lim=document.getElementById("g-limit").value, a=Math.abs(pct);
+  if(lim==="long"){
+    if(a<=3) h+='<div class="verdict pass">\u2713 Within longitudinal limit ('+fmtPct(pct)+' \u2264 \u00b13%). The change between adjacent 200\u2032 sections must also be \u2264 \u00b11.5% \u2014 use the Longitudinal profile tab.</div>';
+    else h+='<div class="verdict fail">\u2717 Exceeds longitudinal limit ('+fmtPct(pct)+' &gt; \u00b13%).</div>';
+  } else if(lim==="trans"){
+    if(a<0.5) h+='<div class="verdict fail">\u2717 Too flat for transverse drainage ('+fmtPct(pct)+' &lt; \u00b10.5%). Needs at least \u00b10.5%.</div>';
+    else if(a<=3) h+='<div class="verdict pass">\u2713 Within transverse range ('+fmtPct(pct)+' is between \u00b10.5% and \u00b13%).</div>';
+    else h+='<div class="verdict fail">\u2717 Too steep for transverse ('+fmtPct(pct)+' &gt; \u00b13%).</div>';
+  }
+  h+='<span class="src-tag">SAAZA Unit 1 (grade slides 64\u201372, trig 89\u201396); limits DAFMAN 13-217 Table 4.2.</span>';
+  box.style.display="block"; box.innerHTML=h;
+}
+
+/* ---------- LINE-LEVEL ---------- */
+var LL_SEGS=["1\u201320","21\u201340","41\u201360","61\u201380","81\u2013100","101\u2013120","121\u2013140","141\u2013160","161\u2013180","181\u2013200"];
+function buildLL(){
+  var h="";
+  LL_SEGS.forEach(function(lab,i){
+    h+='<tr><td class="lbl">'+lab+'</td>'+
+       '<td><input type="text" id="ll-'+i+'" inputmode="text" oninput="calcLL()"></td>'+
+       '<td class="dec" id="ll-d-'+i+'">\u2014</td>'+
+       '<td class="pct" id="ll-p-'+i+'">\u2014</td></tr>';
+  });
+  h+='<tr class="cum"><td class="lbl">Cumulative</td><td id="ll-sum">\u2014</td><td class="dec" id="ll-cd">\u2014</td><td class="pct" id="ll-cp">\u2014</td></tr>';
+  document.getElementById("ll-rows").innerHTML=h;
+}
+function calcLL(){
+  var sumIn=0, count=0;
+  LL_SEGS.forEach(function(_,i){
+    var v=num("ll-"+i);
+    if(isNaN(v)){ document.getElementById("ll-d-"+i).textContent="\u2014"; document.getElementById("ll-p-"+i).textContent="\u2014"; return; }
+    var dec=v/240;
+    document.getElementById("ll-d-"+i).textContent=fmtDec(dec);
+    document.getElementById("ll-p-"+i).textContent=fmtPct(dec*100);
+    sumIn+=v; count++;
+  });
+  var res=document.getElementById("ll-result");
+  if(count===0){
+    document.getElementById("ll-sum").textContent="\u2014";
+    document.getElementById("ll-cd").textContent="\u2014";
+    document.getElementById("ll-cp").textContent="\u2014";
+    res.innerHTML=""; return;
+  }
+  var runIn=count*240, dec=sumIn/runIn, pct=dec*100;
+  document.getElementById("ll-sum").textContent=(sumIn>=0?"+":"\u2212")+Math.abs(sumIn).toString().replace(/\.?0+$/,"")+'"';
+  document.getElementById("ll-cd").textContent=fmtDec(dec);
+  document.getElementById("ll-cp").textContent=fmtPct(pct);
+  var ft=count*20, a=Math.abs(pct);
+  var v= a<=3
+    ? '<div class="verdict pass">\u2713 Section grade '+fmtPct(pct)+' over '+ft+'\u2032 \u2014 within longitudinal \u00b13%.</div>'
+    : '<div class="verdict fail">\u2717 Section grade '+fmtPct(pct)+' over '+ft+'\u2032 \u2014 exceeds longitudinal \u00b13%.</div>';
+  v+='<div class="steps">total rise = '+(sumIn>=0?"+":"\u2212")+Math.abs(sumIn)+'"   total run = '+count+' \u00d7 240" = '+runIn+'"\n'+
+     'cumulative = '+sumIn+' \u00f7 '+runIn+' = '+fmtDec(dec)+' = '+fmtPct(pct)+'</div>';
+  v+='<span class="src-tag">SAAZA Unit 1 (slides 67\u201370); limit DAFMAN 13-217 Table 4.2.</span>';
+  res.innerHTML=v;
+}
+
+/* ---------- PROFILE ---------- */
+var profCount=0;
+function addSection(){
+  profCount++;
+  var n=document.querySelectorAll("#prof-rows .prof-row").length+1;
+  var ph=document.getElementById("p-unit").value==="deg"?"angle \u00b0":"% grade";
+  var div=document.createElement("div");
+  div.className="prof-row";
+  var lo=(n-1)*200, hi=n*200;
+  div.innerHTML='<div class="plabel">Section '+n+' <span style="color:#aaa">('+lo+'\u2013'+hi+' ft)</span></div>'+
+    '<input type="text" inputmode="text" class="pg" placeholder="'+ph+'" oninput="calcProfile()">'+
+    '<button class="xbtn" onclick="this.parentNode.remove();relabelProfile();calcProfile()">\u00d7</button>';
+  document.getElementById("prof-rows").appendChild(div);
+  calcProfile();
+}
+function profUnit(){
+  var deg=document.getElementById("p-unit").value==="deg";
+  document.querySelectorAll("#prof-rows .pg").forEach(function(inp){ inp.placeholder=deg?"angle \u00b0":"% grade"; });
+  calcProfile();
+}
+function relabelProfile(){
+  document.querySelectorAll("#prof-rows .prof-row").forEach(function(row,idx){
+    var n=idx+1, lo=(n-1)*200, hi=n*200;
+    row.querySelector(".plabel").innerHTML='Section '+n+' <span style="color:#aaa">('+lo+'\u2013'+hi+' ft)</span>';
+  });
+}
+function clearProfile(){ document.getElementById("prof-rows").innerHTML=""; calcProfile(); }
+function calcProfile(){
+  var pdeg=document.getElementById("p-unit").value==="deg";
+  var inputs=document.querySelectorAll("#prof-rows .pg");
+  var grades=[], any=false;
+  inputs.forEach(function(inp){
+    var raw=(inp.value||"").trim().replace(/,/g,"");
+    if(raw===""||raw==="+"||raw==="-"){ grades.push(null); return; }
+    var x=parseFloat(raw);
+    if(isNaN(x)){ grades.push(null); return; }
+    if(pdeg) x=100*Math.tan(x*Math.PI/180);
+    grades.push(x); any=true;
+  });
+  var box=document.getElementById("prof-result");
+  if(!any){ box.style.display="none"; return; }
+  var filled=grades.filter(function(g){return g!==null;});
+  var avg=filled.reduce(function(a,b){return a+b;},0)/filled.length;
+  // section-to-section changes (consecutive filled, in sequence)
+  var worst=0, worstPair="", viol=[];
+  var seq=[]; grades.forEach(function(g,i){ if(g!==null) seq.push({g:g,n:i+1}); });
+  for(var i=1;i<seq.length;i++){
+    var ch=Math.abs(seq[i].g-seq[i-1].g);
+    if(ch>worst){ worst=ch; worstPair="S"+seq[i-1].n+"\u2192S"+seq[i].n; }
+    if(ch>1.5) viol.push("S"+seq[i-1].n+"\u2192S"+seq[i].n+" ("+ch.toFixed(2).replace(/\.?0+$/,"")+"%)");
+  }
+  var cumOK=Math.abs(avg)<=3, chOK=worst<=1.5;
+  var h='<div class="result-grid">'+
+    '<div class="metric"><div class="metric-label">Cumulative grade</div><div class="metric-val">'+fmtPct(avg)+'</div></div>'+
+    '<div class="metric"><div class="metric-label">Sections used</div><div class="metric-val">'+filled.length+'<span class="metric-unit">&times;200\u2032 = '+(filled.length*200)+'\u2032</span></div></div>'+
+    '<div class="metric"><div class="metric-label">Largest change</div><div class="metric-val" style="font-size:18px">'+(seq.length>1?(worst.toFixed(2).replace(/\.?0+$/,"")+"%"):"\u2014")+'</div></div>'+
+    '</div>';
+  h+='<div class="verdict '+(cumOK?"pass":"fail")+'">'+(cumOK?"\u2713":"\u2717")+' Cumulative '+fmtPct(avg)+' '+(cumOK?"\u2264":">")+' \u00b13%.</div>';
+  if(seq.length>1){
+    if(chOK) h+='<div class="verdict pass" style="margin-top:6px">\u2713 Largest section-to-section change '+worst.toFixed(2).replace(/\.?0+$/,"")+'% \u2264 \u00b11.5% ('+worstPair+').</div>';
+    else h+='<div class="verdict fail" style="margin-top:6px">\u2717 Change exceeds \u00b11.5% per 200\u2032 at: '+viol.join(", ")+'.</div>';
+  }
+  if(pdeg){
+    var conv=[]; grades.forEach(function(g,i){ if(g!==null) conv.push("S"+(i+1)+" "+fmtPct(g)); });
+    if(conv.length) h+='<div class="steps">angle \u2192 grade (100\u00d7tan\u03b8):  '+conv.join("   ")+'</div>';
+  }
+  h+='<span class="src-tag">Cumulative = length-weighted average of section grades. Limits DAFMAN 13-217 Table 4.2.</span>';
+  box.style.display="block"; box.innerHTML=h;
+}
+
+/* ---------- GLIDESLOPE ---------- */
+function acChange(){ document.getElementById("gs-custom-wrap").style.display = document.getElementById("gs-ac").value==="custom"?"flex":"none"; calcGlide(); }
+function calcGlide(){
+  var box=document.getElementById("gs-result");
+  var run=num("gs-run"), rise=num("gs-rise"), u=document.getElementById("gs-u").value;
+  var sel=document.getElementById("gs-ac").value;
+  var R = sel==="custom" ? num("gs-custom") : parseFloat(sel);
+  if(isNaN(run)||isNaN(rise)){ box.style.display="none"; return; }
+  if(rise<=0){ box.style.display="block"; box.innerHTML='<div class="verdict info">Enter a positive obstacle height to check clearance.</div>'; return; }
+  if(run<0) run=Math.abs(run);
+  var ratio=run/rise;
+  var acName = sel==="35"?"C-130 (35:1)" : sel==="20"?"C-17 (20:1)" : (isNaN(R)?"custom":R.toString().replace(/\.?0+$/,"")+":1");
+  var h='<div class="result-grid">'+
+    '<div class="metric"><div class="metric-label">Obstacle ratio</div><div class="metric-val" style="font-size:19px">'+ratioStr(run,rise)+'</div></div>'+
+    '<div class="metric"><div class="metric-label">Required</div><div class="metric-val" style="font-size:19px">'+(isNaN(R)?"\u2014":R.toString().replace(/\.?0+$/,"")+":1")+'</div></div>';
+  if(!isNaN(R)&&R>0){
+    var maxH=run/R;
+    h+='<div class="metric"><div class="metric-label">Max height @ '+run.toString().replace(/\.?0+$/,"")+' '+u+'</div><div class="metric-val" style="font-size:18px">'+maxH.toFixed(1).replace(/\.?0+$/,"")+'<span class="metric-unit">'+u+'</span></div></div>';
+  }
+  h+='</div>';
+  if(!isNaN(R)&&R>0){
+    var clears = ratio>=R;
+    h+='<div class="steps">obstacle ratio = run \u00f7 rise = '+run.toString().replace(/\.?0+$/,"")+' \u00f7 '+rise.toString().replace(/\.?0+$/,"")+' = '+ratio.toFixed(2).replace(/\.?0+$/,"")+':1\n'+
+       'surface allows 1 '+u+' rise per '+R.toString().replace(/\.?0+$/,"")+' '+u+' run \u2192 max height here = '+run.toString().replace(/\.?0+$/,"")+' \u00f7 '+R.toString().replace(/\.?0+$/,"")+' = '+ (run/R).toFixed(1).replace(/\.?0+$/,"") +' '+u+'</div>';
+    if(clears) h+='<div class="verdict pass">\u2713 Clears '+acName+' \u2014 obstacle ratio '+ratio.toFixed(2).replace(/\.?0+$/,"")+':1 is shallower than the required '+R.toString().replace(/\.?0+$/,"")+':1 (it sits below the surface).</div>';
+    else h+='<div class="verdict fail">\u2717 Penetrates '+acName+' by '+(rise-run/R).toFixed(1).replace(/\.?0+$/,"")+' '+u+' \u2014 obstacle ratio '+ratio.toFixed(2).replace(/\.?0+$/,"")+':1 is steeper than the required '+R.toString().replace(/\.?0+$/,"")+':1.</div>';
+  } else {
+    h+='<div class="verdict info">Enter a valid required ratio to check clearance.</div>';
+  }
+  h+='<span class="src-tag">SAAZA Unit 1 (slides 71\u201372); required slopes per Imaginary Surfaces / DAFMAN 13-217 Table 4.2.</span>';
+  box.style.display="block"; box.innerHTML=h;
+}
+
+/* ---------- TRANSVERSE ---------- */
+function addTrans(){
+  var n=document.querySelectorAll("#trans-rows .prof-row").length+1;
+  var ph=document.getElementById("t-unit").value==="deg"?"angle \u00b0":"% grade";
+  var div=document.createElement("div");
+  div.className="prof-row";
+  var lo=(n-1)*15, hi=n*15;
+  div.innerHTML='<div class="plabel">Segment '+n+' <span style="color:#aaa">('+lo+'\u2013'+hi+'\u2032 from CL)</span></div>'+
+    '<input type="text" inputmode="text" class="tg" placeholder="'+ph+'" oninput="calcTrans()">'+
+    '<button class="xbtn" onclick="this.parentNode.remove();relabelTrans();calcTrans()">\u00d7</button>';
+  document.getElementById("trans-rows").appendChild(div);
+  calcTrans();
+}
+function relabelTrans(){
+  document.querySelectorAll("#trans-rows .prof-row").forEach(function(row,idx){
+    var n=idx+1, lo=(n-1)*15, hi=n*15;
+    row.querySelector(".plabel").innerHTML='Segment '+n+' <span style="color:#aaa">('+lo+'\u2013'+hi+'\u2032 from CL)</span>';
+  });
+}
+function transUnit(){
+  var deg=document.getElementById("t-unit").value==="deg";
+  document.querySelectorAll("#trans-rows .tg").forEach(function(inp){ inp.placeholder=deg?"angle \u00b0":"% grade"; });
+  calcTrans();
+}
+function clearTrans(){ document.getElementById("trans-rows").innerHTML=""; calcTrans(); }
+function calcTrans(){
+  var tdeg=document.getElementById("t-unit").value==="deg";
+  var inputs=document.querySelectorAll("#trans-rows .tg");
+  var grades=[], any=false;
+  inputs.forEach(function(inp){
+    var raw=(inp.value||"").trim().replace(/,/g,"");
+    if(raw===""||raw==="+"||raw==="-"){ grades.push(null); return; }
+    var x=parseFloat(raw); if(isNaN(x)){ grades.push(null); return; }
+    if(tdeg) x=100*Math.tan(x*Math.PI/180);
+    grades.push(x); any=true;
+  });
+  var box=document.getElementById("trans-result");
+  if(!any){ box.style.display="none"; return; }
+  var filled=grades.filter(function(g){return g!==null;});
+  var avg=filled.reduce(function(s,b){return s+b;},0)/filled.length, a=Math.abs(avg);
+  var h='<div class="result-grid">'+
+    '<div class="metric"><div class="metric-label">Transverse grade</div><div class="metric-val">'+fmtPct(avg)+'</div></div>'+
+    '<div class="metric"><div class="metric-label">Segments avg\u2019d</div><div class="metric-val">'+filled.length+'<span class="metric-unit">\u00d715\u2032 = '+(filled.length*15)+'\u2032</span></div></div>'+
+    '</div>';
+  if(a<0.5) h+='<div class="verdict fail">\u2717 Too flat ('+fmtPct(avg)+') \u2014 needs at least \u00b10.5% to drain.</div>';
+  else if(a<=3) h+='<div class="verdict pass">\u2713 Within transverse window ('+fmtPct(avg)+' is between \u00b10.5% and \u00b13%).</div>';
+  else h+='<div class="verdict fail">\u2717 Too steep ('+fmtPct(avg)+') \u2014 exceeds \u00b13%.</div>';
+  if(tdeg){
+    var conv=[]; grades.forEach(function(g,i){ if(g!==null) conv.push("S"+(i+1)+" "+fmtPct(g)); });
+    if(conv.length) h+='<div class="steps">angle \u2192 grade (100\u00d7tan\u03b8):  '+conv.join("   ")+'</div>';
+  }
+  h+='<span class="src-tag">Transverse grade = average of the 15\u2032 segment slopes (centerline to edge). Limit DAFMAN 13-217 Table 4.2.</span>';
+  box.style.display="block"; box.innerHTML=h;
+}
+
+/* ---------- ZONE A/B ---------- */
+function zoneParams(){
+  if(document.getElementById("z-ac").value==="custom"){
+    return {wa:num("z-wa"),ma:num("z-ma"),wb:num("z-wb"),mb:num("z-mb"),custom:true};
+  }
+  return {wa:35,ma:2.75,wb:25,mb:6.25,custom:false};
+}
+function zoneAc(){
+  var custom=document.getElementById("z-ac").value==="custom";
+  document.getElementById("z-custom").style.display=custom?"block":"none";
+  var c=document.getElementById("z-crit");
+  if(custom) c.innerHTML='<b>Custom criteria:</b> enter each zone\u2019s width and max allowable drop below. Drops are measured from the edge of usable runway; Zone B is cumulative.';
+  else c.innerHTML='<b>C-130 ALZ (DAFMAN 13-217 Tbl 4.2):</b> Zone A &mdash; <b>35\u2032</b> wide, max drop <b>2\u20329\u2033</b> (2.75 ft). Zone B &mdash; <b>+25\u2032</b> (60\u2032 total from runway edge), max drop <b>6\u20323\u2033</b> (6.25 ft). Measured from edge of usable runway. C-17 / other airframes differ \u2014 use Custom.';
+  calcZone();
+}
+function zVerdict(label,drop,max){
+  var a=Math.abs(drop);
+  if(drop>1e-9) return '<div class="verdict fail">\u2717 '+label+' rises '+toFtIn(drop)+' above the runway edge \u2014 that\u2019s an obstruction direction; verify (zones should slope down/away).</div>';
+  if(a<=max) return '<div class="verdict pass">\u2713 '+label+' drop '+toFtIn(drop)+' is within the '+toFtIn(max)+' max ('+max.toFixed(2).replace(/\.?0+$/,"")+' ft).</div>';
+  return '<div class="verdict fail">\u2717 '+label+' drop '+toFtIn(drop)+' exceeds the '+toFtIn(max)+' max by '+toFtIn(a-max)+'.</div>';
+}
+function calcZone(){
+  var box=document.getElementById("z-result");
+  var zDeg=document.getElementById("z-unit").value==="deg";
+  var gaRaw=num("z-a"), gbRaw=num("z-b");
+  if(isNaN(gaRaw)&&isNaN(gbRaw)){ box.style.display="none"; return; }
+  var ga=isNaN(gaRaw)?NaN:(zDeg?100*Math.tan(gaRaw*Math.PI/180):gaRaw);
+  var gb=isNaN(gbRaw)?NaN:(zDeg?100*Math.tan(gbRaw*Math.PI/180):gbRaw);
+  var p=zoneParams();
+  if(isNaN(p.wa)||isNaN(p.ma)||isNaN(p.wb)||isNaN(p.mb)){ box.style.display="block"; box.innerHTML='<div class="verdict info">Enter the custom widths and max drops above.</div>'; return; }
+  var dropA = isNaN(ga)?null:(ga/100)*p.wa;
+  var dropBi = isNaN(gb)?null:(gb/100)*p.wb;
+  var cumB = (dropA!==null && dropBi!==null) ? dropA+dropBi : null;
+  var h='<div class="result-grid">';
+  if(dropA!==null) h+='<div class="metric"><div class="metric-label">Zone A drop @ '+p.wa+'\u2032</div><div class="metric-val" style="font-size:18px">'+toFtIn(dropA)+'</div></div>';
+  if(cumB!==null) h+='<div class="metric"><div class="metric-label">Zone B drop @ '+(p.wa+p.wb)+'\u2032 (cum.)</div><div class="metric-val" style="font-size:18px">'+toFtIn(cumB)+'</div></div>';
+  else if(dropBi!==null) h+='<div class="metric"><div class="metric-label">Zone B increment</div><div class="metric-val" style="font-size:18px">'+toFtIn(dropBi)+'</div></div>';
+  h+='</div>';
+  if(dropA!==null) h+=zVerdict("Zone A",dropA,p.ma);
+  if(cumB!==null) h+='<div style="height:6px"></div>'+zVerdict("Zone B (cumulative)",cumB,p.mb);
+  else if(dropBi!==null) h+='<div class="verdict info" style="margin-top:6px">Enter the Zone A grade too \u2014 the Zone B limit is the <b>cumulative</b> drop from the runway edge, so it needs both.</div>';
+  var st='';
+  if(dropA!==null) st+='Zone A: '+(zDeg?gaRaw+'\u00b0 \u2192 ':'')+fmtPct(ga)+' \u00d7 '+p.wa+'\u2032 = '+toFtIn(dropA)+'\n';
+  if(dropBi!==null) st+='Zone B segment: '+(zDeg?gbRaw+'\u00b0 \u2192 ':'')+fmtPct(gb)+' \u00d7 '+p.wb+'\u2032 = '+toFtIn(dropBi)+'\n';
+  if(cumB!==null) st+='Zone B cumulative = Zone A + segment = '+toFtIn(cumB);
+  if(st) h+='<div class="steps">'+st+'</div>';
+  h+='<span class="src-tag">Zone criteria DAFMAN 13-217 Table 4.2 (C-130 ALZ, slide 43). Drops measured from edge of usable runway.</span>';
+  box.style.display="block"; box.innerHTML=h;
+}
+
+/* ---------- init ---------- */
+buildLL();
+addSection(); addSection();
+addTrans(); addTrans();
+solveChange();
+zoneAc();
+</script>
+</body>
+</html>

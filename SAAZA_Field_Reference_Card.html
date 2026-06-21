@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Field Reference Card</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f4f0;color:#1a1a1a;line-height:1.45;padding:1.5rem 1rem;max-width:920px;margin:0 auto}
+a.back{display:inline-block;font-size:12px;color:#1D9E75;text-decoration:none;margin-bottom:12px}
+h1{font-size:22px;font-weight:600;margin-bottom:3px}
+.sub{font-size:12.5px;color:#666;margin-bottom:14px}
+.btn-row{margin-bottom:14px}
+.btn{display:inline-block;background:#1D9E75;color:#fff;border:none;border-radius:9px;padding:11px 18px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:11px}
+.card{background:#fff;border:1px solid #e0e0e0;border-radius:11px;padding:12px 14px;break-inside:avoid}
+.card h2{font-size:13.5px;font-weight:700;color:#14241f;margin-bottom:2px}
+.card .form{font-size:11px;font-weight:600;color:#1D9E75;margin-bottom:7px}
+.card ul{list-style:none}
+.card li{font-size:12.5px;color:#333;padding:3px 0;border-top:1px solid #f2f1ea;display:flex;gap:8px}
+.card li:first-child{border-top:none}
+.k{color:#555;flex:1}
+.v{font-weight:600;color:#14241f;text-align:right;white-space:nowrap}
+.full{font-size:12.5px;color:#333}
+.full b{color:#14241f}
+.note{font-size:11px;color:#999;margin-top:6px;font-style:italic}
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:1.5rem;padding-bottom:1rem}
+@media print{
+  body{padding:0;max-width:none;font-size:10px}
+  a.back,.btn-row,.footer{display:none!important}
+  h1{font-size:15px} .sub{font-size:9.5px;margin-bottom:8px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:6px}
+  .card{padding:7px 9px;border-radius:7px}
+  .card h2{font-size:10.5px} .card .form{font-size:8.5px;margin-bottom:4px}
+  .card li{font-size:9.5px;padding:1.5px 0} .full{font-size:9.5px} .note{font-size:8px}
+}
+</style>
+</head>
+<body>
+
+<a class="back" href="index.html">&larr; Back to all tools</a>
+<h1>Field Reference Card</h1>
+<p class="sub">Quick-reference numbers for ALZ / HLZ / DZ surveys &mdash; the pocket backup to the digital tools. Print it (fits one page) and fold it into a pocket. Confirm against the governing publications before use.</p>
+<div class="btn-row"><button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button></div>
+
+<div class="grid">
+
+  <div class="card">
+    <h2>ALZ &mdash; Fixed-Wing</h2>
+    <div class="form">AF IMT 3822 &middot; UFC 3-260-01 / DAFMAN 13-217</div>
+    <ul>
+      <li><span class="k">Runway, C-130 (min)</span><span class="v">3,000 &times; 60 ft</span></li>
+      <li><span class="k">Runway, C-17 (min)</span><span class="v">3,500 &times; 90 ft</span></li>
+      <li><span class="k">Overrun, each end</span><span class="v">300 ft</span></li>
+      <li><span class="k">Longitudinal grade</span><span class="v">&plusmn;3% max</span></li>
+      <li><span class="k">&nbsp;&nbsp;per 200 ft</span><span class="v">&plusmn;1.5%</span></li>
+      <li><span class="k">Transverse grade</span><span class="v">0.5&ndash;3%</span></li>
+      <li><span class="k">Zone A (inner) drop</span><span class="v">35 ft / 2&prime;9&Prime;</span></li>
+      <li><span class="k">Zone B (outer) drop</span><span class="v">25 ft / 6&prime;3&Prime;</span></li>
+      <li><span class="k">Glideslope</span><span class="v">35:1 C-130 &middot; 20:1 C-17</span></li>
+      <li><span class="k">DCP (3,000 ft run)</span><span class="v">37 locations</span></li>
+    </ul>
+    <div class="note">DCP location count scales with runway length (37 for a 3,000 ft runway).</div>
+  </div>
+
+  <div class="card">
+    <h2>HLZ &mdash; Helicopter</h2>
+    <div class="form">AF IMT 4303 &middot; DAFMAN 13-217 Ch 5</div>
+    <ul>
+      <li><span class="k">Survey for</span><span class="v">max size & # helos</span></li>
+      <li><span class="k">2-rotor spacing</span><span class="v">blade-length apart</span></li>
+      <li><span class="k">Single-rotor</span><span class="v">blade-length between</span></li>
+      <li><span class="k">Slope &mdash; avoid</span><span class="v">&gt; 7&deg;</span></li>
+      <li><span class="k">Never land</span><span class="v">downslope</span></li>
+      <li><span class="k">Glideslope</span><span class="v">10:1</span></li>
+    </ul>
+    <div class="note">Touchdown point clears 10&times; the highest obstacle on approach. Note restricted quadrants.</div>
+  </div>
+
+  <div class="card">
+    <h2>DZ &mdash; Drop Zone</h2>
+    <div class="form">AF IMT 3823 &middot; DAFMAN 13-217 Ch 3</div>
+    <ul>
+      <li><span class="k">CDS (C-130)</span><span class="v">400 &times; 400 yd</span></li>
+      <li><span class="k">&nbsp;&nbsp;CDS length, C-17</span><span class="v">450 yd</span></li>
+      <li><span class="k">Personnel</span><span class="v">600 &times; 600 yd</span></li>
+      <li><span class="k">Heavy Equipment</span><span class="v">1,000 &times; 600 yd</span></li>
+      <li><span class="k">PI standoff CDS</span><span class="v">200 / 250 yd</span></li>
+      <li><span class="k">PI standoff Pers</span><span class="v">300 / 350 yd</span></li>
+      <li><span class="k">PI standoff HE</span><span class="v">500 / 550 yd</span></li>
+      <li><span class="k">Base drop alt (AGL)</span><span class="v">600 / 1,000 / 1,100 ft</span></li>
+    </ul>
+    <div class="note">Base minimums (day / night standoff). Apply cumulative adjustments for altitude, formation & passes &mdash; use the DZ Calculator. PI = center on a circular DZ.</div>
+  </div>
+
+  <div class="card">
+    <h2>DCP / Soil Bearing</h2>
+    <div class="form">Unit 3 &middot; ETL 97-9 / TSPWG 3-260-03.02-19</div>
+    <ul>
+      <li><span class="k">Test depth</span><span class="v">36 in</span></li>
+      <li><span class="k">Denial</span><span class="v">10 blows, no move</span></li>
+      <li><span class="k">&nbsp;&nbsp;then relocate</span><span class="v">12 in</span></li>
+      <li><span class="k">3 denials</span><span class="v">CBR 80</span></li>
+      <li><span class="k">Handle off plumb &gt; 5&deg;</span><span class="v">relocate 6 in</span></li>
+      <li><span class="k">Time per location</span><span class="v">~7 min</span></li>
+      <li><span class="k">Controlling layer</span><span class="v">weakest</span></li>
+    </ul>
+    <div class="note">Priority if short on time: touchdown / braking / turnaround, point of rotation, weak / wet / repaired areas.</div>
+  </div>
+
+  <div class="card">
+    <h2>Gradients & Coordinates</h2>
+    <div class="form">Unit 1 &middot; DAFMAN 13-217 Tbl 4.2</div>
+    <ul>
+      <li><span class="k">% grade</span><span class="v">100 &times; tan&theta;</span></li>
+      <li><span class="k">Line level</span><span class="v">20 ft run</span></li>
+      <li><span class="k">Coordinates</span><span class="v">DAGR, WGS-84</span></li>
+      <li><span class="k">Lat/long to</span><span class="v">1/1000 min</span></li>
+      <li><span class="k">or</span><span class="v">MGRS</span></li>
+      <li><span class="k">Elevation ref</span><span class="v">MSL</span></li>
+    </ul>
+    <div class="note">PI placement mnemonic (DZ): MANFAS &mdash; Minimums, Altitude, Night, Formations, Additional Safety.</div>
+  </div>
+
+  <div class="card">
+    <h2>Forms & Submission</h2>
+    <div class="form">Unit 5 &middot; Talon Point routing</div>
+    <ul>
+      <li><span class="k">ALZ</span><span class="v">AF IMT 3822</span></li>
+      <li><span class="k">HLZ</span><span class="v">AF IMT 4303</span></li>
+      <li><span class="k">DZ</span><span class="v">AF IMT 3823</span></li>
+    </ul>
+    <div class="full" style="margin-top:7px"><b>Routing:</b> Survey &rarr; QC (EAF OIC / MAW Rep) &rarr; MAG ASO / MAW Safety-of-Flight &rarr; MAG CO / MAW CG (approve / disapprove).</div>
+    <div class="note">Write as you go, never from memory &mdash; confirm every block before you depart the zone.</div>
+  </div>
+
+</div>
+
+<div class="footer">136th Contingency Response Flight &mdash; rcarney94.github.io/saaza-calculator &mdash; verify against current publications before use</div>
+
+</body>
+</html>

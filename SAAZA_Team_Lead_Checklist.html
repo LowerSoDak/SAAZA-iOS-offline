@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Team Lead Checklist</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f4f0;color:#1a1a1a;padding:1rem;min-height:100vh}
+a.back{display:inline-block;font-size:12px;color:#1D9E75;text-decoration:none;margin-bottom:12px}
+a.xlink{display:block;text-decoration:none;font-size:12.5px;color:#0F6E56;background:#E1F5EE;border:1px solid #B7E4D4;border-radius:9px;padding:9px 12px;margin-bottom:14px;line-height:1.5}
+h1{font-size:20px;font-weight:600;margin-bottom:2px}
+.sub{font-size:13px;color:#666;margin-bottom:1rem;line-height:1.5}
+.overall{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.overall-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.overall-top .lbl{font-size:13px;font-weight:600}
+.overall-top .pct{font-size:13px;font-weight:700;color:#0F6E56}
+.bar{height:8px;background:#e8e8e4;border-radius:5px;overflow:hidden}
+.fill{height:100%;background:#1D9E75;border-radius:5px;transition:width .3s}
+.tabs{display:flex;gap:5px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
+.tab{flex:1;min-width:74px;padding:9px 6px;border:1px solid #ccc;border-radius:9px;background:#fff;cursor:pointer;font-size:12px;color:#555;font-weight:500;text-align:center;white-space:nowrap}
+.tab.on{background:#1D9E75;color:#fff;border-color:#1D9E75}
+.tab .tn{font-size:10px;opacity:.8;display:block}
+.phase-head{font-size:13px;color:#666;line-height:1.5;margin-bottom:12px;background:#EEF6FB;border-left:3px solid #0C6CB8;padding:9px 12px;border-radius:0 8px 8px 0;color:#0C447C}
+.task{background:#fff;border:1px solid #e0e0e0;border-radius:11px;padding:12px 13px;margin-bottom:9px;transition:border-color .15s}
+.task.done{border-color:#9ccb6e;background:#FBFEF8}
+.task-top{display:flex;align-items:flex-start;gap:11px;cursor:pointer}
+.checkbox{flex-shrink:0;width:24px;height:24px;border:2px solid #ccc;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;margin-top:1px;transition:all .15s}
+.task.done .checkbox{background:#2E9B4F;border-color:#2E9B4F}
+.task-body{flex:1}
+.task-name{font-size:14px;font-weight:600;line-height:1.4}
+.task.done .task-name{color:#5a7a3f}
+.task-detail{font-size:12px;color:#777;line-height:1.55;margin-top:4px}
+.task-notes{margin-top:9px}
+.task-notes textarea{width:100%;border:1px solid #e0e0e0;border-radius:7px;padding:7px 9px;font-size:12.5px;font-family:inherit;resize:vertical;min-height:34px;color:#333;background:#fafafa}
+.task-notes textarea:focus{outline:none;border-color:#1D9E75;background:#fff}
+.notes-label{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.toolbar{display:flex;gap:8px;margin-top:14px;margin-bottom:4px}
+.tb-btn{flex:1;padding:10px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:12.5px;color:#555;font-weight:500}
+.tb-btn.danger{color:#a33}
+.saved-tag{font-size:11px;color:#9a9a9a;text-align:center;margin-top:10px}
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:1.5rem;padding-bottom:2rem}
+.modebar{display:flex;gap:0;margin-bottom:12px;border:1px solid #ccc;border-radius:9px;overflow:hidden;background:#fff}
+.modebtn{flex:1;padding:9px 6px;border:none;background:#fff;cursor:pointer;font-size:13px;color:#666;font-weight:600;text-align:center}
+.modebtn.on{background:#1D9E75;color:#fff}
+.modebtn .ms{display:block;font-size:10px;font-weight:400;opacity:.85;margin-top:1px}
+.mode-note{font-size:11.5px;color:#8a6d3b;background:#FBF3E2;border-left:3px solid #E0A93B;padding:8px 11px;border-radius:0 8px 8px 0;margin-bottom:12px;line-height:1.5}
+.phase-defer{font-size:11.5px;color:#999;text-align:center;padding:9px;border:1px dashed #d8d8d2;border-radius:9px;margin-top:2px;margin-bottom:9px}
+#print-area{display:none}
+@media print{
+ a.back,h1,.sub,.xlink,.overall,.tabs,.phase-head,#task-list,.toolbar,.saved-tag,.footer{display:none !important}
+ body{padding:0;background:#fff;color:#000}
+ #print-area{display:block !important}
+ .p-title{font-size:17px;font-weight:700;margin-bottom:2px}
+ .p-meta{font-size:11px;color:#444;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #ccc}
+ .p-phase{margin-bottom:16px}
+ .p-phase-head{font-size:14px;font-weight:700;background:#eee;padding:5px 8px;border-radius:4px;margin-bottom:8px;border-left:3px solid #1D9E75;page-break-after:avoid}
+ .p-phase-prog{float:right;font-weight:600;color:#555}
+ .p-task{page-break-inside:avoid;margin-bottom:9px;padding-bottom:8px;border-bottom:1px solid #eee}
+ .p-box{display:inline-block;width:12px;height:12px;border:1.5px solid #333;border-radius:2px;margin-right:7px;text-align:center;line-height:10px;font-size:10px;vertical-align:middle}
+ .p-task-name{font-size:12.5px;font-weight:600}
+ .p-task-name.p-done{text-decoration:line-through;color:#666}
+ .p-detail{font-size:10.5px;color:#666;margin:3px 0 0 19px;line-height:1.4}
+ .p-notes{font-size:11px;color:#111;margin:5px 0 0 19px;background:#f4f4f0;padding:4px 7px;border-radius:4px;border-left:2px solid #1D9E75}
+}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">&larr; Back to all tools</a>
+<h1>Team Lead Checklist</h1>
+<p class="sub">The 4-phase SAAZA process &mdash; tracks your progress through a survey from start to finish</p>
+<a class="xlink" href="SAAZA_Survey_Field_Guide.html">🧭 Running the actual on-site survey? Open the <b>Survey Field Guide</b> for step-by-step field execution &mdash; team assignments, equipment &amp; references &rarr;</a>
+
+<div class="overall">
+<div class="overall-top"><span class="lbl">Overall progress</span><span class="pct" id="overall-pct">0%</span></div>
+<div class="bar"><div class="fill" id="overall-fill" style="width:0%"></div></div>
+</div>
+
+<div class="modebar" id="modebar">
+<button class="modebtn on" id="mb-full" onclick="setMode('full')">Full survey<span class="ms">&ge; 12 hr &middot; all tasks</span></button>
+<button class="modebtn" id="mb-hasty" onclick="setMode('hasty')">Hasty survey<span class="ms">&lt; 6 hr &middot; essential only</span></button>
+</div>
+<div class="mode-note" id="mode-note" style="display:none"></div>
+
+<div class="tabs" id="tabs"></div>
+<div class="phase-head" id="phase-head"></div>
+<div id="task-list"></div>
+
+<div class="toolbar">
+<button class="tb-btn" onclick="printAll()">🖨 Print / Share all</button>
+<button class="tb-btn danger" onclick="resetAll()">↺ Reset all</button>
+</div>
+<div class="saved-tag" id="saved-tag">Progress saves automatically on this device</div>
+
+<div class="footer">SAAZA Team Lead Checklist &mdash; 136CRF &mdash; based on Unit 4 (SAAZA Process) &middot; works offline</div>
+
+<div id="print-area"></div>
+
+<script>
+var PHASES=[
+ {key:"p1", tab:"Info", num:"Phase 1", title:"Information Gathering",
+  head:"Collection and consolidation of all pre-existing information on the location. Build an efficient collection plan \u2014 everything still gets validated on site.",
+  items:[
+   ["Pull previously completed surveys","Talon Point / Zone Availability Reports (ZARs). NIPR: talonpoint.net \u2014 best single source; shows prior areas of concern.",true],
+   ["Obtain satellite imagery","S-2 products, Google Earth, HAWG-VIEW.",true],
+   ["Acquire maps","Record series, sheet number, edition, and date.",true],
+   ["Gather ATC supplemental information","Airspace, frequencies, restrictions.",false],
+   ["Obtain weather reports","Forecast and climatology for the window.",false],
+   ["Review intelligence reports","Threat, terrain, recent activity.",false],
+   ["Establish Host Nation (HN) POCs","Coordination and access.",false],
+   ["Confirm requestor criteria (T/M/S)","NATOPS-specific: glideslopes, gradients, airframe mission weight (FW), LZ size requirements, supplemental requests. Your assessment depends on this.",true],
+   ["Inventory available assets","Logistics (air/ground insert, life support), personnel (EAF integration, security), equipment.",false],
+   ["Identify gaps & build collection plan","Determine what you HAVE to find what you DON'T \u2014 prioritize for the site visit.",true]
+  ]},
+ {key:"p2", tab:"Prep", num:"Phase 2", title:"Preparation",
+  head:"Team planning, task assignment, and logistics. Proper Prior Planning Prevents Poor Performance \u2014 the physical survey is the simplest part if this is done well.",
+  items:[
+   ["Define mission requirements","LZ purpose (ALZ / HLZ / FARP), requesting agency (T/M/S), supplemental requests.",true],
+   ["Identify limitations","Time (incl. time of day), personnel, security concerns.",true],
+   ["Confirm available assets","Re-verify logistics, personnel, equipment for execution.",false],
+   ["Task organization","Assign each member a role/task up front; multi-capable airman \u2014 when a member finishes their part, they flow to help the teams still working. Integrate EAF & security.",true],
+   ["Conduct mission briefing","TL paints a clear, concise ground scheme of maneuver to ALL members & attachments; set output expectations.",true],
+   ["Conduct rehearsals","Walk through tasks and contingencies.",false],
+   ["Prepare & inventory equipment","LRF, DCP, clinometer, DAGR, line level, measuring wheel, compass, digital camera.",true],
+   ["Plan staging","Insert/extract and on-site sequence.",false]
+  ]},
+ {key:"p3", tab:"Site", num:"Phase 3", title:"Site Visit",
+  head:"Physical collection of ground truth data. Time defines the scope \u2014 you likely won't get a second chance. Bad data = bad survey = loss of confidence.",
+  items:[
+   ["Confirm time available \u2192 set scope","Hasty survey/assessment < 6 hr \u2022 Full survey/assessment \u2265 12 hr.",true],
+   ["TL supervises AND participates","Not solely a supervisor; ensure the plan is executed as briefed, adjust as needed.",true],
+   ["Execute the on-site survey","Run the physical data collection \u2014 coordinates, dimensions, DCP, gradients, obstacles, surface, and photos \u2014 with the <a href=\"SAAZA_Survey_Field_Guide.html\" onclick=\"event.stopPropagation()\">Survey Field Guide<\/a>: team assignments, per-step gear, references, slides, and check-off, all maintained in one place.",true],
+   ["Maintain equipment accountability","At ALL times \u2014 a DCP cone is an indicator to the enemy.",true]
+  ]},
+ {key:"p4", tab:"Product", num:"Phase 4", title:"Final Product Development",
+  head:"Synthesis of all data points into a cohesive, informative document for the requesting agency. Everything is invisible except the final product.",
+  items:[
+   ["Analyze & synthesize data","CBR: identify layers, average per layer, find the controlling (weakest) layer/location. Gradient averages (e.g. 150 readings \u2192 15\u00d7200 ft avgs \u2192 1 cumulative).",true],
+   ["Determine allowable passes","Driven by the weakest / controlling layer.",true],
+   ["Refine product","LZ diagram (north arrow, scale, dimensions, obstacles w/ distances & heights), photographs.",false],
+   ["Complete survey form","AF IMT 3822 (fixed-wing / ALZ) \u2022 AF IMT 4303 (helicopter / tilt-rotor HLZ).",true],
+   ["Quality control review","EAF OIC / MAW Rep checks the survey.",true],
+   ["Submit via Talon Point routing","Survey \u2192 QC (EAF OIC) \u2192 MAG ASO/MAW DOS (Safety of Flight) \u2192 MAG CO/MAW CG (Approve/Disapprove).",true]
+  ]}
+];
+
+var KEY="saaza_tl_checklist_v1";
+var KEY_MODE="saaza_tl_mode_v1";
+var mode="full";
+var state={};
+function load(){
+ try{var s=localStorage.getItem(KEY); if(s)state=JSON.parse(s);}catch(e){state={};}
+ try{var m=localStorage.getItem(KEY_MODE); if(m==="hasty"||m==="full")mode=m;}catch(e){}
+}
+function save(){ try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){ document.getElementById("saved-tag").textContent="(Progress can't be saved in this view \u2014 works when hosted online)"; } }
+
+var active="p1";
+function cid(p,i){return p+"_"+i;}
+
+function buildTabs(){
+ var h="";
+ PHASES.forEach(function(p){
+  h+='<button class="tab'+(p.key===active?" on":"")+'" onclick="setTab(\''+p.key+'\')"><span class="tn">'+p.num+'</span>'+p.tab+'</button>';
+ });
+ document.getElementById("tabs").innerHTML=h;
+}
+function setTab(k){active=k;buildTabs();render();}
+
+function visIdx(p){
+ var out=[]; p.items.forEach(function(it,i){ if(mode==="full"||it[2]) out.push(i); }); return out;
+}
+function phaseProg(p){
+ var idxs=visIdx(p), done=0;
+ idxs.forEach(function(i){ if(state[cid(p.key,i)] && state[cid(p.key,i)].done) done++; });
+ return {done:done,total:idxs.length};
+}
+
+function render(){
+ var p=PHASES.find(function(x){return x.key===active;});
+ document.getElementById("phase-head").textContent=p.head;
+ var idxs=visIdx(p), h="";
+ idxs.forEach(function(i){
+  var it=p.items[i];
+  var id=cid(p.key,i);
+  var st=state[id]||{done:false,notes:""};
+  h+='<div class="task'+(st.done?" done":"")+'" id="task-'+id+'">'+
+     '<div class="task-top" onclick="toggle(\''+id+'\')">'+
+     '<div class="checkbox">'+(st.done?"\u2713":"")+'</div>'+
+     '<div class="task-body"><div class="task-name">'+it[0]+'</div><div class="task-detail">'+it[1]+'</div></div>'+
+     '</div>'+
+     '<div class="task-notes"><div class="notes-label">Notes</div>'+
+     '<textarea placeholder="Add notes, measurements, POCs\u2026" oninput="setNote(\''+id+'\',this.value)">'+(st.notes||"").replace(/</g,"&lt;")+'</textarea></div>'+
+     '</div>';
+ });
+ if(mode==="hasty"){
+  var hidden=p.items.length-idxs.length;
+  if(hidden>0) h+='<div class="phase-defer">+ '+hidden+' full-survey item'+(hidden>1?"s":"")+' deferred in hasty mode</div>';
+ }
+ document.getElementById("task-list").innerHTML=h;
+ updateProgress();
+}
+
+function toggle(id){
+ var st=state[id]||{done:false,notes:""};
+ st.done=!st.done; state[id]=st; save();
+ var el=document.getElementById("task-"+id);
+ el.classList.toggle("done",st.done);
+ el.querySelector(".checkbox").textContent=st.done?"\u2713":"";
+ updateProgress();
+}
+function setNote(id,v){
+ var st=state[id]||{done:false,notes:""};
+ st.notes=v; state[id]=st; save();
+}
+
+function updateProgress(){
+ var total=0,done=0;
+ PHASES.forEach(function(p){ var pr=phaseProg(p); total+=pr.total; done+=pr.done; });
+ var pct=total?Math.round(done/total*100):0;
+ document.getElementById("overall-pct").textContent=pct+"%  ("+done+"/"+total+")";
+ document.getElementById("overall-fill").style.width=pct+"%";
+ // update tab labels with mini progress
+ var tabs=document.querySelectorAll(".tab");
+ PHASES.forEach(function(p,idx){
+  var pr=phaseProg(p);
+  var done=pr.done===pr.total&&pr.total>0;
+  tabs[idx].querySelector(".tn").textContent=p.num+" "+pr.done+"/"+pr.total+(done?" \u2713":"");
+ });
+}
+
+function resetAll(){
+ if(confirm("Reset all checkboxes and notes? This cannot be undone.")){
+  state={}; save(); render();
+ }
+}
+
+function applyModeUI(){
+ document.getElementById("mb-full").classList.toggle("on",mode==="full");
+ document.getElementById("mb-hasty").classList.toggle("on",mode==="hasty");
+ var note=document.getElementById("mode-note");
+ if(mode==="hasty"){
+  note.style.display="block";
+  note.innerHTML="<b>Hasty mode</b> \u2014 showing the essential, flight-safety-critical tasks for a compressed timeline (&lt; 6 hr): prioritize essential information; assessment stays focused on minimum criteria. Lower-priority coordination, documentation, and product-polish tasks are deferred. This is a suggested prioritization \u2014 adjust to your TACSOP and your TL\u2019s direction.";
+ } else {
+  note.style.display="none";
+ }
+}
+function setMode(m){
+ if(m!=="hasty"&&m!=="full") return;
+ mode=m;
+ try{localStorage.setItem(KEY_MODE,m);}catch(e){}
+ applyModeUI(); buildTabs(); render();
+}
+
+function buildPrintArea(){
+ var total=0,done=0;
+ PHASES.forEach(function(p){var pr=phaseProg(p);total+=pr.total;done+=pr.done;});
+ var pct=total?Math.round(done/total*100):0;
+ var modeLabel=mode==="hasty"?"Hasty survey \u2014 essential tasks":"Full survey";
+ var h='<div class="p-title">SAAZA Team Lead Checklist \u2014 '+modeLabel+'</div>';
+ h+='<div class="p-meta">Overall: '+pct+'% ('+done+'/'+total+' tasks complete) &middot; Printed '+new Date().toLocaleDateString()+'</div>';
+ PHASES.forEach(function(p){
+  var pr=phaseProg(p), idxs=visIdx(p);
+  h+='<div class="p-phase"><div class="p-phase-head">'+p.num+': '+p.title+'<span class="p-phase-prog">'+pr.done+'/'+pr.total+'</span></div>';
+  idxs.forEach(function(i){
+   var it=p.items[i];
+   var st=state[cid(p.key,i)]||{done:false,notes:""};
+   h+='<div class="p-task"><span class="p-box">'+(st.done?"\u2713":"")+'</span>';
+   h+='<span class="p-task-name'+(st.done?" p-done":"")+'">'+it[0]+'</span>';
+   h+='<div class="p-detail">'+it[1]+'</div>';
+   if(st.notes && st.notes.trim()){ h+='<div class="p-notes"><b>Notes:</b> '+st.notes.replace(/</g,"&lt;")+'</div>'; }
+   h+='</div>';
+  });
+  h+='</div>';
+ });
+ document.getElementById("print-area").innerHTML=h;
+}
+function printAll(){ buildPrintArea(); window.print(); }
+
+load();
+applyModeUI();
+buildTabs();
+render();
+</script>
+</body>
+</html>

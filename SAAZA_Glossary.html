@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA Glossary &amp; Acronyms</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f4f0;color:#1a1a1a;line-height:1.5;padding:1.5rem 1rem;max-width:760px;margin:0 auto}
+a.back{display:inline-block;font-size:12px;color:#1D9E75;text-decoration:none;margin-bottom:12px}
+h1{font-size:22px;font-weight:600;margin-bottom:4px}
+.sub{font-size:13px;color:#666;margin-bottom:16px}
+.searchbar{position:sticky;top:0;background:#f4f4f0;padding:8px 0 10px;z-index:5}
+#q{width:100%;padding:12px 14px;font-size:16px;border:1px solid #d8d8cf;border-radius:10px;background:#fff;outline:none}
+#q:focus{border-color:#1D9E75}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.chip{font-size:12px;padding:6px 11px;border-radius:999px;border:1px solid #d8d8cf;background:#fff;color:#555;cursor:pointer;user-select:none}
+.chip.on{background:#1D9E75;border-color:#1D9E75;color:#fff;font-weight:500}
+.count{font-size:11px;color:#999;margin:10px 0 8px;text-transform:uppercase;letter-spacing:.05em}
+.entry{background:#fff;border:1px solid #e0e0e0;border-radius:11px;padding:12px 14px;margin-bottom:8px}
+.entry .g-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.g-acr{font-size:16px;font-weight:700;color:#14241f}
+.g-term{font-size:13px;font-weight:600;color:#1D9E75}
+.g-cat{margin-left:auto;font-size:10px;color:#999;background:#f2f2ec;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.g-def{font-size:13px;color:#444;margin-top:5px}
+.empty{text-align:center;color:#999;font-size:13px;padding:30px 10px}
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:2rem;padding-bottom:1rem}
+</style>
+</head>
+<body>
+
+<a class="back" href="index.html">&larr; Back to all tools</a>
+<h1>Glossary &amp; Acronyms</h1>
+<p class="sub">Every acronym and term used across the SAAZA tools and course, in one searchable place. Type to filter, or tap a category.</p>
+
+<div class="searchbar">
+  <input type="text" id="q" placeholder="Search acronym, term, or definition&hellip;" oninput="render()" autocomplete="off"/>
+  <div class="chips" id="chips"></div>
+</div>
+
+<div class="count" id="count"></div>
+<div id="list"></div>
+
+<div class="footer">136th Contingency Response Flight &mdash; rcarney94.github.io/saaza-calculator &mdash; works offline once loaded</div>
+
+<script>
+var CATS=[
+  ["all","All"],["zones","Zones & ops"],["equip","Equipment"],["soil","Soil & surface"],
+  ["forms","Forms"],["coord","Coordinates"],["org","Organizations"],["pub","Publications"],["info","Planning"]
+];
+var TERMS=[
+  ["ALZ","Assault Landing Zone","A semi-prepared or expedient runway surveyed for fixed-wing assault-support aircraft (e.g., C-130, C-17). Recorded on AF IMT 3822.","zones"],
+  ["HLZ","Helicopter Landing Zone","A site surveyed for rotary-wing and tilt-rotor aircraft. Recorded on AF IMT 4303.","zones"],
+  ["DZ","Drop Zone","A surveyed area for the airdrop of personnel or cargo. Recorded on AF IMT 3823.","zones"],
+  ["LZ","Landing Zone","General term for a surveyed aircraft landing area; covers both ALZ and HLZ.","zones"],
+  ["FARP","Forward Arming and Refueling Point","A temporary site for arming and refueling aircraft forward of the main base.","zones"],
+  ["FW","Fixed-Wing","Fixed-wing aircraft (as opposed to rotary-wing); drives ALZ criteria and mission weight.","zones"],
+  ["PI","Point of Impact","The aim point on a drop zone for the lead jumper or load; placed using the MANFAS method.","zones"],
+  ["CDS","Container Delivery System","Airdrop of palletized supply bundles; the DZ mission type with the smallest minimum dimensions.","zones"],
+  ["HE","Heavy Equipment","Airdrop of platform-mounted heavy loads; the DZ mission type with the largest minimums.","zones"],
+  ["DCP","Dynamic Cone Penetrometer","A drop-hammer probe that measures soil bearing strength; blows-per-depth convert to a CBR value.","equip"],
+  ["LRF","Laser Range Finder","Handheld laser for measuring distance, and (paired with a clinometer) slope and obstacle height.","equip"],
+  ["DAGR","Defense Advanced GPS Receiver","Military GPS unit used to record WGS-84 coordinates and MSL elevation in the field.","equip"],
+  ["CBR","California Bearing Ratio","A measure of subgrade/soil strength used to determine allowable aircraft passes; derived from DCP readings.","soil"],
+  ["SPACI","Semi-Prepared Airfield Condition Index","A surface-condition rating built from documented distress types; scored for the C-130 and C-17.","soil"],
+  ["FOD","Foreign Object Debris / Damage","Loose material that can damage aircraft or engines; documented during the surface assessment.","soil"],
+  ["AF IMT 3822","Air Force Information Management Tool 3822","The fixed-wing / ALZ survey form.","forms"],
+  ["AF IMT 4303","Air Force Information Management Tool 4303","The helicopter / tilt-rotor HLZ survey form.","forms"],
+  ["AF IMT 3823","Air Force Information Management Tool 3823","The drop zone survey form.","forms"],
+  ["MGRS","Military Grid Reference System","The standard military grid coordinate format.","coord"],
+  ["UTM","Universal Transverse Mercator","A projected coordinate system expressed as zone, hemisphere, easting, and northing.","coord"],
+  ["WGS-84","World Geodetic System 1984","The datum used for SAAZA coordinates and elevations.","coord"],
+  ["MSL","Mean Sea Level","The reference datum for elevation readings.","coord"],
+  ["WMM","World Magnetic Model","The NOAA/NGA model of Earth's magnetic field; gives magnetic declination for a location and date.","coord"],
+  ["MANFAS","Minimums, Altitude, Night, Formations, Additional Safety","The mnemonic for placing the drop zone Point of Impact.","coord"],
+  ["NAVAID","Navigational Aid","Ground-based equipment that provides navigation or approach guidance to aircraft.","coord"],
+  ["MMT","Marine Air Traffic Control Mobile Team","The team that plans and conducts SAAZA surveys.","org"],
+  ["MAGTF","Marine Air-Ground Task Force","The Marine Corps combined-arms force structure.","org"],
+  ["MAW","Marine Aircraft Wing","The major Marine Corps aviation organization.","org"],
+  ["MAG","Marine Aircraft Group","A subordinate aviation group within a MAW.","org"],
+  ["EAF","Expeditionary Airfield","The engineering capability/element that builds and evaluates expeditionary airfields; performs follow-on survey-grade work.","org"],
+  ["ASO","Aviation Safety Officer","Reviews the survey during the QC / safety-of-flight routing.","org"],
+  ["OIC","Officer in Charge","The officer responsible for an element or task (e.g., the EAF OIC at quality control).","org"],
+  ["CO","Commanding Officer","Approves or disapproves the survey at the group level (MAG CO).","org"],
+  ["CG","Commanding General","Approves or disapproves the survey at the wing level (MAW CG).","org"],
+  ["QC","Quality Control","The review step (EAF OIC / MAW Rep) before a survey is submitted.","org"],
+  ["HN","Host Nation","The nation whose territory the survey is conducted in; a coordination point in planning.","org"],
+  ["CRF","Contingency Response Flight","A USAF rapid-deployment unit that opens and assesses airfields (e.g., the 136th CRF).","org"],
+  ["ATC","Air Traffic Control","Supplemental airspace, frequency, and restriction information gathered during planning.","org"],
+  ["UFC","Unified Facilities Criteria","DoD facility design and criteria documents (e.g., UFC 3-260-01 airfield & heliport design; UFC 3-260-03 evaluation / allowable passes).","pub"],
+  ["ETL","Engineering Technical Letter","Air Force engineering guidance (e.g., ETL 97-9 C-17 semi-prepared ops; ETL 02-19 pavement evaluation).","pub"],
+  ["TSPWG","Tri-Service Pavements Working Group","Issues the manual (TSPWG M 3-260-03.02-19) for airfield pavement evaluation, which superseded ETL 02-19.","pub"],
+  ["DAFMAN","Department of the Air Force Manual","Air Force manual series; DAFMAN 13-217 covers Drop Zone, Landing Zone, and Helicopter Landing Zone Operations.","pub"],
+  ["TM","Technical Manual","Army/joint technical manual series; TM 3-34.48-2 covers theater airfield and heliport design.","pub"],
+  ["NATOPS","Naval Air Training and Operating Procedures Standardization","The source of aircraft type/model/series-specific criteria (glideslopes, gradients, weights).","pub"],
+  ["PCASE","Pavement-Transportation Computer Assisted Structural Engineering","Software used to compute allowable aircraft passes from the controlling CBR.","pub"],
+  ["SAAZA","Survey and Assault Zone Assessment","The discipline and process of surveying assault zones \u2014 ALZ, HLZ, and DZ.","info"],
+  ["MSAAZA","Marine Survey and Assault Zone Assessment (course)","The Marine course (held at Ft. McCoy) that trains the SAAZA process.","info"],
+  ["ZAR","Zone Availability Report","A previously completed survey/report, located via Talon Point during information gathering.","info"],
+  ["T/M/S","Type / Model / Series","An aircraft's designation, which drives the survey criteria (glideslope, gradient, mission weight).","info"],
+  ["Talon Point","Survey repository & routing portal","The web portal (talonpoint.net) where prior surveys/ZARs are found and completed surveys are routed for approval.","info"]
+];
+TERMS.sort(function(a,b){ return a[0].toLowerCase()<b[0].toLowerCase()?-1:1; });
+
+var active="all";
+function catName(c){ for(var i=0;i<CATS.length;i++) if(CATS[i][0]===c) return CATS[i][1]; return c; }
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function renderChips(){
+  document.getElementById("chips").innerHTML=CATS.map(function(c){
+    return '<span class="chip'+(active===c[0]?" on":"")+'" onclick="setCat(\''+c[0]+'\')">'+c[1]+'</span>';
+  }).join("");
+}
+function setCat(c){ active=c; renderChips(); render(); }
+function render(){
+  var q=(document.getElementById("q").value||"").toLowerCase().trim();
+  var rows=TERMS.filter(function(t){
+    if(active!=="all" && t[3]!==active) return false;
+    if(!q) return true;
+    return (t[0]+" "+t[1]+" "+t[2]).toLowerCase().indexOf(q)>=0;
+  });
+  document.getElementById("count").textContent=rows.length+(rows.length===1?" term":" terms");
+  if(!rows.length){ document.getElementById("list").innerHTML='<div class="empty">No matches. Try a different word or tap <b>All</b>.</div>'; return; }
+  document.getElementById("list").innerHTML=rows.map(function(t){
+    return '<div class="entry"><div class="g-top"><span class="g-acr">'+esc(t[0])+'</span><span class="g-term">'+esc(t[1])+'</span><span class="g-cat">'+esc(catName(t[3]))+'</span></div><div class="g-def">'+esc(t[2])+'</div></div>';
+  }).join("");
+}
+renderChips(); render();
+</script>
+</body>
+</html>

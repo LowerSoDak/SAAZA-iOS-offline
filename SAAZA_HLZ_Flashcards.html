@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAAZA HLZ Flashcards</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f4f0;color:#1a1a1a;padding:1rem;min-height:100vh}
+a.back{display:inline-block;font-size:12px;color:#1D9E75;text-decoration:none;margin-bottom:12px}
+h1{font-size:20px;font-weight:600;margin-bottom:2px}
+.sub{font-size:13px;color:#666;margin-bottom:1.25rem}
+.tnav{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.tb{padding:5px 11px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:12px;color:#555}
+.tb.on{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:500}
+.prog{font-size:12px;color:#666;display:flex;justify-content:space-between;margin-bottom:10px}
+.bar{height:4px;background:#e0e0e0;border-radius:2px;margin-bottom:10px;overflow:hidden}
+.fill{height:100%;background:#1D9E75;border-radius:2px;transition:width .3s}
+.card{border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem;min-height:180px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;background:#fff;margin-bottom:10px}
+.card.ans{border-color:#1D9E75}
+.clabel{font-size:11px;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.clabel.g{color:#1D9E75}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:8px;margin-bottom:8px}
+.td{background:#E1F5EE;color:#0F6E56}
+.tp{background:#EEEDFE;color:#3C3489}
+.tg{background:#FAEEDA;color:#633806}
+.tm{background:#E6F1FB;color:#0C447C}
+.ctext{font-size:14px;color:#1a1a1a;line-height:1.6;white-space:pre-line}
+.hint{font-size:12px;color:#aaa;margin-top:10px;text-align:center}
+.brow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.fb{padding:8px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;color:#555}
+.fb.ok{background:#EAF3DE;color:#27500A;border-color:#639922}
+.fb.no{background:#FCEBEB;color:#791F1F;border-color:#E24B4A}
+.nav{display:flex;gap:8px;margin-bottom:1rem}
+.done{background:#f7f7f5;border-radius:12px;padding:1rem;text-align:center;display:none;margin-top:1rem}
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:1.5rem;padding-bottom:1rem}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← Back to all tools</a>
+<h1>Helicopter LZ Flashcards</h1>
+<p class="sub">SAAZA Unit 2.2 — HLZ types, space requirements, gradients, glideslope & Form 4303</p>
+<div class="tnav">
+<button class="tb on" onclick="setT('all',this)">All cards</button>
+<button class="tb" onclick="setT('types',this)">HLZ Types</button>
+<button class="tb" onclick="setT('space',this)">Space requirements</button>
+<button class="tb" onclick="setT('grad',this)">Gradients</button>
+<button class="tb" onclick="setT('glide',this)">Glideslope</button>
+<button class="tb" onclick="setT('form',this)">Form 4303</button>
+</div>
+<div class="bar"><div class="fill" id="fill" style="width:0%"></div></div>
+<div class="prog"><span id="pr">Card 1</span><span id="sc">✓ 0  ✗ 0</span></div>
+<div class="card" id="cf" onclick="flip()">
+<div class="clabel">Question — tap to reveal</div>
+<div class="tag" id="tg"></div>
+<div class="ctext" id="cq"></div>
+<div class="hint">Tap card to see answer</div>
+</div>
+<div class="card ans" id="cb" onclick="flip()" style="display:none">
+<div class="clabel g">Answer — tap to go back</div>
+<div class="ctext" id="ca"></div>
+</div>
+<div class="brow" id="br" style="display:none">
+<button class="fb no" onclick="mark(0)">✗ Missed</button>
+<button class="fb" onclick="mark(2)">→ Skip</button>
+<button class="fb ok" onclick="mark(1)">✓ Got it</button>
+</div>
+<div class="nav">
+<button class="fb" style="flex:1" onclick="go(-1)">← Prev</button>
+<button class="fb" style="flex:1" onclick="shuf()">Shuffle ↺</button>
+<button class="fb" style="flex:1" onclick="go(1)">Next →</button>
+</div>
+<div class="done" id="dn">
+<div style="font-size:15px;font-weight:600;margin-bottom:6px">Deck complete!</div>
+<div style="font-size:13px;color:#666" id="fs"></div>
+<button class="fb" style="margin-top:10px" onclick="restart()">Restart ↺</button>
+</div>
+<div class="footer">SAAZA HLZ Flashcards — 136CRF — works offline, no internet required</div>
+<script>
+var D=[
+{t:'types',q:'What are the two common types of HLZ?',a:'Hasty — located in forward battle areas, requires no construction\nPre-planned — construction limited to what is required for safety/efficiency in adverse weather'},
+{t:'types',q:'What is the survey principle for HLZ size?',a:'Always survey for the MAXIMUM size and/or number of helicopters the area will support'},
+{t:'types',q:'What obstacles are of concern in an HLZ survey?',a:'ALL obstacles within the immediate HLZ area'},
+{t:'types',q:'What should the HLZ survey recommend regarding axes?',a:'Give recommended approach AND departure axis\nList any quadrants that may restrict approach/departure'},
+{t:'space',q:'How is blade clearance spacing determined between multiple helicopters?',a:'Two-rotor blade lengths spacing required for blade clearance between aircraft\nSingle-rotor blade length clearance between each additional helicopter'},
+{t:'space',q:'Single LZ size for AH-1Z, AH-1W, or UH-1Y?',a:'Rotor length: 48\'\nSingle LZ: 100\'×100\' day AND night'},
+{t:'space',q:'Single LZ size for CH-53?',a:'Rotor length: 79\'\nSingle LZ: 100\'×120\' day AND night\nSection: 250\'×270\''},
+{t:'space',q:'Single LZ size for MV-22?',a:'Rotor length: 85\'\nSingle LZ: 100\'×120\' day\nSection: 250\'×270\' day / 310\'×330\' night\nRVL: 200\'×200\' day / 600\'×600\' night'},
+{t:'grad',q:'How is longitudinal gradient direction determined for an HLZ?',a:'From the end of the HLZ where the NOSE of the aircraft will point when landing, to the end where the TAIL will point'},
+{t:'grad',q:'How is transverse gradient direction determined for an HLZ?',a:'From the pilot\'s right to left'},
+{t:'grad',q:'What is the maximum safe landing slope for a helicopter?',a:'7 degrees — avoid slopes exceeding 7°\nAlways avoid landing aircraft downslope on sideslopes'},
+{t:'glide',q:'What is the minimum glideslope for ALL helicopters?',a:'10:1 ratio (5.70°)\nThe landing point should be a distance 10 times as far from the highest obstacle'},
+{t:'glide',q:'How do you calculate a glideslope ratio from an obstacle?',a:'Run ÷ Rise = ratio\nExample: 300\' run ÷ 30\' obstacle = 10:1 ratio'},
+{t:'glide',q:'What does a 7.14:1 glideslope mean?',a:'For every 7.14 feet of horizontal distance there is 1 foot of rise\nIf obstacle is 35\' tall, landing point must be at least 250\' away (35 × 7.14)'},
+{t:'form',q:'What form is used for an HLZ survey?',a:'AF IMT 4303 — Helicopter Landing Zone Form'},
+{t:'form',q:'What goes in Block 6 of AF IMT 4303?',a:'Approach and Departure information — axes, ratios, and any restricted quadrants'},
+{t:'form',q:'What goes in Block 7 of AF IMT 4303?',a:'Coordinates — WGS-84 for GPS derived (almost always)\nLat/long to nearest 1/1000th minute'},
+{t:'form',q:'What goes in Block 8 of AF IMT 4303?',a:'8A/B: LZ Dimensions\n8C: Elevation in feet MSL\n8D: Maximum T/M/S of requesting agency\n8E: Obstructions to approach and departure\n8F: LZ slope from approach angle'},
+{t:'form',q:'What goes in Block 9 of AF IMT 4303?',a:'Describe items from Block 8E and other concerns — obstruction radials, heights, surface conditions'},
+{t:'form',q:'What must the HLZ diagram show?',a:'All obstructions with distances and heights, approach/departure axes, scale, north arrow, and magnetic variation'},
+{t:'form',q:'How are obstructions described on the 4303?',a:'By radial and height\nExample: "45\' palm trees from 310 radial to 035 radial"'},
+];
+var TG={types:'td',space:'tp',grad:'tg',glide:'tm',form:'td'};
+var TL={types:'HLZ Types',space:'Space Requirements',grad:'Gradients',glide:'Glideslope',form:'Form 4303'};
+var deck=[],idx=0,flipped=false,cor=0,wrg=0,topic='all';
+function build(){deck=topic==='all'?D.slice():D.filter(function(c){return c.t===topic;});idx=0;cor=0;wrg=0;show();}
+function setT(t,b){topic=t;document.querySelectorAll('.tb').forEach(function(x){x.classList.remove('on');});b.classList.add('on');build();}
+function show(){
+var done=idx>=deck.length;
+document.getElementById('dn').style.display=done?'block':'none';
+document.getElementById('cf').style.display=done?'none':'flex';
+document.getElementById('cb').style.display='none';
+document.getElementById('br').style.display='none';
+flipped=false;
+if(done){document.getElementById('fs').textContent='✓ '+cor+' correct   ✗ '+wrg+' missed   → '+(deck.length-cor-wrg)+' skipped';return;}
+var c=deck[idx];
+document.getElementById('cq').textContent=c.q;
+document.getElementById('ca').textContent=c.a;
+document.getElementById('tg').textContent=TL[c.t];
+document.getElementById('tg').className='tag '+TG[c.t];
+document.getElementById('pr').textContent='Card '+(idx+1)+' of '+deck.length;
+document.getElementById('sc').textContent='✓ '+cor+'  ✗ '+wrg;
+document.getElementById('fill').style.width=(deck.length>0?Math.round(cor/deck.length*100):0)+'%';
+}
+function flip(){flipped=!flipped;document.getElementById('cf').style.display=flipped?'none':'flex';document.getElementById('cb').style.display=flipped?'flex':'none';document.getElementById('br').style.display=flipped?'grid':'none';}
+function mark(r){if(r===1)cor++;else if(r===0)wrg++;idx++;show();}
+function go(d){var n=idx+d;if(n>=0&&n<deck.length){idx=n;flipped=false;show();}}
+function shuf(){for(var i=deck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=deck[i];deck[i]=deck[j];deck[j]=tmp;}idx=0;cor=0;wrg=0;show();}
+function restart(){idx=0;cor=0;wrg=0;document.getElementById('dn').style.display='none';show();}
+build();
+</script>
+</body>
+</html>
