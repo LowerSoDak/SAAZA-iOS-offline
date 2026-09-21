@@ -1,4 +1,11 @@
-# SAAZA Study Tools
+Original app design and documentation noted below.
+
+## Updates and bug fixes by J. Stokes *270th Contingency Response Squadron* to make field functional application
+After real world use in the field functionality was patched for DCP Calculator functions to include exported data with graph and additional information fields to make a more complete data set for creating post survey and assessment reports
+
+LIVE SITE from J.Stokes (https://lowersodak.github.io/SAAZA-iOS-offline/)
+
+## SAAZA Study Tools
 
 Live site: **https://rcarney94.github.io/saaza-calculator**
 
