@@ -1,5 +1,5 @@
 
-const CACHE_NAME='saaza-v1';
+const CACHE_NAME='saaza-v18';
 const URLS=[
   "./SAAZA_DCP_Layout.html",
   "./SAAZA_SPACI_Calculator.html",
@@ -45,7 +45,7 @@ self.addEventListener('install',e=>{
  self.skipWaiting();
 });
 self.addEventListener('activate',e=>{
- e.waitUntil(self.clients.claim());
+ e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE_NAME).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));
 });
 self.addEventListener('fetch',e=>{
  e.respondWith(

@@ -41,7 +41,14 @@ table.dt .del{color:#c44;cursor:pointer;font-weight:700;text-align:center;font-f
 .add-row{display:flex;gap:6px;align-items:flex-end;margin-top:8px;flex-wrap:wrap}
 .add-row>div{flex:1;min-width:70px}
 .add-row .mini-label{font-size:10px;color:#888;margin-bottom:3px;display:block}
-.graph-wrap{margin-top:10px;background:#000;border-radius:10px;padding:8px;overflow-x:auto}
+.graph-wrap{margin-top:10px;background:#fff;border:1px solid #d7d7d7;border-radius:10px;padding:8px;overflow-x:auto}
+.break-suggestions{background:#FFF7E6;border:1px solid #ead39a;border-radius:9px;padding:10px 11px;margin:8px 0 10px}
+.break-suggestions .st{font-size:12px;font-weight:700;color:#6d5200;margin-bottom:3px}
+.break-suggestions .sd{font-size:10.5px;color:#7a650f;line-height:1.4;margin-bottom:7px}
+.suggestion-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;border-top:1px solid #ecdcae;padding:7px 0}
+.suggestion-row:first-of-type{border-top:0}
+.suggestion-info{flex:1;min-width:170px;font-size:11.5px;color:#554400}.suggestion-info b{font-family:"Courier New",monospace}
+.suggestion-row button{padding:5px 8px;border:1px solid #c9aa4d;border-radius:6px;background:#fff;cursor:pointer;font-size:11px;color:#5d4a00}
 .layer-card{border:1px solid #e0e0e0;border-radius:9px;padding:9px 11px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
 .layer-card.ctrl{border-color:#D8403E;background:#FCEBEB}
 .layer-info{font-size:13px}.layer-info .lt{font-size:11px;color:#888}
@@ -77,6 +84,14 @@ table.dt .del{color:#c44;cursor:pointer;font-weight:700;text-align:center;font-f
 #printSheet th,#printSheet td{border:1px solid #000;padding:3px 4px;text-align:center}
 #printSheet .hdr{font-weight:bold;font-size:13px;text-align:center;padding:6px}
 #printSheet .hrow td{text-align:left;font-weight:bold}
+#printSheet .print-page{break-before:page;page-break-before:always}
+#printSheet .print-cover{min-height:90vh;padding-top:28px}
+#printSheet .print-cover .cover-title{text-align:center;font-size:22px;font-weight:bold;margin:20px 0 6px}
+#printSheet .print-cover .cover-sub{text-align:center;font-size:12px;margin-bottom:28px}
+#printSheet .print-footer{font-size:9px;margin-top:8px}
+#printSheet tr.controlling-layer td{background:#d9d9d9!important;font-weight:bold;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#printSheet .print-graph{margin:10px auto 0;max-width:680px;break-inside:avoid;page-break-inside:avoid}
+#printSheet .print-graph svg{display:block;width:100%;height:auto}
 </style>
 </head>
 <body>
@@ -93,8 +108,19 @@ Enter penetration readings (blows + depth) and this computes the <b>DCP index &r
 <div class="row3">
 <div><span class="seg-label" style="margin-top:0">Base</span><input class="fld" id="s-base" placeholder="Base / site" oninput="saveSurvey()"/></div>
 <div><span class="seg-label" style="margin-top:0">Feature / Runway</span><input class="fld" id="s-feature" placeholder="e.g. RWY 18" oninput="saveSurvey()"/></div>
+<div><span class="seg-label" style="margin-top:0">Date</span><input class="fld" id="s-date" placeholder="DD MMM YYYY" oninput="saveSurvey()"/></div>
 </div>
-<div style="margin-top:8px"><span class="seg-label" style="margin-top:0">Date</span><input class="fld" id="s-date" placeholder="DD MMM YYYY" oninput="saveSurvey()"/></div>
+<div class="row3" style="margin-top:8px">
+<div style="flex:2"><span class="seg-label" style="margin-top:0">Survey Team Lead</span><input class="fld" id="s-team-lead" placeholder="Name / rank" oninput="saveSurvey()"/></div>
+</div>
+<span class="seg-label">Team Members (up to 5)</span>
+<div class="row3">
+<div><input class="fld" id="s-member-1" placeholder="Team member 1" oninput="saveSurvey()"/></div>
+<div><input class="fld" id="s-member-2" placeholder="Team member 2" oninput="saveSurvey()"/></div>
+<div><input class="fld" id="s-member-3" placeholder="Team member 3" oninput="saveSurvey()"/></div>
+<div><input class="fld" id="s-member-4" placeholder="Team member 4" oninput="saveSurvey()"/></div>
+<div><input class="fld" id="s-member-5" placeholder="Team member 5" oninput="saveSurvey()"/></div>
+</div>
 </div>
 
 <div class="card no-print">
@@ -126,8 +152,13 @@ Enter penetration readings (blows + depth) and this computes the <b>DCP index &r
 <option value="std">Standard (Table 2-3)</option>
 <option value="chcl">CH / CL clay (2-4)</option>
 </select></div>
-<div><span class="seg-label" style="margin-top:0">Depth unit</span>
+<div><span class="seg-label" style="margin-top:0">Entry depth unit</span>
 <select class="fld" id="h-unit" onchange="saveHoleMeta();recompute()">
+<option value="in">inches</option>
+<option value="mm">mm</option>
+</select></div>
+<div><span class="seg-label" style="margin-top:0">Display / export unit</span>
+<select class="fld" id="h-display-unit" onchange="saveHoleMeta();recompute()">
 <option value="in">inches</option>
 <option value="mm">mm</option>
 </select></div>
@@ -139,6 +170,10 @@ Enter penetration readings (blows + depth) and this computes the <b>DCP index &r
 <div id="pen-mode">
 <div class="card no-print">
 <div class="card-title">Penetration readings</div>
+<div class="row3" style="margin-bottom:10px">
+<div><span class="seg-label" style="margin-top:0">Pavement thickness (<span class="unit-lbl">in</span>)</span><input class="fld" id="h-pavement-thickness" type="number" inputmode="decimal" min="0" step="0.1" placeholder="e.g. 6.2" oninput="saveHoleMeta();recompute()"/></div>
+<div><span class="seg-label" style="margin-top:0">Pavement type</span><select class="fld" id="h-pavement-type" onchange="saveHoleMeta();recompute()"><option value="">Select type</option><option value="Rigid">Rigid</option><option value="Flexible">Flexible</option></select></div>
+</div>
 <div style="font-size:11.5px;color:#888;line-height:1.5;margin-bottom:4px">Each row = blows in that set + the <b>cumulative</b> depth reached after that set.</div>
 <table class="dt" id="readings-table"><tbody></tbody></table>
 <div class="add-row">
@@ -152,7 +187,8 @@ Enter penetration readings (blows + depth) and this computes the <b>DCP index &r
 <div class="card-title">Depth vs CBR profile</div>
 <div class="graph-wrap" id="graph"></div>
 <div class="card-title" style="margin-top:14px">Layers</div>
-<div style="font-size:11.5px;color:#888;line-height:1.5;margin-bottom:6px">Add a layer break at the depth (in display units) where the soil changes. Each layer's CBR is computed from its aggregate penetration and blows.</div>
+<div style="font-size:11.5px;color:#888;line-height:1.5;margin-bottom:6px">Add a layer break at the cumulative depth (in the entry units) where the soil changes. Each layer's CBR is computed from its aggregate penetration and blows.</div>
+<div id="break-suggestions"></div>
 <div class="add-row">
 <div><span class="mini-label">Layer break at depth (<span class="unit-lbl">in</span>)</span><input class="fld" id="add-break" type="number" inputmode="decimal" placeholder="0.0"/></div>
 <div style="flex:0 0 auto"><button class="btn btn-grn" onclick="addBreak()" style="padding:9px 14px">Add break</button></div>
@@ -170,7 +206,7 @@ Enter penetration readings (blows + depth) and this computes the <b>DCP index &r
 <table class="dt" id="layers-table"><tbody></tbody></table>
 <div class="add-row">
 <div><span class="mini-label">Thickness (in)</span><input class="fld" id="ly-thk" type="number" inputmode="decimal" placeholder="0.0"/></div>
-<div><span class="mini-label">CBR %</span><input class="fld" id="ly-cbr" type="number" inputmode="numeric" placeholder="0"/></div>
+<div><span class="mini-label">CBR</span><input class="fld" id="ly-cbr" type="number" inputmode="numeric" placeholder="0"/></div>
 </div>
 <div class="add-row">
 <div><span class="mini-label">Layer type</span>
@@ -192,10 +228,11 @@ Enter penetration readings (blows + depth) and this computes the <b>DCP index &r
 <!-- EXPORT -->
 <div class="card no-print">
 <div class="card-title">Export &amp; transfer</div>
-<div class="btn-row"><button class="btn" onclick="printSheet()">🖨 DCP Data Sheet (Fig 2-13)</button></div>
-<div class="btn-row"><button class="btn" onclick="exportData()">⬇ Export data file</button><button class="btn" onclick="document.getElementById('import-file').click()">⬆ Import data file</button></div>
-<input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)"/>
-<div class="hint">The data file carries the whole survey (all holes) for transfer between your devices. The DCP Data Sheet prints/saves as PDF in the official format.</div>
+<div class="btn-row"><button class="btn" onclick="printSheet()">🖨 Current hole PDF</button><button class="btn" onclick="printSurvey()">🖨 Complete survey PDF</button></div>
+<div class="btn-row"><button class="btn" onclick="exportData('json')">⬇ Export JSON data</button><button class="btn" onclick="exportData('txt')">⬇ Export text backup</button></div>
+<div class="btn-row"><button class="btn" onclick="document.getElementById('import-file').click()">⬆ Import JSON or text data</button></div>
+<input type="file" id="import-file" accept=".json,.txt,application/json,text/plain" style="display:none" onchange="importData(event)"/>
+<div class="hint">JSON and text backups contain the same complete survey and can both be imported on another device. Export either the selected hole or every hole as a single PDF report.</div>
 <div class="btn-row" style="margin-top:14px"><button class="btn danger" onclick="clearAll()">↺ Clear entire survey</button></div>
 <div class="saved-tag">Saves automatically on this device &middot; only clears when you choose</div>
 </div>
@@ -217,19 +254,48 @@ Enter penetration readings (blows + depth) and this computes the <b>DCP index &r
 
 <script>
 var KEY="saaza_dcp_v1";
-var st={survey:{base:"",feature:"",date:""},holes:[],active:0};
+var st={survey:{base:"",feature:"",date:"",teamLead:"",teamMembers:["","","","",""],pavementThickness:"",pavementType:""},holes:[],active:0};
 
-function newHole(label){return {label:label||String(st.holes.length+1),comment:"",mode:"pen",hammer:"1",soil:"std",unit:"in",readings:[],breaks:[],layers:[]};}
+function newHole(label){return {label:label||String(st.holes.length+1),comment:"",mode:"pen",hammer:"1",soil:"std",unit:"in",displayUnit:"in",pavementThickness:"",pavementType:"",readings:[],breaks:[],dismissedBreaks:[],layers:[]};}
 function load(){try{var s=localStorage.getItem(KEY);if(s)st=JSON.parse(s);}catch(e){}
- if(!st.holes||!st.holes.length){st.holes=[newHole("1")];st.active=0;}}
+ ensureSurveyDefaults();
+ if(!st.holes||!st.holes.length){st.holes=[newHole("1")];st.active=0;}
+ st.holes.forEach(ensureHoleDefaults);}
+function ensureSurveyDefaults(){
+ if(!st.survey)st.survey={};
+ if(!Array.isArray(st.survey.teamMembers))st.survey.teamMembers=[];
+ while(st.survey.teamMembers.length<5)st.survey.teamMembers.push("");
+ st.survey.teamMembers=st.survey.teamMembers.slice(0,5);
+}
+function ensureHoleDefaults(h){
+ if(!h||typeof h!=="object")throw new Error("Invalid hole record.");
+ if(!h.label)h.label=String(st.holes.indexOf(h)+1);
+ if(!h.mode)h.mode="pen";
+ if(!h.hammer)h.hammer="1";
+ if(!h.soil)h.soil="std";
+ if(h.unit!=="mm"&&h.unit!=="in")h.unit="in";
+ if(h.displayUnit!=="mm"&&h.displayUnit!=="in")h.displayUnit=h.unit;
+ if(!Array.isArray(h.readings))h.readings=[];
+ if(!Array.isArray(h.breaks))h.breaks=[];
+ if(!Array.isArray(h.layers))h.layers=[];
+ if(h.pavementThickness===undefined||h.pavementThickness==="")h.pavementThickness=st.survey.pavementThickness||"";
+ if(h.pavementType===undefined||h.pavementType==="")h.pavementType=st.survey.pavementType||"";
+ if(h.readings&&h.readings.length&&parseFloat(h.readings[0].blows)===0&&parseFloat(h.readings[0].depth)>0){h.pavementThickness=h.readings[0].depth;h.readings.shift();}
+ if(!Array.isArray(h.dismissedBreaks))h.dismissedBreaks=[];
+}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){document.querySelector(".saved-tag").textContent="(Saving works once hosted online)";}}
 function H(){return st.holes[st.active];}
 
-function saveSurvey(){st.survey.base=val("s-base");st.survey.feature=val("s-feature");st.survey.date=val("s-date");save();}
+function saveSurvey(){
+ st.survey.base=val("s-base");st.survey.feature=val("s-feature");st.survey.date=val("s-date");
+ st.survey.teamLead=val("s-team-lead");
+ st.survey.teamMembers=[];for(var i=1;i<=5;i++)st.survey.teamMembers.push(val("s-member-"+i));
+ save();
+}
 function val(id){return document.getElementById(id).value;}
 
 function saveHoleMeta(){var h=H();h.label=val("h-label")||h.label;h.comment=val("h-comment");
- h.hammer=val("h-hammer");h.soil=val("h-soil");h.unit=val("h-unit");save();buildHoleBar();syncUnitLabels();}
+ h.hammer=val("h-hammer");h.soil=val("h-soil");h.unit=val("h-unit");h.displayUnit=val("h-display-unit");h.pavementThickness=val("h-pavement-thickness");h.pavementType=val("h-pavement-type");save();buildHoleBar();syncUnitLabels();}
 
 function syncUnitLabels(){var u=H().unit;document.querySelectorAll(".unit-lbl").forEach(function(e){e.textContent=u;});}
 
@@ -257,12 +323,14 @@ function cbrFromDPImm(dpi){
  return 292/Math.pow(dpi,1.12);
 }
 function rnd(v){return v>=10?Math.round(v):Math.round(v*10)/10;}
+function convertDepth(v,fromUnit,toUnit){if(fromUnit===toUnit)return v;return fromUnit==="in"?v*25.4:v/25.4;}
 
 // compute intervals from readings (cumulative depth)
 function intervals(){
- var h=H(),out=[],prev=0,toMM=(h.unit==="in"?25.4:1),hf=parseFloat(h.hammer);
+ var h=H(),out=[],prev=parseFloat(h.pavementThickness)||0,toMM=(h.unit==="in"?25.4:1),hf=parseFloat(h.hammer);
  h.readings.forEach(function(r){
   var blows=parseFloat(r.blows)||0, cum=parseFloat(r.depth)||0;
+  if(blows<=0){if(cum>prev)prev=cum;return;}
   var penU=cum-prev; var penMM=penU*toMM;
   var ppb = blows>0 ? penMM/blows : 0;
   var dpi = ppb*hf;
@@ -276,6 +344,8 @@ function intervals(){
 function addReading(){
  var b=document.getElementById("add-blows").value, d=document.getElementById("add-depth").value;
  if(b===""||d===""){alert("Enter blows and cumulative depth.");return;}
+ var h=H(),depth=parseFloat(d),base=h.readings.length?parseFloat(h.readings[h.readings.length-1].depth):(parseFloat(h.pavementThickness)||0);
+ if(!isFinite(depth)||depth<=base){alert("Cumulative depth must be greater than the pavement thickness and the previous reading ("+base+" "+h.unit+").");return;}
  H().readings.push({blows:b,depth:d});
  document.getElementById("add-blows").value="";document.getElementById("add-depth").value="";
  save();recompute();
@@ -285,16 +355,45 @@ function delReading(i){H().readings.splice(i,1);save();recompute();}
 function addBreak(){
  var v=document.getElementById("add-break").value;
  if(v==="")return;
- H().breaks.push(parseFloat(v));H().breaks.sort(function(a,b){return a-b;});
+ insertBreak(parseFloat(v));
  document.getElementById("add-break").value="";save();recompute();
 }
 function delBreak(i){H().breaks.splice(i,1);save();recompute();}
+function insertBreak(v){var h=H(),tol=h.unit==="in"?.05:1;if(!isFinite(v)||v<=0)return;if(!h.breaks.some(function(b){return Math.abs(b-v)<=tol;})){h.breaks.push(v);h.breaks.sort(function(a,b){return a-b;});}}
+function median(nums){if(!nums.length)return 0;var a=nums.slice().sort(function(x,y){return x-y;}),m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2;}
+function suggestedBreaks(ivs){
+ var h=H(),valid=ivs.filter(function(iv){return iv.blows>0&&iv.dpi>0;}),out=[],candidates=[];
+ for(var i=1;i<valid.length;i++){
+  var before=median(valid.slice(Math.max(0,i-3),i).map(function(iv){return iv.dpi;}));
+  var after=median(valid.slice(i,Math.min(valid.length,i+3)).map(function(iv){return iv.dpi;}));
+  var immediate=Math.max(valid[i-1].dpi,valid[i].dpi)/Math.min(valid[i-1].dpi,valid[i].dpi);
+  var sustained=Math.max(before,after)/Math.max(.001,Math.min(before,after));
+  if(immediate>=2&&sustained>=1.8&&Math.abs(before-after)>=1.5)candidates.push({depth:valid[i].topU,score:immediate*sustained,reason:"Abrupt, sustained DCP Index change ("+before.toFixed(1)+" to "+after.toFixed(1)+" mm/blow)"});
+ }
+ var spacing=h.unit==="in"?1.5:40;
+ candidates.sort(function(a,b){return b.score-a.score;}).forEach(function(c){if(out.length<4&&!out.some(function(o){return Math.abs(o.depth-c.depth)<spacing;}))out.push(c);});
+ out.sort(function(a,b){return a.depth-b.depth;});return out;
+}
+function breakKey(v){return Number(v).toFixed(3);}
+function addSuggestedBreak(v){insertBreak(v);H().dismissedBreaks=(H().dismissedBreaks||[]).filter(function(k){return k!==breakKey(v);});save();recompute();}
+function dismissSuggestedBreak(v){var h=H();if(!Array.isArray(h.dismissedBreaks))h.dismissedBreaks=[];if(h.dismissedBreaks.indexOf(breakKey(v))<0)h.dismissedBreaks.push(breakKey(v));save();recompute();}
+function addAllSuggestedBreaks(){suggestedBreaks(intervals()).forEach(function(s){addSuggestedBreak(s.depth);});}
+function renderBreakSuggestions(ivs){
+ var h=H(),tol=h.unit==="in"?.05:1,dismissed=h.dismissedBreaks||[];
+ var recs=suggestedBreaks(ivs).filter(function(r){return !h.breaks.some(function(b){return Math.abs(b-r.depth)<=tol;})&&dismissed.indexOf(breakKey(r.depth))<0;});
+ var el=document.getElementById("break-suggestions");if(!recs.length){el.innerHTML="";return;}
+ var html='<div class="break-suggestions"><div class="st">Recommended layer breaks</div><div class="sd">Based on changes in the DCP Index profile. Review each recommendation; none are added automatically.</div>';
+ recs.forEach(function(r){html+='<div class="suggestion-row"><div class="suggestion-info"><b>'+r.depth.toFixed(h.unit==="in"?1:0)+' '+h.unit+'</b><br>'+r.reason+'</div><button onclick="addSuggestedBreak('+r.depth+')">Add break</button><button onclick="dismissSuggestedBreak('+r.depth+')">Ignore</button></div>';});
+ if(recs.length>1)html+='<button class="btn" onclick="addAllSuggestedBreaks()" style="margin-top:5px;padding:6px 9px">Add all recommendations</button>';
+ el.innerHTML=html+'</div>';
+}
 
 // layer aggregation from breaks (assign interval by bottom depth)
 function layersFromBreaks(){
  var h=H(),ivs=intervals();if(!ivs.length)return [];
  var maxD=ivs[ivs.length-1].botU;
- var bounds=[0].concat(h.breaks.filter(function(b){return b>0&&b<maxD;})).concat([maxD]);
+ var startD=parseFloat(h.pavementThickness)||ivs[0].topU||0;
+ var bounds=[startD].concat(h.breaks.filter(function(b){return b>startD&&b<maxD;})).concat([maxD]);
  bounds.sort(function(a,b){return a-b;});
  var layers=[];
  for(var k=0;k<bounds.length-1;k++){
@@ -317,9 +416,11 @@ function recompute(){
  // readings table
  var ivs=intervals();
  var tb=document.querySelector("#readings-table tbody");
- if(!ivs.length){tb.innerHTML='<tr><td colspan="5" class="empty">No readings yet</td></tr>';}
+ var pavement=parseFloat(h.pavementThickness)||0;
+ if(!ivs.length&&pavement<=0){tb.innerHTML='<tr><td colspan="5" class="empty">No readings yet</td></tr>';}
  else{
   var rows='<tr><th>Blows</th><th>Cum '+h.unit+'</th><th>DCP idx</th><th>CBR</th><th></th></tr>';
+  if(pavement>0)rows+='<tr style="background:#f6f6f6"><td style="text-align:left;font-family:inherit">Pavement</td><td>'+pavement+'</td><td>&ndash;</td><td>&ndash;</td><td></td></tr>';
   ivs.forEach(function(iv,i){
    rows+='<tr><td style="text-align:right">'+iv.blows+'</td><td>'+iv.cumU+'</td><td>'+(iv.dpi?iv.dpi.toFixed(1):"-")+'</td><td><b>'+(iv.cbr?rnd(iv.cbr):"-")+'</b></td><td class="del" onclick="delReading('+i+')">&times;</td></tr>';
   });
@@ -329,6 +430,7 @@ function recompute(){
  document.getElementById("profile-card").style.display = ivs.length? "block":"none";
  if(ivs.length){
   document.getElementById("graph").innerHTML=renderGraph(ivs,h.breaks);
+  renderBreakSuggestions(ivs);
   // breaks list
   var bl="";
   h.breaks.forEach(function(b,i){bl+='<span style="display:inline-block;background:#FCEBEB;border:1px solid #e8b3b3;border-radius:6px;padding:3px 9px;margin:2px;font-size:12px">'+b+' '+h.unit+' <span style="color:#c44;cursor:pointer;font-weight:700" onclick="delBreak('+i+')">&times;</span></span>';});
@@ -350,34 +452,39 @@ function recompute(){
 
 function renderGraph(ivs,breaks){
  var h=H();
- var W=680,Hh=Math.max(300,40+ivs[ivs.length-1].botU*(h.unit==="in"?7:0.28)+30);
+ var graphUnit=h.displayUnit||h.unit;
+ function GD(d){return convertDepth(d,h.unit,graphUnit);}
+ var rawMaxD=GD(ivs[ivs.length-1].botU);if(rawMaxD<=0)rawMaxD=1;
+ var depthMajor=graphUnit==="in"?5:100,depthMinor=graphUnit==="in"?1:20;
+ var maxD=Math.ceil(rawMaxD/depthMajor)*depthMajor;
+ var W=680,Hh=Math.max(300,40+maxD*(graphUnit==="in"?7:0.28)+30);
  if(Hh>620)Hh=620;
- var mL=46,mT=38,mR=14,mB=14;
+ var mL=54,mT=38,mR=20,mB=18;
  var pW=W-mL-mR,pH=Hh-mT-mB;
- var maxD=ivs[ivs.length-1].botU;if(maxD<=0)maxD=1;
- function X(c){return mL+Math.min(c,100)/100*pW;}
+ function X(c){var clipped=Math.max(1,Math.min(c,100));return mL+(Math.log(clipped)/Math.LN10)/2*pW;}
  function Y(d){return mT+d/maxD*pH;}
- var s='<svg viewBox="0 0 '+W+' '+Hh+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:340px;display:block">';
- // grid + CBR axis (top)
- s+='<text x="'+(mL+pW/2)+'" y="14" fill="#bbb" font-size="12" text-anchor="middle">CBR, %</text>';
- for(var c=0;c<=100;c+=10){var x=X(c);s+='<line x1="'+x+'" y1="'+mT+'" x2="'+x+'" y2="'+(mT+pH)+'" stroke="#222" stroke-width="1"/>';s+='<text x="'+x+'" y="'+(mT-4)+'" fill="#999" font-size="10" text-anchor="middle">'+c+'</text>';}
- // depth axis ticks
- s+='<text x="12" y="'+(mT+pH/2)+'" fill="#bbb" font-size="11" text-anchor="middle" transform="rotate(-90 12 '+(mT+pH/2)+')">Depth, '+h.unit+'</text>';
- var step=maxD<=12?2:(maxD<=40?5:10);
- for(var d=0;d<=maxD;d+=step){var y=Y(d);s+='<line x1="'+mL+'" y1="'+y+'" x2="'+(mL+pW)+'" y2="'+y+'" stroke="#1a1a1a" stroke-width="1"/>';s+='<text x="'+(mL-4)+'" y="'+(y+3)+'" fill="#999" font-size="10" text-anchor="end">'+d+'</text>';}
- s+='<rect x="'+mL+'" y="'+mT+'" width="'+pW+'" height="'+pH+'" fill="none" stroke="#444" stroke-width="1"/>';
- // CBR step profile (yellow)
- var pts="";
- ivs.forEach(function(iv){
-  if(!iv.cbr)return;
-  var x=X(iv.cbr);
-  pts+='<line x1="'+x+'" y1="'+Y(iv.topU)+'" x2="'+x+'" y2="'+Y(iv.botU)+'" stroke="#FFD400" stroke-width="2.5"/>';
- });
- // connectors
- for(var i=1;i<ivs.length;i++){if(!ivs[i].cbr||!ivs[i-1].cbr)continue;pts+='<line x1="'+X(ivs[i-1].cbr)+'" y1="'+Y(ivs[i-1].botU)+'" x2="'+X(ivs[i].cbr)+'" y2="'+Y(ivs[i].botU)+'" stroke="#FFD400" stroke-width="2.5"/>';}
- s+=pts;
- // layer breaks (red)
- breaks.forEach(function(b){if(b>0&&b<maxD){var y=Y(b);s+='<line x1="'+mL+'" y1="'+y+'" x2="'+(mL+pW)+'" y2="'+y+'" stroke="#E0403E" stroke-width="2"/>';}});
+ var s='<svg viewBox="0 0 '+W+' '+Hh+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:340px;display:block;background:#fff">';
+ s+='<rect width="'+W+'" height="'+Hh+'" fill="#fff"/>';
+ // Logarithmic CBR axis matching the pavement-evaluation graph, capped at 100.
+ s+='<text x="'+(mL+pW/2)+'" y="14" fill="#000" font-size="12" text-anchor="middle">CBR</text>';
+ [1,10].forEach(function(base){for(var mult=1;mult<=9;mult++){var c=base*mult,x=X(c),major=mult===1;s+='<line x1="'+x+'" y1="'+mT+'" x2="'+x+'" y2="'+(mT+pH)+'" stroke="'+(major?'#777':'#c7c7c7')+'" stroke-width="'+(major?'1':'0.65')+'"/>';s+='<line x1="'+x+'" y1="'+mT+'" x2="'+x+'" y2="'+(mT-(major?6:3))+'" stroke="#000" stroke-width="1"/>';if(major)s+='<text x="'+x+'" y="'+(mT-9)+'" fill="#000" font-size="10" font-weight="700" text-anchor="middle">'+c+'</text>';}});
+ var x100=X(100);s+='<line x1="'+x100+'" y1="'+mT+'" x2="'+x100+'" y2="'+(mT+pH)+'" stroke="#777" stroke-width="1"/>';s+='<line x1="'+x100+'" y1="'+mT+'" x2="'+x100+'" y2="'+(mT-6)+'" stroke="#000" stroke-width="1"/>';s+='<text x="'+x100+'" y="'+(mT-9)+'" fill="#000" font-size="10" font-weight="700" text-anchor="middle">100</text>';
+ // Selected depth unit only: minor marks throughout and labeled major intervals.
+ s+='<text x="12" y="'+(mT+pH/2)+'" fill="#000" font-size="11" text-anchor="middle" transform="rotate(-90 12 '+(mT+pH/2)+')">Depth, '+graphUnit+'</text>';
+ for(var d=0;d<=maxD+.001;d+=depthMinor){
+  var y=Y(d),dMajor=Math.abs(d/depthMajor-Math.round(d/depthMajor))<.001;
+  if(dMajor){s+='<line x1="'+mL+'" y1="'+y+'" x2="'+(mL+pW)+'" y2="'+y+'" stroke="#c7c7c7" stroke-width="0.7"/>';}
+  s+='<line x1="'+(mL-(dMajor?6:3))+'" y1="'+y+'" x2="'+mL+'" y2="'+y+'" stroke="#000" stroke-width="1"/>';
+  s+='<line x1="'+(mL+pW)+'" y1="'+y+'" x2="'+(mL+pW+(dMajor?6:3))+'" y2="'+y+'" stroke="#000" stroke-width="1"/>';
+  if(dMajor)s+='<text x="'+(mL-9)+'" y="'+(y+3)+'" fill="#000" font-size="10" text-anchor="end">'+d+'</text>';
+ }
+ s+='<rect x="'+mL+'" y="'+mT+'" width="'+pW+'" height="'+pH+'" fill="none" stroke="#000" stroke-width="1.3"/>';
+ // Connect calculated values in entry order, then keep a clean dot visible at each point.
+ var plotPts=[];ivs.forEach(function(iv){if(iv.cbr)plotPts.push(X(iv.cbr)+','+Y(GD(iv.botU)));});
+ if(plotPts.length>1)s+='<polyline points="'+plotPts.join(' ')+'" fill="none" stroke="#000" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>';
+ ivs.forEach(function(iv){if(iv.cbr)s+='<circle cx="'+X(iv.cbr)+'" cy="'+Y(GD(iv.botU))+'" r="3.4" fill="#000"/>';});
+ // Layer breaks remain distinguishable on a monochrome printer by using a dash pattern.
+ breaks.forEach(function(b){var bd=GD(b);if(bd>0&&bd<maxD){var y=Y(bd);s+='<line x1="'+mL+'" y1="'+y+'" x2="'+(mL+pW)+'" y2="'+y+'" stroke="#000" stroke-width="1.4" stroke-dasharray="7 5"/>';}});
  s+='</svg>';
  return s;
 }
@@ -404,39 +511,109 @@ function recomputeLayers(){
 }
 
 // ---- export ----
-function exportData(){
- var blob=new Blob([JSON.stringify(st,null,2)],{type:"application/json"});
- var a=document.createElement("a");a.href=URL.createObjectURL(blob);
- a.download="DCP_survey_"+(st.survey.feature||"data").replace(/[^a-z0-9]/gi,"_")+".json";
- document.body.appendChild(a);a.click();document.body.removeChild(a);
+function exportBaseName(allHoles){
+ var h=H();
+ function clean(v,fallback){var s=(v||"").trim().replace(/[^a-z0-9]+/gi,"_").replace(/^_+|_+$/g,"");return s||fallback;}
+ function cleanDate(v){var s=(v||"").trim().replace(/[^0-9-]+/g,"_").replace(/^_+|_+$/g,"");return s||"Undated";}
+ if(allHoles)return clean(st.survey.base,"Base")+"_Complete_Survey_"+cleanDate(st.survey.date);
+ return clean(st.survey.base,"Base")+"_"+clean(st.survey.feature,"Feature")+"_Hole_"+clean(h.label,"1")+"_"+cleanDate(st.survey.date);
+}
+function exportData(fileType){
+ fileType=fileType==="txt"?"txt":"json";
+ var json="",fileName=exportBaseName(true)+"."+fileType;
+ try{json=JSON.stringify(st,null,2);}catch(err){alert("The survey data could not be prepared for export.");return;}
+ if(!json||json.length<3){alert("The survey export is empty. No file was downloaded.");return;}
+ var mime=fileType==="txt"?"text/plain;charset=utf-8":"application/json;charset=utf-8";
+ var blob=new Blob([json],{type:mime});
+ if(!blob.size){alert("The survey export is empty. No file was downloaded.");return;}
+ var url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download=fileName;a.style.display="none";
+ document.body.appendChild(a);a.click();
+ var sizeText=blob.size<1024?blob.size+" bytes":(blob.size/1024).toFixed(1)+" KB";
+ document.querySelector(".saved-tag").textContent="Export prepared: "+fileName+" ("+sizeText+"). Verify this size in Downloads.";
+ setTimeout(function(){URL.revokeObjectURL(url);if(a.parentNode)a.parentNode.removeChild(a);},5000);
 }
 function importData(e){
- var f=e.target.files[0];if(!f)return;
+ var input=e.target,f=input.files[0];if(!f)return;
+ if(f.size===0){alert("The selected data file is empty (0 bytes). Export it again and verify its file size before importing.");input.value="";return;}
  var r=new FileReader();
- r.onload=function(){try{var d=JSON.parse(r.result);if(d.holes){st=d;if(!st.active||st.active>=st.holes.length)st.active=0;save();renderAll();alert("Survey imported.");}else alert("Not a valid DCP survey file.");}catch(err){alert("Could not read file.");}};
- r.readAsText(f);e.target.value="";
+ r.onerror=function(){alert("The selected file could not be opened by this browser.");input.value="";};
+ r.onload=function(){
+  var d;
+  try{d=JSON.parse(r.result);}catch(err){alert("The selected file does not contain valid JSON data.");input.value="";return;}
+  if(!d||!Array.isArray(d.holes)||!d.holes.length){alert("This is not a valid DCP survey file: no test holes were found.");input.value="";return;}
+  var previous=st;
+  try{
+   st=d;ensureSurveyDefaults();st.holes.forEach(ensureHoleDefaults);
+   if(!Number.isInteger(st.active)||st.active<0||st.active>=st.holes.length)st.active=0;
+   renderAll();save();
+   alert("Survey imported successfully: "+st.holes.length+" hole"+(st.holes.length===1?"":"s")+" loaded.");
+  }catch(err){st=previous;renderAll();alert("The survey file was read, but its data format is not compatible with this version of the calculator.");}
+  input.value="";
+ };
+ r.readAsText(f);
 }
 
-function printSheet(){
+function buildHolePrint(holeIndex,forceNewPage){
+ st.active=holeIndex;
  var h=H(),ivs=intervals();
- var head='<div class="hdr">DCP DATA SHEET</div><table><tr class="hrow"><td colspan="2">BASE: '+esc(st.survey.base)+'</td><td colspan="3">FEATURE: '+esc(st.survey.feature)+'</td><td colspan="3">DATE: '+esc(st.survey.date)+'</td></tr><tr class="hrow"><td colspan="8">TEST / HOLE: '+esc(h.label)+(h.comment?(" \u2014 "+esc(h.comment)):"")+'</td></tr></table>';
- var t='<table><tr><th>No of Blows</th><th>Accum Pen (mm)</th><th>Pen p/Blow Set (mm)</th><th>Pen per Blow (mm)</th><th>Hammer Factor</th><th>DCP Index</th><th>CBR %</th><th>Depth (in)</th></tr>';
+ var outUnit=h.displayUnit||h.unit;
+ var members=st.survey.teamMembers.filter(function(name){return name&&name.trim();}).map(esc).join(', ');
+ var pavementInfo=[h.pavementType,h.pavementThickness?(h.pavementThickness+' '+h.unit):""].filter(Boolean).join(' \u2014 ');
+ var head='<div class="hdr">DCP DATA SHEET</div><table><tr class="hrow"><td colspan="2">BASE: '+esc(st.survey.base)+'</td><td colspan="3">FEATURE: '+esc(st.survey.feature)+'</td><td colspan="3">DATE: '+esc(st.survey.date)+'</td></tr><tr class="hrow"><td colspan="4">SURVEY TEAM LEAD: '+esc(st.survey.teamLead)+'</td><td colspan="4">PAVEMENT: '+esc(pavementInfo)+'</td></tr><tr class="hrow"><td colspan="8">TEAM MEMBERS: '+members+'</td></tr><tr class="hrow"><td colspan="8">TEST / HOLE: '+esc(h.label)+(h.comment?(' \u2014 '+esc(h.comment)):'')+'</td></tr></table>';
+ var t='<table><tr><th>No of Blows</th><th>Accum Pen (mm)</th><th>Pen p/Blow Set (mm)</th><th>Pen per Blow (mm)</th><th>Hammer Factor</th><th>DCP Index</th><th>CBR</th><th>Depth ('+outUnit+')</th></tr>';
+ var pavementDepth=parseFloat(h.pavementThickness)||0;if(pavementDepth>0){var pavementMM=convertDepth(pavementDepth,h.unit,"mm"),pavementOut=convertDepth(pavementDepth,h.unit,outUnit);t+='<tr><td>Pavement</td><td>'+pavementMM.toFixed(0)+'</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>'+(outUnit==="in"?pavementOut.toFixed(1):pavementOut.toFixed(0))+'</td></tr>';}
  ivs.forEach(function(iv){
-  t+='<tr><td>'+iv.blows+'</td><td>'+iv.cumMM.toFixed(0)+'</td><td>'+iv.penMM.toFixed(0)+'</td><td>'+iv.ppb.toFixed(1)+'</td><td>'+iv.hf+'</td><td>'+iv.dpi.toFixed(1)+'</td><td>'+(iv.cbr?rnd(iv.cbr):"-")+'</td><td>'+(Math.round(iv.cumMM/25.4*5)/5).toFixed(1)+'</td></tr>';
+  var outDepth=convertDepth(iv.cumU,h.unit,outUnit);
+  t+='<tr><td>'+iv.blows+'</td><td>'+iv.cumMM.toFixed(0)+'</td><td>'+iv.penMM.toFixed(0)+'</td><td>'+iv.ppb.toFixed(1)+'</td><td>'+iv.hf+'</td><td>'+iv.dpi.toFixed(1)+'</td><td>'+(iv.cbr?rnd(iv.cbr):"-")+'</td><td>'+(outUnit==="in"?outDepth.toFixed(1):outDepth.toFixed(0))+'</td></tr>';
  });
  t+='</table>';
- var layers=layersFromBreaks();var lt="";
- if(layers.length){lt='<div style="margin-top:10px;font-weight:bold">Layer Summary</div><table><tr><th>Layer (in)</th><th>Thickness (in)</th><th>DCP Index</th><th>CBR %</th></tr>';
-  layers.forEach(function(l){lt+='<tr><td>'+l.top.toFixed(1)+'&ndash;'+l.bot.toFixed(1)+'</td><td>'+l.thk.toFixed(1)+'</td><td>'+l.dpi.toFixed(1)+'</td><td>'+rnd(l.cbr)+'</td></tr>';});
+ var layers=layersFromBreaks();var lt="",ctrl=null;
+ layers.forEach(function(l){if(!ctrl||l.cbr<ctrl.cbr)ctrl=l;});
+ if(layers.length){lt='<div style="font-weight:bold">Layer Summary</div><table><tr><th>Layer Depth Range ('+outUnit+')</th><th>Thickness ('+outUnit+')</th><th>Layer DCP Index</th><th>Calculated Layer CBR</th><th>Status</th></tr>';
+  layers.forEach(function(l){var top=convertDepth(l.top,h.unit,outUnit),bot=convertDepth(l.bot,h.unit,outUnit),thk=convertDepth(l.thk,h.unit,outUnit),isCtrl=l===ctrl;lt+='<tr class="'+(isCtrl?'controlling-layer':'')+'"><td>'+top.toFixed(outUnit==="in"?1:0)+'&ndash;'+bot.toFixed(outUnit==="in"?1:0)+'</td><td>'+thk.toFixed(outUnit==="in"?1:0)+'</td><td>'+l.dpi.toFixed(1)+' mm/blow</td><td>'+rnd(l.cbr)+'</td><td>'+(isCtrl?'CONTROLLING':'')+'</td></tr>';});
   lt+='</table>';}
- document.getElementById("printSheet").innerHTML=head+t+lt+'<div style="font-size:9px;margin-top:8px">Format: TSPWG 3-260-03.02-19, Figure 2-13. Generated by SAAZA DCP Calculator (136CRF).</div>';
- setTimeout(function(){window.print();},100);
+ var graph=ivs.length?'<div class="print-graph"><div style="font-weight:bold;font-size:11px;margin-bottom:3px">Depth vs CBR Profile</div>'+renderGraph(ivs,h.breaks)+'</div>':'';
+ var footer='<div class="print-footer">Format: TSPWG 3-260-03.02-19, Figure 2-13. Generated by SAAZA DCP Calculator (136CRF).</div>';
+ var dataPage='<div class="'+(forceNewPage?'print-page':'')+'">'+head+t+footer+'</div>';
+ var resultPage='<div class="print-page">'+(lt||'<div style="font-weight:bold">Layer Summary</div><div style="font-size:11px;margin-top:8px">No calculated layers.</div>')+graph+'<div class="print-footer">Layer DCP Index is calculated from the total penetration and blows within each defined layer. Calculated Layer CBR is derived from the Layer DCP Index. Layer breaks do not alter the original penetration readings.</div></div>';
+ return dataPage+resultPage;
+}
+function beginPrint(markup,fileName){
+ document.getElementById("printSheet").innerHTML=markup;
+ var oldTitle=document.title;document.title=fileName;
+ var restoreTitle=function(){document.title=oldTitle;window.removeEventListener("afterprint",restoreTitle);};
+ window.addEventListener("afterprint",restoreTitle);
+ setTimeout(function(){window.print();setTimeout(function(){if(document.title!==oldTitle)restoreTitle();},1000);},100);
+}
+function printSheet(){
+ var active=st.active,markup=buildHolePrint(active,false);st.active=active;
+ beginPrint(markup,exportBaseName(false));
+}
+function buildSurveyCover(){
+ var active=st.active;
+ var members=st.survey.teamMembers.filter(function(name){return name&&name.trim();}).map(esc).join(', ');
+ var rows='<table><tr><th>Hole</th><th>Pavement</th><th>Readings</th><th>Final Depth</th><th>Controlling CBR</th></tr>';
+ st.holes.forEach(function(h,i){
+  st.active=i;var ivs=intervals(),layers=layersFromBreaks(),ctrl=null;
+  layers.forEach(function(l){if(!ctrl||l.cbr<ctrl.cbr)ctrl=l;});
+  var unit=h.displayUnit||h.unit,finalDepth=ivs.length?convertDepth(ivs[ivs.length-1].botU,h.unit,unit):0;
+  var pavement=[h.pavementType,h.pavementThickness?(h.pavementThickness+' '+h.unit):''].filter(Boolean).join(' — ');
+  rows+='<tr><td>'+esc(h.label)+'</td><td>'+esc(pavement||'—')+'</td><td>'+ivs.length+'</td><td>'+(ivs.length?finalDepth.toFixed(unit==="in"?1:0)+' '+unit:'—')+'</td><td>'+(ctrl?rnd(ctrl.cbr):'—')+'</td></tr>';
+ });
+ st.active=active;rows+='</table>';
+ return '<div class="print-cover"><div class="cover-title">DCP SURVEY REPORT</div><div class="cover-sub">'+esc(st.survey.base)+' &middot; '+esc(st.survey.feature)+' &middot; '+esc(st.survey.date)+'</div><table><tr class="hrow"><td>BASE: '+esc(st.survey.base)+'</td><td>FEATURE: '+esc(st.survey.feature)+'</td><td>DATE: '+esc(st.survey.date)+'</td></tr><tr class="hrow"><td colspan="3">SURVEY TEAM LEAD: '+esc(st.survey.teamLead)+'</td></tr><tr class="hrow"><td colspan="3">TEAM MEMBERS: '+members+'</td></tr><tr class="hrow"><td colspan="3">TEST LOCATIONS: '+st.holes.length+'</td></tr></table><div style="font-weight:bold;margin:24px 0 6px">Survey Hole Summary</div>'+rows+'<div class="print-footer">Generated by SAAZA DCP Calculator (136CRF).</div></div>';
+}
+function printSurvey(){
+ var active=st.active,markup=buildSurveyCover();
+ st.holes.forEach(function(h,i){markup+=buildHolePrint(i,true);});
+ st.active=active;beginPrint(markup,exportBaseName(true));
 }
 function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");}
 
 function clearAll(){
  if(confirm("Clear the ENTIRE survey \u2014 all holes, readings, and layers? This cannot be undone.")){
-  st={survey:{base:"",feature:"",date:""},holes:[newHole("1")],active:0};save();renderAll();
+  st={survey:{base:"",feature:"",date:"",teamLead:"",teamMembers:["","","","",""],pavementThickness:"",pavementType:""},holes:[newHole("1")],active:0};save();renderAll();
  }
 }
 
@@ -446,15 +623,23 @@ function closeLb(){document.getElementById("lightbox").classList.remove("show");
 function toggleC(id){var b=document.getElementById(id+"-b"),a=document.getElementById(id+"-a");if(b.style.display==="block"){b.style.display="none";a.textContent="\u25BC";}else{b.style.display="block";a.textContent="\u25B2";}}
 
 function renderAll(){
+ ensureSurveyDefaults();
  document.getElementById("s-base").value=st.survey.base||"";
  document.getElementById("s-feature").value=st.survey.feature||"";
  document.getElementById("s-date").value=st.survey.date||"";
+ document.getElementById("s-team-lead").value=st.survey.teamLead||"";
+ for(var i=1;i<=5;i++)document.getElementById("s-member-"+i).value=st.survey.teamMembers[i-1]||"";
  var h=H();
  document.getElementById("h-label").value=h.label||"";
  document.getElementById("h-comment").value=h.comment||"";
  document.getElementById("h-hammer").value=h.hammer||"1";
  document.getElementById("h-soil").value=h.soil||"std";
  document.getElementById("h-unit").value=h.unit||"in";
+ document.getElementById("h-pavement-thickness").value=h.pavementThickness||"";
+ document.getElementById("h-pavement-type").value=h.pavementType||"";
+ if(!h.displayUnit)h.displayUnit=h.unit||"in";
+ if(!Array.isArray(h.dismissedBreaks))h.dismissedBreaks=[];
+ document.getElementById("h-display-unit").value=h.displayUnit;
  document.querySelectorAll("#mode-seg button").forEach(function(b){b.classList.toggle("on",b.dataset.v===h.mode);});
  document.getElementById("pen-mode").style.display=h.mode==="pen"?"block":"none";
  document.getElementById("pen-settings").style.display=h.mode==="pen"?"block":"none";
