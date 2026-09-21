@@ -1,5 +1,5 @@
 
-const CACHE_NAME='saaza-v18';
+const CACHE_NAME='saaza-v19';
 const URLS=[
   "./SAAZA_DCP_Layout.html",
   "./SAAZA_SPACI_Calculator.html",

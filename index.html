@@ -22,7 +22,10 @@ h1{font-size:22px;font-weight:600;margin-bottom:4px}
 .tool-desc{font-size:12px;color:#888}
 .badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:6px;background:#E1F5EE;color:#0F6E56;margin-left:6px;vertical-align:middle;font-weight:500}
 .footer{text-align:center;font-size:11px;color:#aaa;margin-top:2rem;padding-bottom:1rem}
-.footer a{color:inherit;text-decoration:none}.footer a:hover{text-decoration:underline}
+.footer a{color:inherit;text-decoration:none;display:block}.footer a:hover{text-decoration:underline}
+.update-btn{margin-top:9px;padding:7px 12px;border:1px solid #bbb;border-radius:8px;background:#fff;color:#555;font-size:11px;font-weight:600;cursor:pointer}
+.update-btn:disabled{opacity:.55;cursor:default}
+.update-status{font-size:10.5px;color:#777;min-height:14px;margin-top:5px}
 .course-group{margin-bottom:1.75rem}
 .course-group summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid #d7d7d7;border-radius:12px;padding:13px 15px;cursor:pointer;font-size:13px;font-weight:600;color:#555}
 .course-group summary::-webkit-details-marker{display:none}
@@ -357,7 +360,7 @@ h1{font-size:22px;font-weight:600;margin-bottom:4px}
 
 </details>
 
-<div class="footer"><a href="https://rcarney94.github.io/saaza-calculator/" target="_blank" rel="noopener">Original application built by R Carney (136th CRF) with updates and bug fixes by J Stokes (270th CRS) - Works offline once loaded</a></div>
+<div class="footer"><a href="./">Original application built by R Carney (136th CRF) with updates and bug fixes by J Stokes (270th CRS) - Works offline once loaded</a><button class="update-btn" id="check-updates" type="button">Check for updates</button><div class="update-status" id="update-status" role="status" aria-live="polite"></div></div>
 
 <script>
 (function(){
@@ -391,6 +394,44 @@ h1{font-size:22px;font-weight:600;margin-bottom:4px}
     try{ localStorage.setItem(KEY,'1'); }catch(e){}
     if(ov) ov.hidden=true;
   });
+
+  /* ---- Manual update check ---- */
+  var updateBtn=document.getElementById('check-updates');
+  var updateStatus=document.getElementById('update-status');
+  var checkingUpdate=false,reloadingForUpdate=false;
+  function setUpdateStatus(message){if(updateStatus)updateStatus.textContent=message;}
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.addEventListener('controllerchange',function(){
+      if(checkingUpdate&&!reloadingForUpdate){
+        reloadingForUpdate=true;setUpdateStatus('Update installed. Reloading…');
+        setTimeout(function(){window.location.reload();},700);
+      }
+    });
+  }
+  if(updateBtn)updateBtn.addEventListener('click',function(){
+    if(!navigator.onLine){setUpdateStatus('Connect to the internet to check for updates.');return;}
+    if(!('serviceWorker' in navigator)){setUpdateStatus('Update checking is not supported in this browser.');return;}
+    checkingUpdate=true;updateBtn.disabled=true;setUpdateStatus('Checking for updates…');
+    navigator.serviceWorker.getRegistration().then(function(reg){
+      if(!reg)return navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'});
+      return reg;
+    }).then(function(reg){
+      var found=false;
+      function watchWorker(worker){
+        if(!worker)return;found=true;setUpdateStatus('Update found. Downloading…');
+        worker.addEventListener('statechange',function(){
+          if(worker.state==='redundant'){checkingUpdate=false;updateBtn.disabled=false;setUpdateStatus('The update could not be installed. Try again while online.');}
+        });
+      }
+      reg.addEventListener('updatefound',function(){watchWorker(reg.installing);},{once:true});
+      if(reg.installing)watchWorker(reg.installing);
+      return reg.update().then(function(){
+        setTimeout(function(){
+          if(!found&&!reloadingForUpdate){checkingUpdate=false;updateBtn.disabled=false;setUpdateStatus('You are using the latest available version.');}
+        },1800);
+      });
+    }).catch(function(){checkingUpdate=false;updateBtn.disabled=false;setUpdateStatus('Unable to check for updates. Confirm that you are online and try again.');});
+  });
 })();
 </script>
 
@@ -398,7 +439,7 @@ h1{font-size:22px;font-weight:600;margin-bottom:4px}
 <link rel="manifest" href="manifest.json">
 <script>
 if ('serviceWorker' in navigator) {
- window.addEventListener('load', ()=>navigator.serviceWorker.register('./service-worker.js'));
+ window.addEventListener('load', ()=>navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'}));
 }
 </script>
 
